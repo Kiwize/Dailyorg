@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function useApi(method, url, body = null, headers = {}) {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -8,7 +10,7 @@ export default function useApi(method, url, body = null, headers = {}) {
     const fetchData = async (customBody = body) => {
         setLoading(true);
         try {
-            const response = await fetch(`http://localhost:8080/api/${url}`, {
+            const response = await fetch(`${API_URL}/api/${url}`, {
                 method,
                 headers: {
                     "Content-Type": "application/json",

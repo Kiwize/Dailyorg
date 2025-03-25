@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Box, Button, Input, Paper, Typography } from "@mui/material";
 import { useNavigate } from "react-router";
 
-const API_URL = "http://localhost:8080/api/login"; // Replace with your actual backend URL
+const API_URL = import.meta.env.VITE_API_URL;
 
 function LoginPage() {
     const navigate = useNavigate();
@@ -15,7 +15,7 @@ function LoginPage() {
         setError("");
 
         try {
-            const response = await fetch(API_URL, {
+            const response = await fetch(`${API_URL}/api/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, password })

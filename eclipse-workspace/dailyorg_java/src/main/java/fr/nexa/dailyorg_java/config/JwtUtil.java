@@ -15,7 +15,6 @@ public class JwtUtil {
     private String SECRET_KEY;
 
     public String generateToken(String username) {
-    	System.out.println("Username : " + SECRET_KEY);
     	
         return Jwts.builder()
             .setSubject(username)

@@ -8,6 +8,8 @@ import { useEffect } from "react";
 import { AccessTime, LocalFireDepartment } from "@mui/icons-material";
 import { BoltIcon } from "lucide-react";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function WTEditCardioWorkoutExercise() {
     const navigate = useNavigate();
     const location = useLocation();
@@ -47,7 +49,7 @@ export default function WTEditCardioWorkoutExercise() {
         setError("");
 
         try {
-            const response = await fetch("http://192.168.1.142:8080/api/record/update_cardio_record", {
+            const response = await fetch(`${API_URL}/api/record/update_cardio_record`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json", Authorization: "Bearer " + localStorage.getItem("token") },
                 body: JSON.stringify({ cardioRecordID: workoutRecordID, calories_burnt: calories, intensity, time_spent_in_mins: timeSpent })
