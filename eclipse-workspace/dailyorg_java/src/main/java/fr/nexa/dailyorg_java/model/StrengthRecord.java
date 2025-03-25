@@ -1,0 +1,23 @@
+package fr.nexa.dailyorg_java.model;
+
+import java.util.List;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.OneToMany;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+
+@Entity
+@Data
+@NoArgsConstructor
+@SuperBuilder
+@AllArgsConstructor
+public class StrengthRecord extends WorkoutRecord {
+	
+	@OneToMany(mappedBy = "strengthRecordId", fetch = FetchType.EAGER)
+    private List<WorkoutSerie> workoutSeries;
+}
+

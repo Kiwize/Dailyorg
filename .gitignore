@@ -1,0 +1,7 @@
+.metadata
+.env
+target
+.mvn
+
+dist
+node_modules
