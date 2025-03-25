@@ -8,7 +8,7 @@ export default function useApi(method, url, body = null, headers = {}) {
     const fetchData = async (customBody = body) => {
         setLoading(true);
         try {
-            const response = await fetch(`http://192.168.1.142:8080/api/${url}`, {
+            const response = await fetch(`http://localhost:8080/api/${url}`, {
                 method,
                 headers: {
                     "Content-Type": "application/json",

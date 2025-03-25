@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Box, Button, Input, Paper, Typography } from "@mui/material";
 import { useNavigate } from "react-router";
 
-const API_URL = "http://192.168.1.142:8080/api/login"; // Replace with your actual backend URL
+const API_URL = "http://localhost:8080/api/login"; // Replace with your actual backend URL
 
 function LoginPage() {
     const navigate = useNavigate();
