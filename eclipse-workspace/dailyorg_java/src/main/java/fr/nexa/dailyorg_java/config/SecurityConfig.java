@@ -2,6 +2,7 @@ package fr.nexa.dailyorg_java.config;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,6 +22,9 @@ public class SecurityConfig {
 	
 	private final JwtUtil jwtUtil;
     private final UserDetailsService userDetailsService;
+    
+    @Value("${ALLOWED_ORIGINS}")
+    private List<String> ALLOWED_ORIGINS;
 
     public SecurityConfig(JwtUtil jwtUtil, UserDetailsService userDetailsService) {
         this.jwtUtil = jwtUtil;
@@ -49,7 +53,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:5173", "http://192.168.1.142:5173", "http://localhost", "http://dailyorg_frontend")); // Allow React frontend
+        configuration.setAllowedOrigins(ALLOWED_ORIGINS);// Allow React frontend
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         configuration.setExposedHeaders(List.of("Authorization")); // <-- Important!
