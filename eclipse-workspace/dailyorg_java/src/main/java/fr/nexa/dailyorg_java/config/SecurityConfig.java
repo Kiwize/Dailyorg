@@ -1,5 +1,6 @@
 package fr.nexa.dailyorg_java.config;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -24,7 +25,7 @@ public class SecurityConfig {
     private final UserDetailsService userDetailsService;
     
     @Value("${ALLOWED_ORIGINS}")
-    private List<String> ALLOWED_ORIGINS;
+    private String ALLOWED_ORIGINS;
 
     public SecurityConfig(JwtUtil jwtUtil, UserDetailsService userDetailsService) {
         this.jwtUtil = jwtUtil;
@@ -53,7 +54,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(ALLOWED_ORIGINS);// Allow React frontend
+        configuration.setAllowedOrigins(Arrays.asList(ALLOWED_ORIGINS.split(",")));// Allow React frontend
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         configuration.setExposedHeaders(List.of("Authorization")); // <-- Important!
