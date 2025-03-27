@@ -1,8 +1,9 @@
 import { Box, Button, Link, List, ListItem } from '@mui/material';
 import './style/Header.css';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-const handleLogout = () => {
+const handleLogout = (navigate) => {
     localStorage.removeItem("token");
     localStorage.removeItem("username");
     navigate("/login");
@@ -10,6 +11,7 @@ const handleLogout = () => {
 
 function Header() {
     const [username, setUsername] = useState(localStorage.getItem("username"));
+    const navigate = useNavigate();
     
     return(
         <header style={{paddingTop: "15px"}}>
@@ -20,7 +22,7 @@ function Header() {
                     </ListItem>
                 </List>
                 <Box sx={{mx: 'auto'}}/>
-                {username && <Button onClick={handleLogout}>Logout</Button>}
+                {username && <Button onClick={() => handleLogout(navigate)}>Logout</Button>}
             </nav>
         </header>
     );
