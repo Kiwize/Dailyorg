@@ -1,23 +1,36 @@
 import WTWorkoutCard from "./WTWorkoutCard";
-import useApi from "../../hooks/useApi";
 import { Box } from "@mui/material";
+import { useEffect, useState } from "react";
 
+const API_URL = import.meta.env.VITE_API_URL;
 
-function LatestUserWorkouts() {
+function LatestUserWorkouts({ refresh }) {
     const email = localStorage.getItem("username");
 
-    const { data, loading, error } = useApi(
-        "POST",
-        "workout/get_user_workout",
-        {"email":email},
-        { Authorization: "Bearer " + localStorage.getItem("token") }
-    );
+    const [workouts, setWorkouts] = useState([]);
+
+    useEffect(() => {
+        async function fetchWorkouts() {
+            const response = await fetch(`${API_URL}/api/workout/get_user_workout`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", Authorization: "Bearer " + localStorage.getItem("token") },
+                body: JSON.stringify({ email: email })
+            });
+
+            if(response.ok) {
+                setWorkouts(await response.json());
+            }
+            
+        }
+
+        fetchWorkouts();
+    }, [refresh]);
 
     return (
         <div>
-            {data ? 
+            {workouts ? 
             <Box>
-                {data.map(workout => (
+                {workouts.map(workout => (
                     <WTWorkoutCard id={workout.idWorkoutSession} notes={workout.notes} date={workout.workoutDate}/>
                 ))}
             </Box>

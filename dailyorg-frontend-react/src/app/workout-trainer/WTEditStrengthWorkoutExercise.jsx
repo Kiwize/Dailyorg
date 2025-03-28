@@ -80,7 +80,7 @@ export default function WTEditStrengthWorkoutExercise() {
         e.preventDefault();
 
         try {
-            const response = await fetch("http://192.168.1.142:8080/api/record/add_strength_serie", {
+            const response = await fetch(`${API_URL}/api/record/add_strength_serie`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json", Authorization: "Bearer " + localStorage.getItem("token") },
                 body: JSON.stringify({

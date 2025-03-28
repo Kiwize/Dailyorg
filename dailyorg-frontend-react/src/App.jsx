@@ -1,6 +1,5 @@
 import { Container, createTheme, CssBaseline, ThemeProvider } from "@mui/material";
 import WTAddExerciseToWorkout from "./app/workout-trainer/WTAddExerciseToWorkout";
-import WTAddWorkout from "./app/workout-trainer/WTAddWorkout";
 import WTEditCardioWorkoutExercise from "./app/workout-trainer/WTEditCardioWorkoutExercise";
 import WTEditStrengthWorkoutExercise from "./app/workout-trainer/WTEditStrengthWorkoutExercise";
 import WTEditWorkoutSession from "./app/workout-trainer/WTEditWorkoutSession";
@@ -33,7 +32,6 @@ function App() {
             <Route path="/edit_workout_cardio_exercise" element={<WTEditCardioWorkoutExercise />} />
             <Route path="/add_exercise_to_workout" element={<WTAddExerciseToWorkout />} />
             <Route path="/edit_workout" element={<WTEditWorkoutSession />} />
-            <Route path="/add_workout" element={<WTAddWorkout />} />
             <Route path="/wthomepage" element={<WTHomePage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/" element={<PrivateRoute><MainPage /></PrivateRoute>} />
