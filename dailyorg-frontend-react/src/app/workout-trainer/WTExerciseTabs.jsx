@@ -9,7 +9,7 @@ export default function WTExerciseTabs({ workoutSessionId }) {
     const navigate = useNavigate();
 
     const { fetchData, data, loading, error } = useApi(
-        "POST",
+        "PUT",
         "workout/add_exercise_to_workout",
         {},
         { Authorization: "Bearer " + localStorage.getItem("token") }

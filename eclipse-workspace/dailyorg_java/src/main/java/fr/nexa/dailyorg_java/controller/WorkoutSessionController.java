@@ -8,15 +8,15 @@ import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import fr.nexa.dailyorg_java.model.AppUser;
 import fr.nexa.dailyorg_java.model.CardioExercise;
-import fr.nexa.dailyorg_java.model.CardioRecord;
-import fr.nexa.dailyorg_java.model.Exercise;
 import fr.nexa.dailyorg_java.model.StrengthExercise;
 import fr.nexa.dailyorg_java.model.WorkoutRecord;
 import fr.nexa.dailyorg_java.model.WorkoutSession;
@@ -68,11 +68,15 @@ public class WorkoutSessionController {
 			exercisesPerType.put("cardio", new ArrayList<WorkoutRecord>());
 			exercisesPerType.put("strength", new ArrayList<WorkoutRecord>());
 
-			List<WorkoutRecord> records = workoutRecordService.getRecordsByWorkoutSession(Long.parseLong(workoutSessionId));
-			
+			List<WorkoutRecord> records = workoutRecordService
+					.getRecordsByWorkoutSession(Long.parseLong(workoutSessionId));
+
 			records.forEach(record -> {
 				try {
-					exercisesPerType.get(strengthExerciseService.isStrengthExercise(record.getExerciseId().getId()) ? "strength" : "cardio").add(record);
+					exercisesPerType
+							.get(strengthExerciseService.isStrengthExercise(record.getExerciseId().getId()) ? "strength"
+									: "cardio")
+							.add(record);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -89,7 +93,7 @@ public class WorkoutSessionController {
 	}
 
 	@SuppressWarnings("rawtypes")
-	@PostMapping("/add_exercise_to_workout")
+	@PutMapping("/add_exercise_to_workout")
 	public ResponseEntity addExerciseToWorkout(@RequestBody Map<String, String> data) {
 		if (!data.containsKey("email") || !data.containsKey("workout_session_id") || !data.containsKey("exercise_id")) {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Missing data...");
@@ -104,17 +108,21 @@ public class WorkoutSessionController {
 				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Exercise already added !");
 
 			if (exerciseType.equalsIgnoreCase("strength")) {
-				workoutRecordService.addStrengthExerciseToWorkout(workoutSessionId, (StrengthExercise) strengthExerciseService.getStrengthExerciseByID(exerciseID));
+				workoutRecordService.addStrengthExerciseToWorkout(workoutSessionId,
+						(StrengthExercise) strengthExerciseService.getStrengthExerciseByID(exerciseID));
 				return ResponseEntity.status(HttpStatus.OK).body("Strength exercise added !");
 			} else if (exerciseType.equalsIgnoreCase("cardio")) {
 				int cardioTimeSpentInMins = Integer.parseInt(data.get("time_spent_in_mins"));
 				int cardioIntensity = Integer.parseInt(data.get("intensity"));
 				int cardioCaloriesBurnt = Integer.parseInt(data.get("calories_burnt"));
 
-				workoutRecordService.addCardioExerciseToWorkout(workoutSessionId, (CardioExercise) cardioExerciseService.getCardioExerciseByID(exerciseID), cardioTimeSpentInMins, cardioCaloriesBurnt, cardioIntensity);
+				workoutRecordService.addCardioExerciseToWorkout(workoutSessionId,
+						(CardioExercise) cardioExerciseService.getCardioExerciseByID(exerciseID), cardioTimeSpentInMins,
+						cardioCaloriesBurnt, cardioIntensity);
 				return ResponseEntity.status(HttpStatus.OK).body("Cardio exercise added !");
 			} else {
-				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Invalid exercise type : " + exerciseType + ", types allowed : strength, cardio");
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+						.body("Invalid exercise type : " + exerciseType + ", types allowed : strength, cardio");
 			}
 		} catch (NumberFormatException e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Invalid data submitted...");
@@ -125,7 +133,7 @@ public class WorkoutSessionController {
 	}
 
 	@SuppressWarnings("rawtypes")
-	@PostMapping("/delete_exercise_from_workout")
+	@DeleteMapping("/delete_exercise_from_workout")
 	public ResponseEntity deleteExerciseFromWorkout(@RequestBody Map<String, String> data) {
 		if (!data.containsKey("email") || !data.containsKey("workout_session_id") || !data.containsKey("exercise_id")) {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Missing data...");
@@ -150,7 +158,7 @@ public class WorkoutSessionController {
 		}
 	}
 
-	@PostMapping("/create_workout")
+	@PutMapping("/create_workout")
 	public ResponseEntity<String> createWorkout(@RequestBody Map<String, String> data) {
 
 		String email = data.get("email");
@@ -165,6 +173,25 @@ public class WorkoutSessionController {
 			}
 
 		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal error...");
+		}
+	}
+
+	@DeleteMapping("/delete_workout")
+	public ResponseEntity<String> deleteWorkout(@RequestBody Map<String, String> data) {
+
+		String email = data.get("email");
+		if (!data.containsKey("workout_session_id")) {
+			return ResponseEntity.internalServerError().body("Missing data...");
+		}
+
+		long workoutSessionID = Long.parseLong(data.get("workout_session_id"));
+
+		try {
+			workoutSessionService.deleteWorkoutSession(workoutSessionID);
+			return ResponseEntity.ok("");
+		} catch (Exception e) {
+			e.printStackTrace();
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal error...");
 		}
 	}

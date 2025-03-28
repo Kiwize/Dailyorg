@@ -110,7 +110,7 @@ export default function WTEditStrengthWorkoutExercise() {
     const handleDeleteSerie = async (workoutSerieID) => {
 
         try {
-            const response = await fetch("http://192.168.1.142:8080/api/record/delete_strength_serie", {
+            const response = await fetch(`${API_URL}:8080/api/record/delete_strength_serie`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json", Authorization: "Bearer " + localStorage.getItem("token") },
                 body: JSON.stringify({
@@ -133,7 +133,7 @@ export default function WTEditStrengthWorkoutExercise() {
         const { repNumber, repWeight, restTimeInMins } = formStates[workoutSerieID] || {};
 
         try {
-            const response = await fetch("http://192.168.1.142:8080/api/record/update_strength_serie", {
+            const response = await fetch(`${API_URL}:8080/api/record/update_strength_serie`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json", Authorization: "Bearer " + localStorage.getItem("token") },
                 body: JSON.stringify({

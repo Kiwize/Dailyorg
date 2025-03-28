@@ -12,6 +12,7 @@ import fr.nexa.dailyorg_java.model.Exercise;
 import fr.nexa.dailyorg_java.model.WorkoutSession;
 import fr.nexa.dailyorg_java.repository.IAppUserRepository;
 import fr.nexa.dailyorg_java.repository.IWorkoutRepository;
+import jakarta.transaction.Transactional;
 
 @Service
 public class WorkoutSessionService implements IWorkoutSessionService{
@@ -38,8 +39,8 @@ public class WorkoutSessionService implements IWorkoutSessionService{
 	}
 	
 	@Override
-	public WorkoutSession getWorkoutSessionById(Long workoutSessionId) throws Exception {
-		return workoutSessionRepository.getReferenceById(workoutSessionId);
+	public Optional<WorkoutSession> getWorkoutSessionById(Long workoutSessionId) throws Exception {
+		return workoutSessionRepository.findById(workoutSessionId);
 	}
 	
 	@Override
@@ -53,10 +54,14 @@ public class WorkoutSessionService implements IWorkoutSessionService{
 	}
 	
 	@Override
-	public void deleteWorkoutSession(WorkoutSession workoutSession) throws Exception {
+	@Transactional
+	public void deleteWorkoutSession(Long workoutSessionID) throws Exception {
+		Optional<WorkoutSession> ws = getWorkoutSessionById(workoutSessionID);
+		if(!ws.isPresent())
+			throw new IllegalStateException("The workout session doesn't exist...");
+			
+		WorkoutSession workoutSession = ws.get();
+		
 		workoutSessionRepository.delete(workoutSession);
 	}
-	
-	
-
 }

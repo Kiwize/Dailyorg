@@ -12,7 +12,7 @@ const handleClick = async (e, setRefresh) => {
 
     try {
         const response = await fetch(`${API_URL}/api/workout/create_workout`, {
-            method: "POST",
+            method: "PUT",
             headers: { "Content-Type": "application/json", Authorization: "Bearer " + localStorage.getItem("token") },
             body: JSON.stringify({
                 email: email
@@ -25,7 +25,6 @@ const handleClick = async (e, setRefresh) => {
 
         setRefresh(prev => !prev);
     } catch (err) {
-        setAlert("An error occurred...", "error");
     }
 }
 
