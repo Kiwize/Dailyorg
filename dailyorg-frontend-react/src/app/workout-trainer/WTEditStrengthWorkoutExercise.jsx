@@ -108,10 +108,11 @@ export default function WTEditStrengthWorkoutExercise() {
     }
 
     const handleDeleteSerie = async (workoutSerieID) => {
+        console.log(workoutSerieID);
 
         try {
-            const response = await fetch(`${API_URL}:8080/api/record/delete_strength_serie`, {
-                method: "POST",
+            const response = await fetch(`${API_URL}/api/record/delete_strength_serie`, {
+                method: "DELETE",
                 headers: { "Content-Type": "application/json", Authorization: "Bearer " + localStorage.getItem("token") },
                 body: JSON.stringify({
                     workoutSerieID
@@ -133,7 +134,7 @@ export default function WTEditStrengthWorkoutExercise() {
         const { repNumber, repWeight, restTimeInMins } = formStates[workoutSerieID] || {};
 
         try {
-            const response = await fetch(`${API_URL}:8080/api/record/update_strength_serie`, {
+            const response = await fetch(`${API_URL}/api/record/update_strength_serie`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json", Authorization: "Bearer " + localStorage.getItem("token") },
                 body: JSON.stringify({
@@ -149,6 +150,7 @@ export default function WTEditStrengthWorkoutExercise() {
             setAlert("Strength training updated!", "success");
             await fetchData(); // 🔥 Auto-refresh the data
         } catch (err) {
+            console.error(err);
             setAlert("An error occurred...", "error");
         }
     };
@@ -163,6 +165,9 @@ export default function WTEditStrengthWorkoutExercise() {
                         <List>
                             {exerciseData.workoutSeries.map(serie => (
                                 <div key={serie.workoutSerieID}>
+                                    {
+                                        <p>{JSON.stringify(serie)}</p>
+                                    }
                                     <ListItem >
                                         <ListItemButton sx={{borderRadius: 5}} onClick={() => handleClick(serie.workoutSerieID)}>
                                             <ListItemText>

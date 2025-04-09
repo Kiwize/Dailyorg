@@ -33,7 +33,7 @@ function WTEditWorkoutSession() {
                             <Box>
                                 {
                                     data.strength.map(exercise => (
-                                        <ListItem key={exercise.id} disablePadding onClick={() => navigate("/edit_workout_strength_exercise", { state: { workoutID: exercise.workoutSession.idWorkoutSession, workoutRecordID: exercise.id } })}>
+                                        <ListItem key={exercise.id} disablePadding onClick={() => navigate("/edit_workout_strength_exercise", { state: { workoutID: workoutid, workoutRecordID: exercise.id } })}>
                                             <ListItemButton>
                                                 <ListItemText primary={exercise.exerciseId.exerciseName} />
                                             </ListItemButton>
@@ -45,7 +45,7 @@ function WTEditWorkoutSession() {
                             <Box>
                                 {
                                     data.cardio.map(exercise => (
-                                        <ListItem key={exercise.id} disablePadding onClick={() => navigate("/edit_workout_cardio_exercise", { state: { workoutID: exercise.workoutSession.idWorkoutSession, workoutRecordID: exercise.id, isEdited: true } })}>
+                                        <ListItem key={exercise.id} disablePadding onClick={() => navigate("/edit_workout_cardio_exercise", { state: { workoutID: workoutid, workoutRecordID: exercise.id, isEdited: true } })}>
                                             <ListItemButton>
                                                 <ListItemText primary={exercise.exerciseId.exerciseName} />
                                             </ListItemButton>

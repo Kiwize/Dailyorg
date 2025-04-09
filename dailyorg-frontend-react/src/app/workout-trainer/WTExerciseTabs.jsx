@@ -1,5 +1,6 @@
+import { PlusIcon } from "lucide-react";
 import useApi from "../../hooks/useApi";
-import { Box, Tab, Tabs } from "@mui/material";
+import { Box, Button, Tab, Tabs } from "@mui/material";
 import PropTypes from "prop-types";
 import React from "react";
 import {useNavigate } from "react-router";
@@ -111,6 +112,9 @@ export default function WTExerciseTabs({ workoutSessionId }) {
                 </CustomTabPanel>
 
             </div>
+            <Box sx={{textAlign: 'center'}}>
+                <Button variant="contained" color="success" startIcon={<PlusIcon/>} onClick={() => navigate("/create_exercise")}>Create exercise</Button>
+            </Box>
         </div>
     );
 }

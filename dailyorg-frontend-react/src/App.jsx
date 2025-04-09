@@ -9,6 +9,7 @@ import MainPage from "./MainPage";
 import React, { useState, useEffect } from "react";
 import AlertPopup from "./components/AlertPopup";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router";
+import WTCreateExercise from "./app/workout-trainer/WTCreateExercise";
 
 function PrivateRoute({ children }) {
   return localStorage.getItem("token") ? children : <Navigate to="/login" />;
@@ -32,6 +33,7 @@ function App() {
             <Route path="/edit_workout_cardio_exercise" element={<WTEditCardioWorkoutExercise />} />
             <Route path="/add_exercise_to_workout" element={<WTAddExerciseToWorkout />} />
             <Route path="/edit_workout" element={<WTEditWorkoutSession />} />
+            <Route path="create_exercise" element={<WTCreateExercise/>}></Route>
             <Route path="/wthomepage" element={<WTHomePage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/" element={<PrivateRoute><MainPage /></PrivateRoute>} />
