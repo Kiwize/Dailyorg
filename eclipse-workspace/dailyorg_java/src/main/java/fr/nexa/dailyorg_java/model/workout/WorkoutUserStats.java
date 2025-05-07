@@ -2,6 +2,7 @@ package fr.nexa.dailyorg_java.model.workout;
 
 import java.time.LocalDate;
 
+import fr.nexa.dailyorg_java.model.AppUser;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;

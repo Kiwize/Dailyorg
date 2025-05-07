@@ -9,7 +9,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import fr.nexa.dailyorg_java.model.workout.AppUser;
+import fr.nexa.dailyorg_java.model.AppUser;
 import fr.nexa.dailyorg_java.repository.workout.IAppUserRepository;
 
 @Service

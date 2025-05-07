@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import fr.nexa.dailyorg_java.model.workout.AppUser;
+import fr.nexa.dailyorg_java.model.AppUser;
 import fr.nexa.dailyorg_java.model.workout.WorkoutSession;
 
 @Repository

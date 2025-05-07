@@ -7,7 +7,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import fr.nexa.dailyorg_java.model.workout.AppUser;
+import fr.nexa.dailyorg_java.model.AppUser;
 import fr.nexa.dailyorg_java.model.workout.Exercise;
 import fr.nexa.dailyorg_java.model.workout.WorkoutSession;
 import fr.nexa.dailyorg_java.repository.workout.IAppUserRepository;

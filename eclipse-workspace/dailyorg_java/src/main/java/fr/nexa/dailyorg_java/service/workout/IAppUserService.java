@@ -2,7 +2,7 @@ package fr.nexa.dailyorg_java.service.workout;
 
 import java.util.Optional;
 
-import fr.nexa.dailyorg_java.model.workout.AppUser;
+import fr.nexa.dailyorg_java.model.AppUser;
 
 public interface IAppUserService {
 

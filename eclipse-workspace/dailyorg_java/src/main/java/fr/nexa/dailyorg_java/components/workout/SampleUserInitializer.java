@@ -4,7 +4,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import fr.nexa.dailyorg_java.model.workout.AppUser;
+import fr.nexa.dailyorg_java.model.AppUser;
 import fr.nexa.dailyorg_java.repository.workout.IAppUserRepository;
 
 @Component

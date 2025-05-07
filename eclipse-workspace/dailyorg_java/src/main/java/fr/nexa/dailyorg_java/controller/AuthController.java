@@ -1,4 +1,4 @@
-package fr.nexa.dailyorg_java.controller.workout;
+package fr.nexa.dailyorg_java.controller;
 
 import java.util.HashMap;
 import java.util.Map;

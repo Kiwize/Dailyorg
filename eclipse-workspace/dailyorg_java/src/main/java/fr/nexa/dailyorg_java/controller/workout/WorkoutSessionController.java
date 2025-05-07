@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import fr.nexa.dailyorg_java.DTO.workout.ExerciseDTO;
 import fr.nexa.dailyorg_java.DTO.workout.WorkoutRecordDTO;
-import fr.nexa.dailyorg_java.model.workout.AppUser;
+import fr.nexa.dailyorg_java.model.AppUser;
 import fr.nexa.dailyorg_java.model.workout.CardioExercise;
 import fr.nexa.dailyorg_java.model.workout.Exercise;
 import fr.nexa.dailyorg_java.model.workout.StrengthExercise;
