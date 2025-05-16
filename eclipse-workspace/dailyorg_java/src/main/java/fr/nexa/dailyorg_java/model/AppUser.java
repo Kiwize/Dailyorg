@@ -2,9 +2,10 @@ package fr.nexa.dailyorg_java.model;
 
 import java.util.List;
 
+import fr.nexa.dailyorg_java.model.dailyorg.OrganizerUser;
 import fr.nexa.dailyorg_java.model.workout.WorkoutSession;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
-import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -12,17 +13,17 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.experimental.SuperBuilder;
 
 @Entity
-@SuperBuilder
+@Builder
 @Getter @Setter @AllArgsConstructor @NoArgsConstructor
-@DiscriminatorValue("APP_USER")
 @Table(name = "AppUser")
 public class AppUser {
 	
@@ -50,4 +51,7 @@ public class AppUser {
 	@OneToMany(fetch = FetchType.EAGER)
 	@JoinColumn(name = "userId")
 	private List<WorkoutSession> workoutSessions;
+	
+	@OneToOne(mappedBy = "appUser", cascade = CascadeType.ALL)
+	private OrganizerUser organizerUser;
 }

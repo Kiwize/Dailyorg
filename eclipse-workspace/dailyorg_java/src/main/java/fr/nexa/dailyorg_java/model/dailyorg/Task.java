@@ -3,6 +3,8 @@ package fr.nexa.dailyorg_java.model.dailyorg;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -29,33 +31,34 @@ public class Task {
 	private long taskId;
 	
 	@Column(nullable = false, length = 50)
-	private String task_name;
+	private String taskName;
 	
 	@Column(length = 255)
-	private String task_description;
+	private String taskDescription;
 	
 	@Column(nullable = false)
-	private LocalDateTime task_creation_date;
+	private LocalDateTime taskCreationDate;
 	
 	@Column()
-	private LocalDateTime task_completion_date;
+	private LocalDateTime taskCompletionDate;
 	
 	@Column(nullable = false)
-	private int task_required_energy;
+	private int taskRequiredEnergy;
 	
 	@Column(nullable = false)
-	private LocalDateTime task_start_date;
+	private LocalDateTime taskStartDate;
 	
 	@Column(nullable = false)
-	private LocalDateTime task_end_date;
+	private LocalDateTime taskEndDate;
 
 	@PrePersist
 	public void prePersist() {
-		this.task_creation_date = LocalDateTime.now();
+		this.taskCreationDate = LocalDateTime.now();
 	}
 	
 	@ManyToOne
 	@JoinColumn(name = "organizer_user")
+	@JsonIgnore
 	private OrganizerUser organizerUser;
 	
 	@ManyToOne
