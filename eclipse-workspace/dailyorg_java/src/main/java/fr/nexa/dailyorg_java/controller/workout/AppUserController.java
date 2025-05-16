@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import fr.nexa.dailyorg_java.model.AppUser;
-import fr.nexa.dailyorg_java.service.workout.impl.AppUserService;
+import fr.nexa.dailyorg_java.service.AppUserService;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor

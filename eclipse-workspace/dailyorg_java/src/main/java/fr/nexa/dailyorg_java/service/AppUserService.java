@@ -1,4 +1,4 @@
-package fr.nexa.dailyorg_java.service.workout.impl;
+package fr.nexa.dailyorg_java.service;
 
 import java.util.Optional;
 
@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 
 import fr.nexa.dailyorg_java.model.AppUser;
 import fr.nexa.dailyorg_java.repository.workout.IAppUserRepository;
-import fr.nexa.dailyorg_java.service.workout.IAppUserService;
 
 @Service
 public class AppUserService implements IAppUserService {
@@ -21,8 +20,8 @@ public class AppUserService implements IAppUserService {
 	}
 
 	@Override
-	public void updateUser(AppUser appuser) throws Exception {
-		appUserRepository.save(appuser);
+	public AppUser updateUser(AppUser appuser) throws Exception {
+		return appUserRepository.save(appuser);
 	}
 
 	@Override

@@ -23,7 +23,7 @@ import fr.nexa.dailyorg_java.model.workout.Exercise;
 import fr.nexa.dailyorg_java.model.workout.StrengthExercise;
 import fr.nexa.dailyorg_java.model.workout.WorkoutRecord;
 import fr.nexa.dailyorg_java.model.workout.WorkoutSession;
-import fr.nexa.dailyorg_java.service.workout.impl.AppUserService;
+import fr.nexa.dailyorg_java.service.AppUserService;
 import fr.nexa.dailyorg_java.service.workout.impl.CardioExerciseService;
 import fr.nexa.dailyorg_java.service.workout.impl.ExerciseService;
 import fr.nexa.dailyorg_java.service.workout.impl.StrengthExerciseService;

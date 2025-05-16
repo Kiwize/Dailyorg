@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 import fr.nexa.dailyorg_java.model.AppUser;
 import fr.nexa.dailyorg_java.model.dailyorg.OrganizerUser;
 import fr.nexa.dailyorg_java.model.dailyorg.Task;
+import fr.nexa.dailyorg_java.service.AppUserService;
 import fr.nexa.dailyorg_java.service.dailyorg.impl.OrganizerUserService;
 import fr.nexa.dailyorg_java.service.dailyorg.impl.TaskService;
-import fr.nexa.dailyorg_java.service.workout.impl.AppUserService;
 import lombok.AllArgsConstructor;
 
 @RestController
