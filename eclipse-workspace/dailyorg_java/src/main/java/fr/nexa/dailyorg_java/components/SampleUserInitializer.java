@@ -1,4 +1,4 @@
-package fr.nexa.dailyorg_java.components.workout;
+package fr.nexa.dailyorg_java.components;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import fr.nexa.dailyorg_java.model.AppUser;
 import fr.nexa.dailyorg_java.repository.workout.IAppUserRepository;
 
-//@Component
+@Component
 public class SampleUserInitializer implements CommandLineRunner {
     private final IAppUserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
@@ -24,10 +24,10 @@ public class SampleUserInitializer implements CommandLineRunner {
         // Check if user already exists
         if (userRepository.findByEmail(sampleEmail).isEmpty()) {
             AppUser testUser = new AppUser();
-            testUser.setUsername("Nico");
-            testUser.setPassword(passwordEncoder.encode("password123")); // Encrypt password
+            testUser.setUsername("PRADEAU");
+            testUser.setPassword(passwordEncoder.encode("Linux@794456")); // Encrypt password
             testUser.setEmail(sampleEmail);
-            testUser.setSurname("Nico");
+            testUser.setSurname("Thomas");
             testUser.setRole("ROLE_USER");
 
             userRepository.save(testUser);

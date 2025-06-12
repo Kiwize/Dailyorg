@@ -70,5 +70,5 @@ public class Task {
 	private RecurringTaskState recurringTaskState;
 	
 	@OneToMany(mappedBy = "taskId")
-	private List<TaskOccurence> taskOccurences;
+	private List<TaskOccurence> masterTaskId;
 }

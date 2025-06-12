@@ -5,7 +5,8 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +17,7 @@ import fr.nexa.dailyorg_java.model.dailyorg.OrganizerUser;
 import fr.nexa.dailyorg_java.model.dailyorg.Task;
 import fr.nexa.dailyorg_java.service.AppUserService;
 import fr.nexa.dailyorg_java.service.dailyorg.impl.OrganizerUserService;
+import fr.nexa.dailyorg_java.service.dailyorg.impl.TaskOccurenceService;
 import fr.nexa.dailyorg_java.service.dailyorg.impl.TaskService;
 import lombok.AllArgsConstructor;
 
@@ -25,6 +27,7 @@ import lombok.AllArgsConstructor;
 public class TaskController {
 
 	private final TaskService taskService;
+	private final TaskOccurenceService taskOccurenceService;
 	private final AppUserService appUserService;
 	private final OrganizerUserService organizerUserService;
 
@@ -67,7 +70,75 @@ public class TaskController {
 		}
 	}
 
-	@GetMapping("/get_tasks_by_date")
+	@PutMapping("/update_task")
+	public ResponseEntity<?> updateTask(@RequestBody Map<String, String> data) {
+		try {
+			if (!data.containsKey("task_id") || !data.containsKey("task_name")
+					|| !data.containsKey("task_required_energy") || !data.containsKey("user_email")
+					|| !data.containsKey("task_start_date") || !data.containsKey("task_end_date")) {
+				return ResponseEntity.badRequest().body("One or multiple mandatory fields are missing...");
+			}
+
+			Optional<AppUser> user = appUserService.findByEmail(data.get("user_email"));
+
+			if (user.isPresent()) {
+				AppUser appUser = user.get();
+				Task task = taskService.getTaskById(Long.parseLong(data.get("task_id")));
+
+				if (task != null && task.getOrganizerUser().getAppUser().getUserId() == appUser.getUserId()) {
+					task.setTaskName(data.get("task_name"));
+					task.setTaskRequiredEnergy(Integer.parseInt(data.get("task_required_energy")));
+					task.setTaskStartDate(LocalDateTime.parse(data.get("task_start_date")));
+					task.setTaskEndDate(LocalDateTime.parse(data.get("task_end_date")));
+					taskService.updateTask(task);
+					return ResponseEntity.ok("Task updated successfully...");
+				} else {
+					return ResponseEntity.badRequest().body("Task not found or does not belong to the user...");
+				}
+			} else {
+				return ResponseEntity.badRequest().body("User not found...");
+			}
+		} catch (NumberFormatException e) {
+			e.printStackTrace();
+			return ResponseEntity.badRequest().body("Invalid number format for task_required_energy...");
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.internalServerError().body("Internal error...");
+		}
+	}
+
+	@DeleteMapping("/delete_task")
+	public ResponseEntity<?> deleteTask(@RequestBody Map<String, String> data) {
+		try {
+			if (!data.containsKey("task_id") || !data.containsKey("user_email")) {
+				return ResponseEntity.badRequest().body("One or multiple mandatory fields are missing...");
+			}
+
+			Optional<AppUser> user = appUserService.findByEmail(data.get("user_email"));
+
+			if (user.isPresent()) {
+				AppUser appUser = user.get();
+				Task task = taskService.getTaskById(Long.parseLong(data.get("task_id")));
+
+				if (task != null && task.getOrganizerUser().getAppUser().getUserId() == appUser.getUserId()) {
+					taskService.deleteTask(task.getTaskId());
+					return ResponseEntity.ok("Task deleted successfully...");
+				} else {
+					return ResponseEntity.badRequest().body("Task not found or does not belong to the user...");
+				}
+			} else {
+				return ResponseEntity.badRequest().body("User not found...");
+			}
+		} catch (NumberFormatException e) {
+			e.printStackTrace();
+			return ResponseEntity.badRequest().body("Invalid number format for task_id...");
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.internalServerError().body("Internal error...");
+		}
+	}
+
+	@PostMapping("/get_tasks_by_date")
 	public ResponseEntity<?> getTasksByDate(@RequestBody Map<String, String> data) {
 		try {
 			if (!data.containsKey("user_email") || !data.containsKey("date")) {

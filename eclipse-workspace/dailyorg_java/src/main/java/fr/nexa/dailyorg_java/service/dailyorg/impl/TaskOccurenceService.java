@@ -3,11 +3,13 @@ package fr.nexa.dailyorg_java.service.dailyorg.impl;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import fr.nexa.dailyorg_java.model.dailyorg.TaskOccurence;
 import fr.nexa.dailyorg_java.repository.dailyorg.ITaskOccurenceRepository;
 import fr.nexa.dailyorg_java.service.dailyorg.ITaskOccurenceService;
 
+@Service
 public class TaskOccurenceService implements ITaskOccurenceService {
 
 	@Autowired

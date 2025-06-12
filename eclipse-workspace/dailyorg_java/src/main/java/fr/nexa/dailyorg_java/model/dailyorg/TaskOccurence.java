@@ -32,7 +32,7 @@ public class TaskOccurence {
 	private String userNotes;
 	
 	@ManyToOne
-	@JoinColumn(name = "taskOccurences")
+	@JoinColumn(name = "masterTaskId")
 	private Task taskId;
 	
 	@ManyToOne
