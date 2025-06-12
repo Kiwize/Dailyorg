@@ -47,6 +47,13 @@ function LoginPage() {
                 </form>
                 {error && <p style={{ color: "red" }}>{error}</p>}
             </Paper>
+            <Button
+                variant="text"
+                onClick={() => navigate("/register")}
+                sx={{ mt: 2 }}
+            >
+                Don't have an account? Register
+            </Button>
         </Box>
     );
 }

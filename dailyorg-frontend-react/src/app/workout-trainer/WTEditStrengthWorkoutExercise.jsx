@@ -165,9 +165,6 @@ export default function WTEditStrengthWorkoutExercise() {
                         <List>
                             {exerciseData.workoutSeries.map(serie => (
                                 <div key={serie.workoutSerieID}>
-                                    {
-                                        <p>{JSON.stringify(serie)}</p>
-                                    }
                                     <ListItem >
                                         <ListItemButton sx={{borderRadius: 5}} onClick={() => handleClick(serie.workoutSerieID)}>
                                             <ListItemText>

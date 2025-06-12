@@ -10,6 +10,12 @@ const apps = [
         navigateTo: "/wthomepage",
         img: "images\\cards\\workout_trainer.webp",
         imgAlt: "workout weights"
+    },
+    {
+        name: "Daily Organizer",
+        navigateTo: "/dohomepage",
+        img: "images\\cards\\daily_organizer.webp",
+        imgAlt: "workout weights"
     }
 ];
 

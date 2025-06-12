@@ -8,6 +8,7 @@ class DailyorgJavaApplicationTests {
 
 	@Test
 	void contextLoads() {
+		
 	}
 
 }

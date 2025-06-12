@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import fr.nexa.dailyorg_java.model.AppUser;
 import fr.nexa.dailyorg_java.repository.workout.IAppUserRepository;
 
-@Component
+//@Component
 public class SampleUserInitializer implements CommandLineRunner {
     private final IAppUserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;

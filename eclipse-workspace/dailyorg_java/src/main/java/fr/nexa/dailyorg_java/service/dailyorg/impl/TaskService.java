@@ -4,15 +4,21 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
+import fr.nexa.dailyorg_java.components.dailyorg.TaskChangedEvent;
 import fr.nexa.dailyorg_java.model.dailyorg.OrganizerUser;
 import fr.nexa.dailyorg_java.model.dailyorg.Task;
 import fr.nexa.dailyorg_java.repository.dailyorg.ITaskRepository;
 import fr.nexa.dailyorg_java.service.dailyorg.ITaskService;
+import lombok.AllArgsConstructor;
 
+@AllArgsConstructor
 @Service
 public class TaskService implements ITaskService {
+	
+	private final ApplicationEventPublisher eventPublisher;
 	
 	@Autowired
 	private ITaskRepository taskRepository;
@@ -24,16 +30,19 @@ public class TaskService implements ITaskService {
 
 	@Override
 	public Task addTask(Task task) {
+		eventPublisher.publishEvent(new TaskChangedEvent(TaskChangedEvent.TaskChangeType.CREATED, task.getTaskId()));
 		return taskRepository.save(task);
 	}
 
 	@Override
 	public Task updateTask(Task task) {
+		eventPublisher.publishEvent(new TaskChangedEvent(TaskChangedEvent.TaskChangeType.UPDATED, task.getTaskId()));
 		return taskRepository.save(task);
 	}
 
 	@Override
 	public Task deleteTask(long id) {
+		eventPublisher.publishEvent(new TaskChangedEvent(TaskChangedEvent.TaskChangeType.DELETED, id));
 		return taskRepository.findById(id).map(task -> {
 			taskRepository.delete(task);
 			return task;
