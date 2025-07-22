@@ -3,7 +3,7 @@ import Header from "../../Header";
 import { useEffect, useState } from "react";
 import { PlusIcon } from "lucide-react";
 import WTMuscleSelector from "./WTMuscleSelector";
-import useApi from "../../hooks/useApi";
+import useApi from "../../hooks/api";
 import useAlert from "../../hooks/useAlert";
 
 const API_URL = import.meta.env.VITE_API_URL;

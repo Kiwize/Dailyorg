@@ -13,7 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import fr.nexa.dailyorg_java.model.AppUser;
-import fr.nexa.dailyorg_java.repository.workout.IAppUserRepository;
+import fr.nexa.dailyorg_java.repository.IAppUserRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class AppUserServiceTest {

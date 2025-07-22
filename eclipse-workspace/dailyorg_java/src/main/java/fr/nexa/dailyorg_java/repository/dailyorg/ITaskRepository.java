@@ -14,5 +14,6 @@ public interface ITaskRepository extends JpaRepository<Task, Long> {
 
 	List<Task> findAllByOrganizerUser(OrganizerUser organizerUser);
 	List<Task> findAllByOrganizerUserAndTaskStartDate(OrganizerUser organizerUser, LocalDateTime taskStartDate);
+	List<Task> findAllByOrganizerUserAndTaskStartDateBetween(OrganizerUser organizerUser, LocalDateTime startDate, LocalDateTime endDate);
 	
 }

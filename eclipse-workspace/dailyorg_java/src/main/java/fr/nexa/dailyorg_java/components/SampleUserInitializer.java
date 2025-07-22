@@ -5,7 +5,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import fr.nexa.dailyorg_java.model.AppUser;
-import fr.nexa.dailyorg_java.repository.workout.IAppUserRepository;
+import fr.nexa.dailyorg_java.repository.IAppUserRepository;
 
 @Component
 public class SampleUserInitializer implements CommandLineRunner {
@@ -17,6 +17,8 @@ public class SampleUserInitializer implements CommandLineRunner {
         this.passwordEncoder = passwordEncoder;
     }
 
+    
+    
     @Override
     public void run(String... args) {
         String sampleEmail = "test@test.fr";

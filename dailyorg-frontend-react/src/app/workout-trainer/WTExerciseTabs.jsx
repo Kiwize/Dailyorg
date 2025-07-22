@@ -1,5 +1,5 @@
 import { PlusIcon } from "lucide-react";
-import useApi from "../../hooks/useApi";
+import useApi from "../../hooks/api";
 import { Box, Button, Tab, Tabs } from "@mui/material";
 import PropTypes from "prop-types";
 import React from "react";

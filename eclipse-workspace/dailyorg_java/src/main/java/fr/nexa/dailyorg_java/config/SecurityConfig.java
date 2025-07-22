@@ -41,12 +41,12 @@ public class SecurityConfig {
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		return http.cors(cors -> cors.configurationSource(corsConfigurationSource())).csrf(csrf -> csrf.disable())
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-				.authorizeHttpRequests(
-						auth -> auth.requestMatchers(new String[] { "/api/login", "/api/register", "/" }).permitAll() // Allow
-																														// login
-																														// and
-																														// register
-								.requestMatchers("/api/**").authenticated() // Protect API routes
+				.authorizeHttpRequests(auth -> auth
+						.requestMatchers(new String[] { "/api/login", "/api/register", "/api/check_token" }).permitAll() // Allow
+						// login
+						// and
+						// register
+						.requestMatchers("/api/**").authenticated() // Protect API routes
 				)
 				.addFilterBefore(new JwtFilter(jwtUtil, userDetailsService), UsernamePasswordAuthenticationFilter.class)
 				.build();

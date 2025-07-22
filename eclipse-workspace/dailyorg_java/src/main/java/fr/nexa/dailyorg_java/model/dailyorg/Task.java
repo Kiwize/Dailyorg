@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -49,11 +50,15 @@ public class Task {
 	private LocalDateTime taskStartDate;
 	
 	@Column(nullable = false)
+	private boolean isTaskCompleted;
+	
+	@Column(nullable = false)
 	private LocalDateTime taskEndDate;
 
 	@PrePersist
 	public void prePersist() {
 		this.taskCreationDate = LocalDateTime.now();
+		this.isTaskCompleted = false;
 	}
 	
 	@ManyToOne
@@ -61,14 +66,16 @@ public class Task {
 	@JsonIgnore
 	private OrganizerUser organizerUser;
 	
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "task_priority")
 	private TaskPriority taskPriority;
 	
 	@ManyToOne
 	@JoinColumn(name = "recurring_task_state")
+	@JsonIgnore
 	private RecurringTaskState recurringTaskState;
 	
 	@OneToMany(mappedBy = "taskId")
+	@JsonIgnore
 	private List<TaskOccurence> masterTaskId;
 }

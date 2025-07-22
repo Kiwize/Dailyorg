@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import fr.nexa.dailyorg_java.model.AppUser;
 import fr.nexa.dailyorg_java.model.workout.Exercise;
 import fr.nexa.dailyorg_java.model.workout.WorkoutSession;
-import fr.nexa.dailyorg_java.repository.workout.IAppUserRepository;
+import fr.nexa.dailyorg_java.repository.IAppUserRepository;
 import fr.nexa.dailyorg_java.repository.workout.IWorkoutRepository;
 import fr.nexa.dailyorg_java.service.workout.IWorkoutSessionService;
 import jakarta.transaction.Transactional;

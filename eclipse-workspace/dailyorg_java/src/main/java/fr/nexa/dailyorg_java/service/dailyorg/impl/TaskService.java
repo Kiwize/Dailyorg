@@ -59,5 +59,10 @@ public class TaskService implements ITaskService {
 		return taskRepository.findAllByOrganizerUserAndTaskStartDate(userId, date);
 	}
 	
+	@Override
+	public List<Task> getAllTasksByUserIdAndDateRange(OrganizerUser userId, LocalDateTime startDate, LocalDateTime endDate) {
+		return taskRepository.findAllByOrganizerUserAndTaskStartDateBetween(userId, startDate, endDate);
+	}
+	
 
 }

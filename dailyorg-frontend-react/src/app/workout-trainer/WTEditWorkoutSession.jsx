@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from "react-router";
 import Header from "../../Header";
-import useApi from "../../hooks/useApi";
+import useApi from "../../hooks/api";
 import { Box, Button, Divider, List, ListItem, ListItemButton, ListItemText } from "@mui/material";
 import { PlusIcon } from "lucide-react";
 

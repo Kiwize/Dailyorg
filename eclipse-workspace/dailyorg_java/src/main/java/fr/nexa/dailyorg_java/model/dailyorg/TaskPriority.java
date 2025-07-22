@@ -2,8 +2,11 @@ package fr.nexa.dailyorg_java.model.dailyorg;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -27,7 +30,8 @@ public class TaskPriority {
 	@Column(nullable = false, length = 50)
 	private String taskPriorityName;
 	
-	@OneToMany(mappedBy = "taskPriority")
+	@OneToMany(mappedBy = "taskPriority", fetch = FetchType.EAGER)
+	@JsonIgnore
 	private List<Task> tasks;
 	
 }

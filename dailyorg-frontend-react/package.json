@@ -27,6 +27,7 @@
     "prop-types": "^15.8.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-gauge-component": "^1.2.64",
     "react-google-recaptcha": "^3.1.0",
     "react-router-dom": "^7.4.0",
     "react-simple-captcha": "^9.3.1",

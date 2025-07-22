@@ -5,7 +5,9 @@ import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,6 +28,18 @@ public class AuthController {
 	private final BCryptPasswordEncoder passwordEncoder;
 	
 	private final AppUserService userService;
+	
+	@PostMapping("/check_token")
+	public ResponseEntity<?> checkToken(@RequestBody Map<String, String> tokenData) {
+		String token = tokenData.get("token");
+		String email = jwtUtil.extractUsername(token);
+		
+		if (email == null || !jwtUtil.validateToken(token, email)) {
+			return ResponseEntity.badRequest().body("Invalid or expired token.");
+		}
+		
+		return ResponseEntity.ok("Token is valid for user: " + email);
+	}
 
 	@PostMapping("/login")
 	public Map<String, String> login(@RequestBody Map<String, String> credentials) {
@@ -33,7 +47,13 @@ public class AuthController {
 		String email = credentials.get("email");
 		String password = credentials.get("password");
 
-		authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
+		try {
+			authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
+		} catch (BadCredentialsException e) {
+			System.err.println("Invalid credentials provided for user: " + email);
+			result.put("error", "Invalid credentials");
+			return result;
+		}
 
 		String token = jwtUtil.generateToken(email);
 		result.put("token", token);

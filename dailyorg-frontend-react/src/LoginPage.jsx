@@ -54,6 +54,11 @@ function LoginPage() {
             >
                 Don't have an account? Register
             </Button>
+            {
+                error && <Typography variant="body2" color="error" sx={{ mt: 2 }}>
+                    {`${API_URL}/api/login`}
+                </Typography>
+            }
         </Box>
     );
 }

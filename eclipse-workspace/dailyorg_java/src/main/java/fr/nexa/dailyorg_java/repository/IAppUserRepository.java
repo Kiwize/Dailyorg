@@ -1,4 +1,4 @@
-package fr.nexa.dailyorg_java.repository.workout;
+package fr.nexa.dailyorg_java.repository;
 
 import java.util.Optional;
 

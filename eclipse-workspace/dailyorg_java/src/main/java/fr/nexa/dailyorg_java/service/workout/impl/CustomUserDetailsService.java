@@ -10,7 +10,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import fr.nexa.dailyorg_java.model.AppUser;
-import fr.nexa.dailyorg_java.repository.workout.IAppUserRepository;
+import fr.nexa.dailyorg_java.repository.IAppUserRepository;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {

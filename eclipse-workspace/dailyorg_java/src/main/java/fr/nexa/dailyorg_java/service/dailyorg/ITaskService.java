@@ -14,5 +14,6 @@ public interface ITaskService {
 	Task deleteTask(long id);
 	List<Task> getAllTasksByUserId(OrganizerUser userId);
 	List<Task> getAllTasksByUserIdAndDate(OrganizerUser userId, LocalDateTime date);
+	List<Task> getAllTasksByUserIdAndDateRange(OrganizerUser userId, LocalDateTime startDate, LocalDateTime endDate);
 
 }

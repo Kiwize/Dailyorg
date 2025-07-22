@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import fr.nexa.dailyorg_java.model.AppUser;
-import fr.nexa.dailyorg_java.repository.workout.IAppUserRepository;
+import fr.nexa.dailyorg_java.repository.IAppUserRepository;
 
 @Service
 public class AppUserService implements IAppUserService {
