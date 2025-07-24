@@ -41,18 +41,14 @@ public class SecurityConfig {
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		return http.cors(cors -> cors.configurationSource(corsConfigurationSource())).csrf(csrf -> csrf.disable())
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-				.authorizeHttpRequests(auth -> auth
-						.requestMatchers(new String[] { "/api/login", "/api/register", "/api/check_token" }).permitAll() // Allow
-						// login
-						// and
-						// register
-						.requestMatchers("/api/**").authenticated() // Protect API routes
-				)
+				.authorizeHttpRequests(
+						auth -> auth.requestMatchers(new String[] { "/api/login", "/api/register", "/api/check_token" })
+								.permitAll().requestMatchers("/api/**").authenticated())
 				.addFilterBefore(new JwtFilter(jwtUtil, userDetailsService), UsernamePasswordAuthenticationFilter.class)
 				.build();
 	}
 
-	// @Bean
+	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration configuration = new CorsConfiguration();
 		configuration.setAllowedOrigins(Arrays.asList(ALLOWED_ORIGINS.split(",")));// Allow React frontend
