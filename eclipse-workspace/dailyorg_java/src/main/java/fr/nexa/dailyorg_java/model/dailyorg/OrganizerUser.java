@@ -2,6 +2,8 @@ package fr.nexa.dailyorg_java.model.dailyorg;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import fr.nexa.dailyorg_java.model.AppUser;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -38,14 +40,16 @@ public class OrganizerUser {
 	@Column(nullable = false)
 	private int exp_points;
 	
+	@JsonIgnore
 	@OneToOne
 	@JoinColumn(name = "userId")
 	private AppUser appUser;
 	
-	@ManyToMany()
+	@ManyToMany(fetch = jakarta.persistence.FetchType.EAGER)
 	@JoinTable(name = "organizer_user_badge", joinColumns = @JoinColumn(name = "organizer_user_id"), inverseJoinColumns = @JoinColumn(name = "badge_id"))
 	private List<Badge> badges;
 	
+	@JsonIgnore
 	@OneToMany(mappedBy = "organizerUser")
 	private List<Task> tasks;
 }

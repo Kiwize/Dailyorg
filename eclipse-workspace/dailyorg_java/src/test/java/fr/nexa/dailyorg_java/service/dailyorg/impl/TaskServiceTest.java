@@ -30,7 +30,7 @@ public class TaskServiceTest {
 
 	@Test
 	void testGetTaskByID() {
-		Task task = Task.builder().taskId(1L).taskName("Test Task").taskDescription("Test Description").build();
+		Task task = Task.builder().id(1L).taskName("Test Task").taskDescription("Test Description").build();
 
 		when(taskRepository.findById(1L)).thenReturn(Optional.of(task));
 
@@ -41,7 +41,7 @@ public class TaskServiceTest {
 
 	@Test
 	void testAddTask() {
-		Task task = Task.builder().taskId(1L).taskName("Test Task").taskDescription("Test Description").build();
+		Task task = Task.builder().id(1L).taskName("Test Task").taskDescription("Test Description").build();
 
 		when(taskRepository.save(task)).thenReturn(task);
 
@@ -52,7 +52,7 @@ public class TaskServiceTest {
 
 	@Test
 	void testUpdateTask() {
-		Task task = Task.builder().taskId(1L).taskName("Test Task").taskDescription("Test Description").build();
+		Task task = Task.builder().id(1L).taskName("Test Task").taskDescription("Test Description").build();
 
 		when(taskRepository.save(task)).thenReturn(task);
 
@@ -63,18 +63,17 @@ public class TaskServiceTest {
 
 	@Test
 	void testDeleteTask() {
-		Task task = Task.builder().taskId(1L).taskName("Test Task").taskDescription("Test Description").build();
+		Task task = Task.builder().id(1L).taskName("Test Task").taskDescription("Test Description").build();
 
 		when(taskRepository.findById(1L)).thenReturn(Optional.of(task));
 
-		Task result = taskService.deleteTask(1L);
-
-		assertThat(result.getTaskName()).isEqualTo("Test Task");
+		taskService.deleteTask(task);
+		when(taskRepository.findById(1L)).thenReturn(Optional.empty());
 	}
 
 	@Test
 	void testGetAllTasksByUserId() {
-		Task task = Task.builder().taskId(1L).taskName("Test Task").taskDescription("Test Description").build();
+		Task task = Task.builder().id(1L).taskName("Test Task").taskDescription("Test Description").build();
 
 		when(taskRepository.findAllByOrganizerUser(task.getOrganizerUser())).thenReturn(List.of(task));
 
@@ -86,7 +85,7 @@ public class TaskServiceTest {
 
 	@Test
 	void testGetAllTasksByUserIdAndDate() {
-		Task task = Task.builder().taskId(1L).taskName("Test Task").taskDescription("Test Description").build();
+		Task task = Task.builder().id(1L).taskName("Test Task").taskDescription("Test Description").build();
 
 		when(taskRepository.findAllByOrganizerUserAndTaskStartDate(task.getOrganizerUser(), task.getTaskStartDate()))
 				.thenReturn(List.of(task));

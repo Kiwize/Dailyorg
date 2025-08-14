@@ -17,19 +17,17 @@ public class SampleUserInitializer implements CommandLineRunner {
         this.passwordEncoder = passwordEncoder;
     }
 
-    
-    
     @Override
     public void run(String... args) {
-        String sampleEmail = "test@test.fr";
+        String sampleEmail = "john.smith@gmail.fr";
         
         // Check if user already exists
         if (userRepository.findByEmail(sampleEmail).isEmpty()) {
             AppUser testUser = new AppUser();
-            testUser.setUsername("PRADEAU");
-            testUser.setPassword(passwordEncoder.encode("Linux@794456")); // Encrypt password
+            testUser.setUsername("Smith");
+            testUser.setPassword(passwordEncoder.encode("userPassword")); // Encrypt password
             testUser.setEmail(sampleEmail);
-            testUser.setSurname("Thomas");
+            testUser.setSurname("John");
             testUser.setRole("ROLE_USER");
 
             userRepository.save(testUser);

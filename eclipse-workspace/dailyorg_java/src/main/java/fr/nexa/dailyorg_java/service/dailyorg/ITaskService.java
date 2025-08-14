@@ -11,9 +11,14 @@ public interface ITaskService {
 	Task getTaskById(long id);
 	Task addTask(Task task);
 	Task updateTask(Task task);
-	Task deleteTask(long id);
+	Task updateTask(Task task, boolean triggerEvent);
+	void deleteTask(Task task);
+	void deleteTask(Task task, boolean triggerEvent);
+	void deleteAllTasks(List<Task> tasks);
+	void deleteAllTasks(List<Task> tasks, boolean triggerEvent);
 	List<Task> getAllTasksByUserId(OrganizerUser userId);
 	List<Task> getAllTasksByUserIdAndDate(OrganizerUser userId, LocalDateTime date);
 	List<Task> getAllTasksByUserIdAndDateRange(OrganizerUser userId, LocalDateTime startDate, LocalDateTime endDate);
+	List<Task> getAllTasksByOcurrenceUniqueId(String occurrenceUniqueId);
 
 }

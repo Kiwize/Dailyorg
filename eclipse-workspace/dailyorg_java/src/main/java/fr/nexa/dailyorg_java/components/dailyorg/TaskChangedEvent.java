@@ -14,4 +14,5 @@ public class TaskChangedEvent {
 	
 	private final TaskChangeType changeType;
 	private final long taskId;
+	private final boolean recurringTaskStateChanged;
 }

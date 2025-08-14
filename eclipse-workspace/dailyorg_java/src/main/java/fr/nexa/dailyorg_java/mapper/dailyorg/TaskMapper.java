@@ -18,7 +18,7 @@ public class TaskMapper {
 			return null;
 		}
 		TaskDTO dto = new TaskDTO();
-		dto.setTaskId(task.getTaskId());
+		dto.setTaskId(task.getId());
 		dto.setTaskName(task.getTaskName());
 		dto.setTaskDescription(task.getTaskDescription());
 		dto.setTaskCreationDate(task.getTaskCreationDate().toString());
@@ -36,7 +36,7 @@ public class TaskMapper {
 			return null;
 		}
 		Task task = new Task();
-		task.setTaskId(dto.getTaskId());
+		task.setId(dto.getTaskId());
 		task.setTaskName(dto.getTaskName());
 		task.setTaskDescription(dto.getTaskDescription());
 		task.setTaskCreationDate(LocalDateTime.parse(dto.getTaskCreationDate()));

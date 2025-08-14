@@ -25,7 +25,7 @@ class TaskMapperTests {
 	@Test
 	void testToDTO_withValidTask_shouldMapCorrectly() {
 		Task task = new Task();
-		task.setTaskId(1L);
+		task.setId(1L);
 		task.setTaskName("Test Task");
 		task.setTaskDescription("Description");
 		task.setTaskCreationDate(LocalDateTime.of(2023, 1, 1, 12, 0));
@@ -37,7 +37,7 @@ class TaskMapperTests {
 		TaskDTO dto = taskMapper.toDTO(task);
 
 		assertNotNull(dto);
-		assertEquals(task.getTaskId(), dto.getTaskId());
+		assertEquals(task.getId(), dto.getTaskId());
 		assertEquals(task.getTaskName(), dto.getTaskName());
 		assertEquals(task.getTaskDescription(), dto.getTaskDescription());
 		assertEquals("2023-01-01T12:00", dto.getTaskCreationDate());
@@ -67,7 +67,7 @@ class TaskMapperTests {
 		Task task = taskMapper.toEntity(dto);
 
 		assertNotNull(task);
-		assertEquals(dto.getTaskId(), task.getTaskId());
+		assertEquals(dto.getTaskId(), task.getId());
 		assertEquals(dto.getTaskName(), task.getTaskName());
 		assertEquals(dto.getTaskDescription(), task.getTaskDescription());
 		assertEquals(LocalDateTime.parse(dto.getTaskCreationDate()), task.getTaskCreationDate());
@@ -85,14 +85,14 @@ class TaskMapperTests {
 	@Test
 	void testToDTOList_withValidList_shouldConvertAll() {
 		Task task1 = new Task();
-		task1.setTaskId(1L);
+		task1.setId(1L);
 		task1.setTaskName("Task 1");
 		task1.setTaskDescription("Desc 1");
 		task1.setTaskCreationDate(LocalDateTime.now());
 		task1.setTaskRequiredEnergy(10);
 
 		Task task2 = new Task();
-		task2.setTaskId(2L);
+		task2.setId(2L);
 		task2.setTaskName("Task 2");
 		task2.setTaskDescription("Desc 2");
 		task2.setTaskCreationDate(LocalDateTime.now());
