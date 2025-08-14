@@ -65,10 +65,7 @@ public class TaskServiceTest {
 	void testDeleteTask() {
 		Task task = Task.builder().id(1L).taskName("Test Task").taskDescription("Test Description").build();
 
-		when(taskRepository.findById(1L)).thenReturn(Optional.of(task));
-
 		taskService.deleteTask(task);
-		when(taskRepository.findById(1L)).thenReturn(Optional.empty());
 	}
 
 	@Test
