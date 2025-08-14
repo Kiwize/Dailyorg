@@ -77,5 +77,5 @@ public class Task {
 	
 	@OneToMany(mappedBy = "taskId")
 	@JsonIgnore
-	private List<TaskOccurence> masterTaskId;
+	private List<TaskOccurrence> masterTaskId;
 }

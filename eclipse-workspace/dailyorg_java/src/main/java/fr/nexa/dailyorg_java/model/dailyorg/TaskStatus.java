@@ -25,6 +25,6 @@ public class TaskStatus {
 	private String name;
 	
 	@OneToMany(mappedBy = "taskStatus")
-	private List<TaskOccurence> taskOcurrences;
+	private List<TaskOccurrence> taskOcurrences;
 	
 }

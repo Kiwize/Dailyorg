@@ -26,7 +26,7 @@ import fr.nexa.dailyorg_java.model.dailyorg.OrganizerUser;
 import fr.nexa.dailyorg_java.model.dailyorg.Task;
 import fr.nexa.dailyorg_java.service.AppUserService;
 import fr.nexa.dailyorg_java.service.dailyorg.impl.OrganizerUserService;
-import fr.nexa.dailyorg_java.service.dailyorg.impl.TaskOccurenceService;
+import fr.nexa.dailyorg_java.service.dailyorg.impl.TaskOccurrenceService;
 import fr.nexa.dailyorg_java.service.dailyorg.impl.TaskService;
 
 @WebMvcTest(TaskController.class)
@@ -39,7 +39,7 @@ public class TaskControllerTests {
 	private TaskService taskService;
 
 	@MockBean
-	private TaskOccurenceService taskOccurenceService;
+	private TaskOccurrenceService taskOccurenceService;
 
 	@MockBean
 	private AppUserService appUserService;

@@ -18,7 +18,6 @@ import fr.nexa.dailyorg_java.model.dailyorg.Task;
 import fr.nexa.dailyorg_java.model.dailyorg.TaskPriority;
 import fr.nexa.dailyorg_java.service.AppUserService;
 import fr.nexa.dailyorg_java.service.dailyorg.impl.OrganizerUserService;
-import fr.nexa.dailyorg_java.service.dailyorg.impl.TaskOccurenceService;
 import fr.nexa.dailyorg_java.service.dailyorg.impl.TaskPriorityService;
 import fr.nexa.dailyorg_java.service.dailyorg.impl.TaskService;
 import lombok.AllArgsConstructor;
@@ -29,7 +28,6 @@ import lombok.AllArgsConstructor;
 public class TaskController {
 
 	private final TaskService taskService;
-	private final TaskOccurenceService taskOccurenceService;
 	private final AppUserService appUserService;
 	private final OrganizerUserService organizerUserService;
 	private final TaskPriorityService taskPriorityService;

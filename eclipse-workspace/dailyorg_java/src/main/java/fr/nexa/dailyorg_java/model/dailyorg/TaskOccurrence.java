@@ -17,7 +17,7 @@ import lombok.Data;
 @Builder
 @Data
 @Table(name = "TaskOccurence")
-public class TaskOccurence {
+public class TaskOccurrence {
 
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long taskOccurenceId;

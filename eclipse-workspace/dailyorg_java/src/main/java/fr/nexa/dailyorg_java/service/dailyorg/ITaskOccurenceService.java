@@ -2,13 +2,13 @@ package fr.nexa.dailyorg_java.service.dailyorg;
 
 import java.util.Optional;
 
-import fr.nexa.dailyorg_java.model.dailyorg.TaskOccurence;
+import fr.nexa.dailyorg_java.model.dailyorg.TaskOccurrence;
 
 public interface ITaskOccurenceService {
 	
-	Optional<TaskOccurence> findById(Long id);
-	TaskOccurence update(TaskOccurence taskOccurence);
-	TaskOccurence create(TaskOccurence taskOccurence);
-	void delete(TaskOccurence taskOccurence);
+	Optional<TaskOccurrence> findById(Long id);
+	TaskOccurrence update(TaskOccurrence taskOccurence);
+	TaskOccurrence create(TaskOccurrence taskOccurence);
+	void delete(TaskOccurrence taskOccurence);
 
 }
