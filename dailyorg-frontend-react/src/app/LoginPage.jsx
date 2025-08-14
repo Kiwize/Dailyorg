@@ -1,41 +1,45 @@
 import React, { useState } from "react";
 import { Box, Button, Input, Paper, Typography } from "@mui/material";
 import { useNavigate } from "react-router";
-
+import useAlert from "../hooks/useAlert";
+import { sha256 } from "js-sha256";
 const API_URL = import.meta.env.VITE_API_URL;
 
 function LoginPage() {
     const navigate = useNavigate();
+    const alert = useAlert();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
 
     const handleLogin = async (e) => {
         e.preventDefault();
+
         setError("");
 
         try {
             const response = await fetch(`${API_URL}/api/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
+                credentials: 'include',
                 body: JSON.stringify({ email, password })
             });
 
             if (!response.ok) {
+                alert.setAlert("Invalid email or password", "error");
                 throw new Error("Invalid email or password");
             }
 
-            const data = await response.json();
-            localStorage.setItem("token", data.token);
+            await response.json();
             localStorage.setItem("username", email);
+
             navigate("/");
         } catch (err) {
-            setError(err.message);
         }
     };
 
     return (
-        <Box sx={{ mx: { xs: "10%", md: "35%" }, pt: 8, textAlign: 'center' }}>
+        <Box sx={{ mx: { xs: "10%", md: "35%" }, pt: 8, textAlign: 'center', height: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
             <Paper elevation={3} sx={{p: 4}}>
                 <Typography variant="h4" sx={{ textAlign: 'center' }}>Login</Typography>
                 <form onSubmit={handleLogin}>

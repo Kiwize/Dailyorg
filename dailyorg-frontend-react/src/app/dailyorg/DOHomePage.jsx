@@ -5,6 +5,8 @@ import WeekViewCalendar from './WeekViewCalendar';
 import TasksCompletedGauge from './TasksCompletedGauge';
 import { isSameDay, set } from 'date-fns';
 import React from 'react';
+import { useToolbar } from '../../contexts/ToolbarProvider';
+import DOSettings from './DOSettings';
 
 const today = new Date();
 
@@ -13,32 +15,89 @@ function DOHomePage() {
   const [todayNumberOfTasks, setTodayNumberOfTasks] = React.useState(0);
   const [todayCompletedTasks, setTodayCompletedTasks] = React.useState(0);
 
+  // Ref to check if local settings are opened
+  const [areLocalSettingsOpened, setLocalSettingsOpened] = React.useState(false);
+
+  const toolBar = useToolbar();
+
+  //Daily Organizer Settings
+  //Load those from DB later
+  const [settings, setSettings] = React.useState({
+    firstDisplayedHour: 8,
+    displayedHours: 12,
+  });
+
+  //Initializing the toolbar
+  React.useEffect(() => {
+    // Set the toolbar title and actions
+    const toolbarTitle = 'Daily Organizer';
+    const toolbarActions = [
+      {
+        label: 'Settings',
+        onClick: () => {
+          setLocalSettingsOpened((prev) => {
+            return !prev;
+          });
+        },
+      },
+      {
+        label: 'Help',
+        onClick: () => console.log('Help clicked'),
+      },
+    ];
+    toolBar.setToolbarEnabled(true);
+    toolBar.updateToolbarTitle(toolbarTitle);
+    toolBar.updateToolbarActions(toolbarActions);
+  }, []);
+
   const handleCalendarWeekTaskRefresh = (tasks) => {
     // Callback function called AFTER the week tasks have been refreshed
     var todayNumberOfTasks = 0;
     var todayCompletedTasks = 0;
 
-    console.log('Refreshing tasks for today:', tasks);
-
     var todayTasks = tasks.filter((task) => {
       return isSameDay(new Date(task.taskStartDate), today);
     });
 
-    console.log('Tasks for the week have been refreshed:', todayTasks);
     todayNumberOfTasks = todayTasks.length;
     todayCompletedTasks = todayTasks.filter((task) => task.taskCompleted).length;
-
-    console.log("Today's number of tasks:", todayNumberOfTasks);
-    console.log("Today's completed tasks:", todayCompletedTasks);
 
     setTodayNumberOfTasks(todayNumberOfTasks);
     setTodayCompletedTasks(todayCompletedTasks);
   };
 
+  const onSettingsClose = () => {
+    setLocalSettingsOpened(false);
+  };
+
+  const onUpdateSetting = (setting) => {
+    if (setting.firstDisplayedHour) {
+      //Prevents from displaying more than 24 hours
+      if (settings.displayedHours > 24 - setting.firstDisplayedHour) {
+        settings.displayedHours = 24 - setting.firstDisplayedHour;
+      }
+    }
+
+    if (setting.displayedHours) {
+      if (settings.firstDisplayedHour + setting.displayedHours > 24) {
+        settings.firstDisplayedHour = 24 - setting.displayedHours;
+      }
+    }
+
+    setSettings((prevSettings) => ({
+      ...prevSettings,
+      ...setting,
+    }));
+  };
+
   return (
     <Box>
       <Header />
-      <Typography variant="h4" sx={{ my: 2 }}>
+      {areLocalSettingsOpened && (
+        //Centered window on the screen
+        <DOSettings onClose={onSettingsClose} onUpdateSetting={onUpdateSetting} settings={settings} />
+      )}
+      <Typography variant="h4" sx={{ my: 2, textAlign: 'center' }}>
         Daily Organizer
       </Typography>
       <Box
@@ -50,12 +109,24 @@ function DOHomePage() {
           mb: 2,
         }}
       >
-        <WeekViewCalendar calendarRefreshCallback={handleCalendarWeekTaskRefresh} />
+        <WeekViewCalendar calendarRefreshCallback={handleCalendarWeekTaskRefresh} settings={settings} />
       </Box>
 
-      <Grid2 container spacing={2} sx={{ mt: 2 }}>
+      <Grid2 container spacing={2} sx={{ mt: 2 }} justifyContent="center" alignItems="center" direction="row">
         {/* Widgets */}
-        <Grid2 size={{ xs: 12, sm: 6, md: 4 }}>
+        <Grid2
+          size={{ xs: 12, sm: 6, md: 4 }}
+          sx={{
+            backgroundColor: '#383838',
+            aspectRatio: '1/1',
+            borderRadius: 8,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            p: 2,
+          }}
+        >
           {todayNumberOfTasks > 0 ? (
             <Typography variant="h6" sx={{ mb: 1 }}>
               <TasksCompletedGauge totalTasks={todayNumberOfTasks} completedTasks={todayCompletedTasks} />

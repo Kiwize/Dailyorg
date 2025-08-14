@@ -1,11 +1,26 @@
+import { grey } from '@mui/material/colors';
 import { parseISO, set } from 'date-fns';
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, use } from 'react';
+import useAlert from '../../hooks/useAlert';
 
-function TaskCard({ task, getTaskPosition, handleTaskClick, updateTaskBeforeDrag, updateTaskAfterDrag, updateTaskWhileDrag }) {
+function TaskCard({
+  task,
+  handleTaskClick,
+  updateTaskBeforeDrag,
+  updateTaskAfterDrag,
+  updateTaskWhileDrag,
+  displayConfig,
+}) {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [dragging, setDragging] = useState(false);
+  const alert = useAlert();
   const offset = useRef({ x: 0, y: 0 });
   const didDrag = useRef(false);
+
+  const borderColor = task.taskCompleted ? '#4caf50' : '#f44336';
+
+  const taskElem = useRef(null);
+  const calculatePosition = useRef();
 
   // Calculate the position of the task based on start and end dates
 
@@ -19,12 +34,23 @@ function TaskCard({ task, getTaskPosition, handleTaskClick, updateTaskBeforeDrag
     };
     // Prevent default to avoid text selection
     e.preventDefault();
-    updateTaskBeforeDrag(task); // Prepare the task for dragging
+
+    let taskElement = e.target.parentElement.parentElement;
+
+    if (taskElement.id.startsWith('taskID-')) {
+      taskElem.current = taskElement;
+      updateTaskBeforeDrag(task, taskElement); // Prepare the task for dragging
+    }
   };
 
   // Function to calculate new start and end dates based on mouse position
   // This function is called when the mouse moves over a date element in the calendar
   const calculateNewDates = (e, hoveredElement, task) => {
+    if (displayConfig === undefined || displayConfig.displayedHours === undefined || displayConfig.firstDisplayedHour === undefined) {
+      alert.setAlert('An error occurred while calculating new dates', 'error');
+      return { newStartDate: task.start, newEndDate: task.end };
+    }
+
     const dateStr = hoveredElement.id.replace('date-', '');
 
     const newStartDate = parseISO(dateStr);
@@ -35,7 +61,7 @@ function TaskCard({ task, getTaskPosition, handleTaskClick, updateTaskBeforeDrag
     const totalHeight = rect.height;
     const taskDuration = task.end.getTime() - task.start.getTime();
 
-    const newStartTime = Math.round((mouseY / totalHeight) * 24 * 60); // minutes in day
+    const newStartTime = Math.round((mouseY / totalHeight) * displayConfig.displayedHours * 60) + displayConfig.firstDisplayedHour * 60; // minutes in day
 
     // Round up to nearest 15 minutes
     const roundedStartTime = Math.ceil(newStartTime / 15) * 15;
@@ -48,6 +74,27 @@ function TaskCard({ task, getTaskPosition, handleTaskClick, updateTaskBeforeDrag
     return { newStartDate, newEndDate };
   };
 
+  // Helper to get top and height percentages for a task
+  function getTaskPosition(start, end) {
+    if(displayConfig === undefined || displayConfig.displayedHours === undefined || displayConfig.firstDisplayedHour === undefined) {
+      alert.setAlert('An error occurred while displaying task...', 'error');
+      return { top: '0%', height: '0%' };
+    }
+
+    const startHour = start.getHours() + start.getMinutes() / 60;
+    const endHour = end.getHours() + end.getMinutes() / 60;
+
+    //Exclude tasks that are outside the displayed hours
+    if (startHour < displayConfig.firstDisplayedHour) {
+      return { top: '110%', height: '0%' }; // Hide tasks outside the displayed hours
+    }
+
+    const top = ((startHour - displayConfig.firstDisplayedHour) / displayConfig.displayedHours) * 100;
+    const height = ((endHour - startHour) / displayConfig.displayedHours) * 100;
+
+    return { top: `${top}%`, height: `${height}%` };
+  }
+
   const onMouseMove = (e) => {
     if (!dragging) return;
 
@@ -58,29 +105,17 @@ function TaskCard({ task, getTaskPosition, handleTaskClick, updateTaskBeforeDrag
 
     didDrag.current = true; // Mark that we have moved
 
-    updateTaskWhileDrag(task, e.clientX, e.clientY, e.target); // Update task position while dragging
+    const dateElement = e.target.closest('[id^="date-"]');
+    if (dateElement) {
+      const calculatedPosition = calculateNewDates(e, dateElement, task);
+      calculatePosition.current = calculatedPosition;
+      updateTaskWhileDrag(task, calculatedPosition.newStartDate, calculatedPosition.newEndDate, dateElement); // Update task position while dragging
+    }
   };
 
   const onMouseUp = (e) => {
     setDragging(false);
-
-    //Check if the mouse hovers one of the days in the calendar
-    //Each day is a Paper component with an id of "date-{date} a.k.a. "date-2025-07-01"
-    //Depending on the Y position of the mouse on the date element, we can determine the start and end time of the task
-    var hoveredElement = document.elementFromPoint(e.clientX, e.clientY);
-
-    if (hoveredElement && hoveredElement.id.startsWith('taskID-')) {
-      // If the mouse is hovering over another task, we simply get the hovered task's parent to update the task position
-      const parent = hoveredElement.parentElement.parentElement.parentElement;
-      hoveredElement = parent;
-    }
-
-    if (hoveredElement && hoveredElement.id.startsWith('date-')) {
-      const result = calculateNewDates(e, hoveredElement, task);
-
-      // Call the update function to save the new task position
-      updateTaskAfterDrag(task, result.newStartDate, result.newEndDate); // Final update after dragging
-    }
+    updateTaskAfterDrag(task, calculatePosition.current.newStartDate, calculatePosition.current.newEndDate); // Final update after dragging
   };
 
   // Attach global mouse move/up when dragging
@@ -102,48 +137,63 @@ function TaskCard({ task, getTaskPosition, handleTaskClick, updateTaskBeforeDrag
     <div>
       {task.start && task.end && (
         <div
-          onMouseDown={onMouseDown}
-          onClick={() => {
-            if (!didDrag.current) handleTaskClick(task);
+          onClick={(e) => {
+            if (e.target.className.includes('task-grabber')) return; // Ignore clicks on the grabber
+            handleTaskClick(task);
           }}
           style={{
-            cursor: 'grab',
             userSelect: 'none',
           }}
         >
-          <div
-            id={`taskID-${task.taskId}`}
-            style={{
-              background: '#1976d2',
-              color: '#fff',
-              borderRadius: 4,
-              padding: '2px 6px',
-              fontSize: 12,
-              zIndex: 5,
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-              left: 2,
-              right: 2,
-              ...getTaskPosition(task.start, task.end),
-              display: 'flex',
-              alignItems: 'center',
-              position: 'absolute',
-            }}
-          >
-            <p style={{ margin: 0 }}>{task.taskName}</p>
+          <div>
             <div
+              id={`taskID-${task.taskId}`}
               style={{
-                position: 'absolute',
-                left: 0,
-                right: 0,
-                top: '96%',
-                background: task.taskCompleted ? '#4caf50' : '#f44336',
+                background: '#1976d2',
                 color: '#fff',
                 borderRadius: 4,
-                padding: '4% 6px',
+                padding: '0px 0px',
                 fontSize: 12,
-                zIndex: 6,
+                zIndex: 5,
+                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                paddingTop: '4px',
+                left: 2,
+                right: 2,
+                ...getTaskPosition(task.start, task.end),
+                display: 'flex',
+                alignItems: 'center',
+                position: 'absolute',
               }}
-            ></div>
+            >
+              <div
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  //Except for the top border
+                  borderLeft: `3px solid ${borderColor}`,
+                  borderRight: `3px solid ${borderColor}`,
+                  borderBottom: `3px solid ${borderColor}`,
+                }}
+              >
+                <div
+                  className="task-grabber"
+                  style={{
+                    cursor: 'grab',
+                    position: 'absolute',
+                    left: 0,
+                    right: 0,
+                    top: '0%',
+                    background: 'gray',
+                    borderRadius: 4,
+                    padding: '3% 0px',
+                  }}
+                  onMouseDown={onMouseDown}
+                ></div>
+                <p className="task-name" style={{ margin: 0 }}>
+                  {task.taskName}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       )}

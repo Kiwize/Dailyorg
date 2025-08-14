@@ -3,56 +3,75 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import PasswordStrengthTester from './PasswordStrengthTester';
 import callApi from '../hooks/api';
+import useAlert from '../hooks/useAlert';
+import { DatasetRounded } from '@mui/icons-material';
 
 export default function Register() {
   const navigate = useNavigate();
+  const alert = useAlert();
 
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-
-  const [error, setError] = useState('');
 
   const [passwordStrength, setPasswordStrength] = useState(0);
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    setError('');
 
-    const data = {
-      firstName,
-      lastName,
-      email,
-      password,
-      confirmPassword,
-    };
+    const data = Object.fromEntries(new FormData(e.target).entries());
+    console.log('Form Data:', data);
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      alert.setAlert('Passwords do not match', 'error');
       return;
     }
 
     if (passwordStrength < 1) {
-      setError('Password is too weak');
+      alert.setAlert('Password is too weak', 'error');
       return;
     }
 
     try {
-      const result = await callApi('POST', 'register', {
-        firstName: data.firstName,
-        lastName: data.lastName,
-        email: data.email,
-        password: data.password,
-        confirmPassword: data.confirmPassword,
-      }, {}, false);
+      const result = await callApi(
+        'POST',
+        'register',
+        {
+          firstName: data.firstName,
+          lastName: data.lastName,
+          email: data.email,
+          password: data.password,
+          confirmPassword: data.confirmPassword
+        },
+        {},
+        false,
+        true
+      );
 
-      localStorage.setItem('token', result.token);
+      console.log('Registration result:', result);
+
+      if(result.status !== 200) {
+        console.error('Registration error:', result.message);
+        alert.setAlert(result.message, 'error');
+        return;
+      }
+
+      if (result.status === 200) {
+        //Upload profile picture if provided
+        alert.setAlert('Registration successful', 'success');
+        console.log(data.profilePicture);
+        if (data.profilePicture) {
+          const formData = new FormData();
+          formData.append('profilePicture', data.profilePicture);
+          formData.append('email', data.email);
+          await callApi('POST', 'upload/profile_picture', formData, {}, false, false, true);
+        }
+      }
+
       localStorage.setItem('username', data.email);
       navigate('/');
     } catch (error) {
-      console.error('Error during registration:', error);
+      console.error('Registration error:', error);
+      alert.setAlert('Registration failed', 'error');
     }
   };
 
@@ -61,35 +80,36 @@ export default function Register() {
   };
 
   return (
-    <Box sx={{ mx: { xs: '10%', md: '35%' }, pt: 8, textAlign: 'center' }}>
+    <Box
+      sx={{
+        mx: { xs: '10%', md: '35%' },
+        pt: 8,
+        textAlign: 'center',
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+      }}
+    >
       <Paper elevation={3} sx={{ p: 4 }}>
         <Typography variant="h4" sx={{ textAlign: 'center', marginBottom: '10px' }}>
           Register
         </Typography>
         <form onSubmit={handleRegister}>
           <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-            <Input sx={{ mb: 3 }} type="text" placeholder="First Name" onChange={(e) => setFirstName(e.target.value)} required />
-            <Input sx={{ mb: 3 }} type="text" placeholder="Last Name" onChange={(e) => setLastName(e.target.value)} required />
-            <Input sx={{ mb: 3 }} type="text" placeholder="Email" onChange={(e) => setEmail(e.target.value)} required />
-            <Input sx={{ mb: 3 }} type="password" placeholder="Password" onChange={(e) => setPassword(e.target.value)} required />
-            <Input sx={{ mb: 3 }} type="password" placeholder="Confirm Password" onChange={(e) => setConfirmPassword(e.target.value)} required />
+            <Input sx={{ mb: 3 }} type="text" name="firstName" placeholder="First Name" required />
+            <Input sx={{ mb: 3 }} type="text" name="lastName" placeholder="Last Name" required />
+            <Input sx={{ mb: 3 }} type="text" name="email" placeholder="Email" required />
+            <Input sx={{ mb: 3 }} type="password" name="password" placeholder="Password" onChange={(e) => setPassword(e.target.value)} required />
+            <Input sx={{ mb: 3 }} type="password" name="confirmPassword" placeholder="Confirm Password" onChange={(e) => setConfirmPassword(e.target.value)} required />
+            {/* Upload profile picture */}
+            <Input sx={{ mb: 3 }} type="file" accept="image/*" name="profilePicture" />
+
             <PasswordStrengthTester password={password} updateCallback={handlePasswordStrengthUpdate} />
           </Box>
           <Button type="submit" variant="contained" size="large">
             Register
           </Button>
-          <div
-            style={{
-              color: 'red',
-              marginTop: '10px',
-              padding: '10px',
-              backgroundColor: 'rgba(255, 0, 0, 0.1)',
-              borderRadius: '5px',
-              display: error !== '' ? 'block' : 'none',
-            }}
-          >
-            {error !== '' && error}
-          </div>
         </form>
       </Paper>
       <Button variant="text" onClick={() => navigate('/login')} sx={{ mt: 2 }}>

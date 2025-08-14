@@ -5,46 +5,19 @@ import WTEditStrengthWorkoutExercise from './app/workout-trainer/WTEditStrengthW
 import WTEditWorkoutSession from './app/workout-trainer/WTEditWorkoutSession';
 import WTHomePage from './app/workout-trainer/WTHomePage';
 import DOHomePage from './app/dailyorg/DOHomePage';
-import LoginPage from './LoginPage';
+import LoginPage from './app/LoginPage';
 import MainPage from './MainPage';
-import AlertPopup from './components/AlertPopup';
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router';
+import { BrowserRouter, Route, Routes } from 'react-router';
 import WTCreateExercise from './app/workout-trainer/WTCreateExercise';
 import Register from './app/Register';
+import AuthChecker from './app/AuthChecker';
+import { useToolbar } from './contexts/ToolbarProvider';
+import { useEffect, useState } from 'react';
+import ProfilePage from './app/ProfilePage';
+import NotFoundView from './components/NotFoundView';
 
 function PrivateRoute({ children }) {
-  if (!localStorage.getItem('token')) {
-    // If not authenticated, redirect to login page
-    return <Navigate to="/login" replace />;
-  } else {
-    //Otherwise, check if the token is valid
-    fetch(`${import.meta.env.VITE_API_URL}/api/check_token`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        token: localStorage.getItem('token'),
-      }),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          // If the token is invalid, redirect to login page
-          localStorage.removeItem('token');
-          localStorage.removeItem('username');
-          return <Navigate to="/login" replace />;
-        }
-      })
-      .catch((error) => {
-        console.error('Error checking token:', error);
-        // If there's an error, redirect to login page
-        localStorage.removeItem('token');
-        localStorage.removeItem('username');
-        return <Navigate to="/login" replace />;
-      });
-
-      return children;
-  }
+  return children;
 }
 
 const darkTheme = createTheme({
@@ -54,13 +27,23 @@ const darkTheme = createTheme({
 });
 
 function App() {
+
+
   return (
-    <Container sx={{ height: '100vh' }}>
+    <Container>
       <ThemeProvider theme={darkTheme}>
         <CssBaseline />
         <BrowserRouter>
-          <AlertPopup />
+          <AuthChecker />
           <Routes>
+            <Route 
+            path='/profilepage'
+            element={
+              <PrivateRoute>
+                <ProfilePage/>
+              </PrivateRoute>
+            }
+            />
             <Route
               path="/dohomepage"
               element={
@@ -127,6 +110,7 @@ function App() {
                 </PrivateRoute>
               }
             />
+            <Route path="*" element={<NotFoundView />} />
           </Routes>
         </BrowserRouter>
       </ThemeProvider>

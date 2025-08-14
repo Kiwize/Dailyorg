@@ -1,41 +1,50 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { format, startOfWeek, addDays, addWeeks, subWeeks, isSameDay, parseISO, subDays, isSameMinute } from 'date-fns';
-import { Box, Button, Typography, Paper, IconButton, InputLabel, MenuItem, Select, TextField, Checkbox } from '@mui/material';
+import { format, startOfWeek, addDays, addWeeks, subWeeks, isSameDay, parseISO, subDays, isSameMinute, set, startOfToday, getHours } from 'date-fns';
+import { Box, Button, Typography, Paper } from '@mui/material';
 import callApi from '../../hooks/api';
-import CloseIcon from '@mui/icons-material/Close';
-import { Task } from '@mui/icons-material';
-import TaskCard from './TaskCard';
 
-export default function WeekViewCalendar({ calendarRefreshCallback }) {
-  const [selectedDate, setSelectedDate] = useState(new Date());
+import TaskCard from './TaskCard';
+import useAlert from '../../hooks/useAlert';
+import VisualTimeIndicator from './VisualTimeIndicator';
+import OutsideHoursTask from './OutsideHoursTask';
+import TaskAddUpdateForm from './TaskAddUpdateForm';
+
+export default function WeekViewCalendar({ calendarRefreshCallback, settings }) {
   const [isAddFormShown, setIsAddFormShown] = useState(false);
   const [triggerRefresh, setTriggerRefresh] = useState(false);
+  const alert = useAlert();
 
   const [selectedTask, setSelectedTask] = useState(null);
-  const [showcaseTaskPosition, setShowcaseTaskPosition] = useState({ x: 0, y: 0 });
-  const [showcaseTaskSize, setShowcaseTaskSize] = useState({ width: 0, height: 0 });
-  const isDragging = useRef(false);
-
-  // State for error handling
-  const [error, setError] = useState('');
-
-  // State for form fields
-  const [taskId, setTaskId] = React.useState('');
-  const [taskName, setTaskName] = React.useState('');
-  const [startTime, setStartTime] = React.useState('');
-  const [endTime, setEndTime] = React.useState('');
-  const [description, setDescription] = React.useState('');
-  const [isCompleted, setIsCompleted] = React.useState(false);
-  const [priority, setPriority] = React.useState('Low');
-  const [energy, setEnergy] = React.useState('');
-
-  const [isEditingTask, setIsEditingTask] = useState(false);
 
   const [currentDate, setCurrentDate] = useState(new Date());
   const startOfCurrentWeek = startOfWeek(currentDate, { weekStartsOn: 1 }); // Monday
 
+  // State for form fields
+  const [taskData, setTaskData] = React.useState({
+    id: '',
+    taskName: '',
+    startTime: '',
+    endTime: '',
+    description: '',
+    isCompleted: false,
+    priority: 'Low',
+    energy: '',
+    isRecurrent: false,
+    repeatFrequency: null,
+    repeatEndDate: '',
+  });
+
+  const [isEditingTask, setIsEditingTask] = useState(false);
+
   // Stores all the tasks for the selected week
+
   const [selectedWeekTasks, setSelectedWeekTasks] = useState([]);
+  const [visualTimeIndicators, setVisualTimeIndicators] = useState([]);
+
+  //Lists of tasks displayed outside of the displayed hours
+  //Those tasks can be before or after the displayed hours
+  const [beforeDisplayedTasks, setBeforeDisplayedTasks] = useState([]);
+  const [afterDisplayedTasks, setAfterDisplayedTasks] = useState([]);
 
   const weekDays = [...Array(7)].map((_, i) => {
     const date = addDays(startOfCurrentWeek, i);
@@ -47,16 +56,31 @@ export default function WeekViewCalendar({ calendarRefreshCallback }) {
   });
 
   useEffect(() => {
+    retrieveTasksForWeek();
+  }, [settings, triggerRefresh]);
+
+  useEffect(() => {
     // Fetch tasks for the current week when the component mounts
-    if (!localStorage.getItem('tasks.calendar.cache')) {
-      localStorage.setItem('tasks.calendar.cache', JSON.stringify(new Map()));
+
+    if (!localStorage.getItem('tasks.calendar.cache_' + localStorage.getItem('username'))) {
+      //Delete previous cache if it exists
+      for (let i = localStorage.length - 1; i >= 0; i--) {
+        const key = localStorage.key(i);
+        if (key.startsWith('tasks.calendar.cache_')) {
+          localStorage.removeItem(key);
+        }
+      }
+
+      localStorage.setItem('tasks.calendar.cache_' + localStorage.getItem('username'), JSON.stringify(new Map()));
     }
 
-    retrieveTasksForWeek();
+    retrieveTasksForWeek(true);
 
     //Calls the calendar refresh callback with the cached tasks for the current week
     calendarRefreshCallback(
-      JSON.parse(localStorage.getItem('tasks.calendar.cache'))[getCacheKeyFromDate(startOfWeek(new Date(), { weekStartsOn: 1 })).split('T')[0]] || []
+      JSON.parse(localStorage.getItem('tasks.calendar.cache_' + localStorage.getItem('username')))[
+        getCacheKeyFromDate(startOfWeek(new Date(), { weekStartsOn: 1 })).split('T')[0]
+      ] || []
     );
   }, [currentDate, triggerRefresh]);
 
@@ -73,23 +97,22 @@ export default function WeekViewCalendar({ calendarRefreshCallback }) {
 
     // Reset form fields when hiding the form
     if (!newState) {
-      setTaskId('');
-      setTaskName('');
-      setStartTime('');
-      setEndTime('');
-      setDescription('');
-      setIsCompleted(false);
-      setPriority('Low');
-      setEnergy('');
-      setError(''); // Reset error state
+      setTaskData({
+        id: '',
+        taskName: '',
+        startTime: '',
+        endTime: '',
+        description: '',
+        isCompleted: false,
+        priority: 'Low',
+        energy: '',
+        isRecurrent: false,
+        repeatFrequency: null,
+        repeatEndDate: '',
+      });
     }
 
     setTriggerRefresh(!triggerRefresh);
-  };
-
-  const handleDateSelect = (date) => {
-    setSelectedDate(date);
-    console.log('Selected date:', date);
   };
 
   const handleTaskClick = (task) => {
@@ -97,25 +120,32 @@ export default function WeekViewCalendar({ calendarRefreshCallback }) {
     setIsEditingTask(true);
     handleAddTask(true);
 
-    setTaskId(task.taskId);
-    setTaskName(task.taskName);
-    setStartTime(task.taskStartDate);
-    setEndTime(task.taskEndDate);
-    setDescription(task.taskDescription);
-    setIsCompleted(task.taskCompleted);
-    setPriority(task.taskPriority.taskPriorityName);
-    setEnergy(task.taskRequiredEnergy);
+    setTaskData({
+      id: task.id,
+      taskName: task.taskName,
+      startTime: task.taskStartDate,
+      endTime: task.taskEndDate,
+      description: task.taskDescription,
+      isCompleted: task.taskCompleted,
+      priority: task.taskPriority.taskPriorityName,
+      energy: task.taskRequiredEnergy,
+      isRecurrent: task.recurringTaskState !== null,
+      repeatFrequency: task.recurringTaskState ? task.recurringTaskState.recurringTaskStateId : null,
+      repeatEndDate: task.recurringTaskState ? task.recurrenceEndDate.split('T')[0] : null,
+    });
+
+    console.log('Selected task for editing:', task);
 
     setTriggerRefresh(!triggerRefresh);
   };
 
-  const handleDeleteTask = async (taskId) => {
+  const handleDeleteTask = async (id) => {
     // Deletes a task by its ID
     await callApi(
       'DELETE',
       'task/delete_task',
       {
-        task_id: taskId,
+        task_id: id,
         user_email: localStorage.getItem('username'),
       },
       {},
@@ -124,6 +154,8 @@ export default function WeekViewCalendar({ calendarRefreshCallback }) {
     );
 
     retrieveTasksForWeek(true);
+    alert.setAlert('Task deleted successfully', 'success');
+    setSelectedTask(null);
     setTriggerRefresh(!triggerRefresh);
   };
 
@@ -137,33 +169,43 @@ export default function WeekViewCalendar({ calendarRefreshCallback }) {
 
   const handleAddTaskFormSubmit = async (event) => {
     event.preventDefault();
+    console.log('Submitting task data:', taskData);
+
+    if(taskData.isRecurrent && (taskData.repeatEndDate == null)) {
+      alert.setAlert('Please provide both repeat frequency and end date for recurring tasks.', 'error');
+      return;
+    }
 
     try {
-      const response = await callApi(
+      await callApi(
         'PUT',
         `task/${isEditingTask ? 'update_task' : 'create_task'}`,
         {
-          task_id: isEditingTask ? taskId : null, // Only include task_id if editing
-          is_task_completed: isCompleted,
-          task_name: taskName,
-          user_email: localStorage.getItem('username'),
-          task_start_date: startTime,
-          task_end_date: endTime,
-          task_description: description,
-          task_required_energy: parseInt(energy, 10),
-          task_priority: priority,
+          task_id: isEditingTask ? taskData.id : null, // Only include task_id if editing
+          is_task_completed: taskData.isCompleted,
+          task_name: taskData.taskName,
+          task_start_date: taskData.startTime,
+          task_end_date: taskData.endTime,
+          task_description: taskData.description,
+          task_required_energy: parseInt(taskData.energy, 10),
+          task_priority: taskData.priority,
+          is_recurrent: taskData.isRecurrent,
+          task_repeat_frequency: taskData.isRecurrent ? taskData.repeatFrequency : null,
+          task_repeat_end_date: taskData.isRecurrent ? taskData.repeatEndDate : null,
         },
         {},
         true,
         false
-      );
+      ).then(() => {
+        // Refresh the tasks after adding or updating
+        retrieveTasksForWeek(true);
+      });
 
       handleAddTask(false); // Hide the form after successful submission
+      alert.setAlert(`Task ${isEditingTask ? 'updated' : 'added'} successfully`, 'success');
     } catch (err) {
-      setError(err.message);
+      alert.setAlert(`Failed to ${isEditingTask ? 'update' : 'add'} task: ${err.message}`, 'error');
     }
-
-    retrieveTasksForWeek(true);
   };
 
   const retrieveTasksForWeek = async (forceRefresh = false) => {
@@ -171,21 +213,41 @@ export default function WeekViewCalendar({ calendarRefreshCallback }) {
     var taskData = [];
     var currentWeekKey = getCacheKeyFromDate(startOfCurrentWeek);
 
-    const cache = JSON.parse(localStorage.getItem('tasks.calendar.cache'));
+    var cache = JSON.parse(localStorage.getItem('tasks.calendar.cache_' + localStorage.getItem('username')));
+
+    if (!cache) {
+      localStorage.setItem('tasks.calendar.cache_' + localStorage.getItem('username'), JSON.stringify({}));
+      cache = JSON.parse(localStorage.getItem('tasks.calendar.cache_' + localStorage.getItem('username')));
+    }
 
     if (cache[currentWeekKey] && !forceRefresh) {
       taskData = cache[currentWeekKey];
     } else {
       const response = await callApi('POST', 'task/get_tasks_between_dates', {
-        user_email: localStorage.getItem('username'),
         start_date: startOfCurrentWeek.toLocaleString('sv-SE').replace(' ', 'T'),
         end_date: addDays(startOfCurrentWeek, 7).toLocaleString('sv-SE').replace(' ', 'T'),
       });
 
       // Store the tasks in the local cache
-      cache[currentWeekKey] = response;
-      localStorage.setItem('tasks.calendar.cache', JSON.stringify(cache));
-      taskData = response;
+      cache[currentWeekKey] = response.content;
+      localStorage.setItem('tasks.calendar.cache_' + localStorage.getItem('username'), JSON.stringify(cache));
+      taskData = response.content;
+    }
+
+    //Update the task data according to the selected task's new start and end dates
+    //find the task with the same ID as the selected task and update its start and end dates
+
+    if (selectedTask) {
+      taskData = taskData.map((task) => {
+        if (task.id === selectedTask.id) {
+          return {
+            ...task,
+            taskStartDate: selectedTask.taskStartDate,
+            taskEndDate: selectedTask.taskEndDate,
+          };
+        }
+        return task;
+      });
     }
 
     setSelectedWeekTasks(
@@ -195,32 +257,59 @@ export default function WeekViewCalendar({ calendarRefreshCallback }) {
         end: parseISO(task.taskEndDate),
       }))
     );
+
+    const beforeTasks = taskData.filter((task) => {
+      const taskEnd = parseISO(task.taskEndDate);
+      return getHours(taskEnd) <= Number(settings.firstDisplayedHour);
+    });
+
+    const afterTasks = taskData.filter((task) => {
+      const taskEnd = parseISO(task.taskStartDate);
+      return getHours(taskEnd) >= Number(settings.firstDisplayedHour) + Number(settings.displayedHours);
+    });
+
+    setBeforeDisplayedTasks(beforeTasks);
+    setAfterDisplayedTasks(afterTasks);
+
+    // Generate visual time indicators for the displayed hours
+    //Add indicators for each quarter hours IF there are 8 or less displayed hours
+    const visualIndicators = [];
+
+    for (let i = 0; i < settings.displayedHours; i++) {
+      const baseDate = startOfToday(); // Midnight today (00:00)
+      const time = set(baseDate, {
+        hours: Number(settings.firstDisplayedHour) + i,
+        minutes: 0,
+        seconds: 0,
+        milliseconds: 0,
+      });
+
+      visualIndicators.push(time);
+    }
+
+    if (settings.displayedHours <= 8) {
+      for (let i = 0; i < settings.displayedHours * 4; i++) {
+        const time = set(startOfToday(), { hours: settings.firstDisplayedHour + Math.floor(i / 4), minutes: (i % 4) * 15, seconds: 0 });
+        visualIndicators.push(time);
+      }
+    }
+
+    setVisualTimeIndicators(visualIndicators);
   };
 
-  // Helper to get top and height percentages for a task
-  function getTaskPosition(start, end) {
-    const startHour = start.getHours() + start.getMinutes() / 60;
-    const endHour = end.getHours() + end.getMinutes() / 60;
-    const top = (startHour / 24) * 100;
-    const height = ((endHour - startHour) / 24) * 100;
-    return { top: `${top}%`, height: `${height}%` };
-  }
-
-  function updateTaskBeforeDrag(task) {
+  function updateTaskBeforeDrag(task, target) {
     // Prepare the task for dragging by converting start and end dates to Date objects
     setSelectedTask(task);
-    isDragging.current = true;
   }
 
   function updateTaskWhileDrag(task, x, y, target) {
     //update the values in the selectedWeekTasks state
-    setSelectedWeekTasks((prevTasks) => prevTasks.map((t) => (t.taskId === task.taskId ? { ...t, start: task.start, end: task.end } : t)));
+    setSelectedWeekTasks((prevTasks) => prevTasks.map((t) => (t.id === task.id ? { ...t, start: task.start, end: task.end } : t)));
 
-    setShowcaseTaskPosition({ x, y });
+    selectedTask.taskStartDate = x.toLocaleString('sv-SE').replace(' ', 'T');
+    selectedTask.taskEndDate = y.toLocaleString('sv-SE').replace(' ', 'T');
 
-    console.log('New position:', target.style);
-    setShowcaseTaskSize({ width: target.offsetWidth, height: target.offsetHeight });
-
+    retrieveTasksForWeek(false);
     setTriggerRefresh(!triggerRefresh);
   }
 
@@ -230,7 +319,7 @@ export default function WeekViewCalendar({ calendarRefreshCallback }) {
       'PUT',
       'task/update_task',
       {
-        task_id: task.taskId,
+        task_id: task.id,
         is_task_completed: task.isCompleted,
         task_name: task.taskName,
         user_email: localStorage.getItem('username'),
@@ -250,151 +339,24 @@ export default function WeekViewCalendar({ calendarRefreshCallback }) {
         setTriggerRefresh(!triggerRefresh);
       })
       .catch((error) => {
-        console.error('Error updating task:', error);
-        setError('Failed to update task. Please try again.');
+        alert.setAlert('Failed to update task. Please try again.', 'error');
       });
 
-    isDragging.current = false; // Reset dragging state
     setSelectedTask(null); // Clear selected task after dragging
   }
 
   return (
-    <Box className="h-full" sx={{ margin: '0 auto', p: 2 }}>
+    <Box className="h-full" sx={{ margin: '0 auto', p: 2, width: { xs: '100%', md: '80%' } }}>
       {isAddFormShown && (
-        <Box
-          sx={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            zIndex: 1000,
-          }}
-        >
-          <Box
-            sx={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              backgroundColor: 'background.paper',
-              padding: 4,
-              borderRadius: 2,
-              boxShadow: 3,
-            }}
-          >
-            <IconButton variant="contained" color="error" onClick={() => handleAddTask(false)} sx={{ position: 'absolute', top: 8, right: 8 }}>
-              <CloseIcon />
-            </IconButton>
-            <Typography variant="h5" sx={{ mb: 5, textAlign: 'center' }}>
-              {isEditingTask ? 'Edit Task' : 'Add Task'}
-            </Typography>
-            {/* Add your form fields here */}
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              <form
-                onSubmit={(e) => {
-                  handleAddTaskFormSubmit(e);
-                }}
-                style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}
-              >
-                <TextField type="text" placeholder="Task Name" value={taskName} onChange={(event) => setTaskName(event.target.value)} required />
-
-                <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
-                  <InputLabel>Start time :</InputLabel>
-                  <input
-                    type="datetime-local"
-                    placeholder="Start Time"
-                    value={startTime}
-                    name="start_time"
-                    onChange={(event) => setStartTime(event.target.value)}
-                    required
-                  />
-                </Box>
-                <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
-                  <InputLabel>End time :</InputLabel>
-                  <input
-                    type="datetime-local"
-                    value={endTime}
-                    placeholder="End Time"
-                    name="end_time"
-                    onChange={(event) => setEndTime(event.target.value)}
-                    required
-                  />
-                </Box>
-                <textarea placeholder="Description" value={description} rows={4} onChange={(event) => setDescription(event.target.value)}></textarea>
-
-                <TextField
-                  type="number"
-                  placeholder="Energy Required (1-10)"
-                  min={1}
-                  max={10}
-                  value={energy}
-                  onChange={(event) => setEnergy(event.target.value)}
-                  required
-                />
-
-                <Select labelId="Priority" value={priority} name="priority" onChange={(event) => setPriority(event.target.value)} required>
-                  <MenuItem value="Low">Low</MenuItem>
-                  <MenuItem value="Medium">Medium</MenuItem>
-                  <MenuItem value="High">High</MenuItem>
-                </Select>
-
-                {isEditingTask && (
-                  <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
-                    <InputLabel>Is completed :</InputLabel>
-                    <Checkbox checked={isCompleted} value={isCompleted} onChange={(event) => setIsCompleted(event.target.checked)} />
-                  </Box>
-                )}
-
-                <Button variant="contained" color="success" type="submit" sx={{ mt: 2 }}>
-                  {isEditingTask ? 'Update Task' : 'Add Task'}
-                </Button>
-
-                {isEditingTask && (
-                  <Button
-                    variant="outlined"
-                    color="error"
-                    onClick={() => {
-                      setIsEditingTask(false);
-                      handleAddTask(false);
-                      handleDeleteTask(taskId);
-                    }}
-                    sx={{ mt: 2 }}
-                  >
-                    Delete Task
-                  </Button>
-                )}
-
-                {error && <Typography color="error">{error}</Typography>}
-              </form>
-            </Box>
-          </Box>
-        </Box>
-      )}
-      <Typography variant="h4" align="center" gutterBottom>
-        {format(currentDate, 'MMMM yyyy dd')} Week View
-      </Typography>
-      {selectedTask && (
-        <Box sx=
-        {{ 
-          position: 'absolute', 
-          top: showcaseTaskPosition.y, 
-          left: showcaseTaskPosition.x, 
-          zIndex: 1000,
-          width: showcaseTaskSize.width || 'auto',
-          height: showcaseTaskSize.height || 'auto',
-        }}>
-          <TaskCard
-            task={selectedTask}
-            updateTaskAfterDrag={updateTaskAfterDrag}
-            updateTaskWhileDrag={updateTaskWhileDrag}
-            getTaskPosition={getTaskPosition}
-            handleTaskClick={handleTaskClick}
-            updateTaskBeforeDrag={updateTaskBeforeDrag}
-            onClick={() => {}}
-          />
-        </Box>
+        <TaskAddUpdateForm
+          handleAddTask={handleAddTask}
+          handleDeleteTask={handleDeleteTask}
+          isEditingTask={isEditingTask}
+          taskData={taskData}
+          setTaskData={setTaskData}
+          handleAddTaskFormSubmit={handleAddTaskFormSubmit}
+          setIsEditingTask={setIsEditingTask}
+        />
       )}
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
         <Button variant="outlined" onClick={goToPreviousWeek}>
@@ -405,63 +367,92 @@ export default function WeekViewCalendar({ calendarRefreshCallback }) {
           Next ›
         </Button>
       </Box>
-      <Box
-        className="grid h-full"
-        gridTemplateColumns="repeat(7, 1fr)"
-        gap={1}
-        sx={{
-          height: '100%',
-          minHeight: { md: '300px' },
-        }}
-      >
+      <Box className="grid h-full" gridTemplateColumns="repeat(7, 1fr)" gap={1}>
         {weekDays.map(({ date, label, isToday }) => (
-          <Paper
-            id={`date-${date.toLocaleString('sv-SE').split(' ')[0]}`}
-            key={date.toISOString()}
-            elevation={isToday ? 4 : 1}
-            sx={{
-              position: 'relative',
-              padding: 2,
-              backgroundColor: isToday ? 'primary.dark' : 'background.paper',
-              border: isToday ? '2px solid' : '1px solid',
-              borderColor: isToday ? 'primary.main' : 'grey.300',
-              textAlign: 'center',
-              height: { xs: 'auto', md: '40vh' },
-              minHeight: { md: '40%' },
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              overflow: 'hidden',
-            }}
-            //onClick={() => handleDateSelect(date)}
-          >
-            <Typography variant="body1" style={{ userSelect: 'none' }}>
+          <Box key={date.toISOString() + '-box'}>
+            <Typography variant="subtitle1" sx={{ textAlign: 'center', fontWeight: 'bold', color: isToday ? 'primary.main' : 'text.primary' }}>
               {label}
             </Typography>
-            {/* Render the task only if it matches this date */}
-            {selectedWeekTasks &&
-              selectedWeekTasks.map((task) => {
-                return (
-                  isSameDay(date, task.start) && (
-                    <TaskCard
-                      key={task.taskId}
-                      task={task}
-                      updateTaskAfterDrag={updateTaskAfterDrag}
-                      updateTaskWhileDrag={updateTaskWhileDrag}
-                      getTaskPosition={getTaskPosition}
-                      handleTaskClick={handleTaskClick}
-                      updateTaskBeforeDrag={updateTaskBeforeDrag}
-                      onClick={() => {
-                        setSelectedTask(task);
-                      }}
-                    />
-                  )
-                );
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'space-evenly',
+                paddingBottom: 2,
+                minHeight: beforeDisplayedTasks.length * 42 + 'px', // Adjust height based on the number of tasks
+              }}
+            >
+              {beforeDisplayedTasks.map((task) => {
+                return isSameDay(date, task.taskStartDate) && <OutsideHoursTask key={task.id + '_before'} task={task} />;
               })}
-          </Paper>
+            </Box>
+            <Paper
+              id={`date-${date.toLocaleString('sv-SE').split(' ')[0]}`}
+              key={date.toISOString()}
+              elevation={isToday ? 4 : 1}
+              sx={{
+                position: 'relative',
+                padding: 2,
+                backgroundColor: isToday ? '#002699' : 'background.paper',
+                border: isToday ? '2px solid' : '1px solid',
+                borderColor: isToday ? 'primary.main' : 'grey.300',
+                textAlign: 'center',
+                height: { xs: 'auto', md: '70vh' },
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                overflow: 'hidden',
+              }}
+              //onClick={() => handleDateSelect(date)}
+            >
+              {/* Render the task only if it matches this date */}
+              {selectedWeekTasks &&
+                selectedWeekTasks.map((task) => {
+                  return (
+                    isSameDay(date, task.start) && (
+                      <TaskCard
+                        key={task.id}
+                        task={task}
+                        isTaskSelected={selectedTask && selectedTask.id === task.id}
+                        updateTaskAfterDrag={updateTaskAfterDrag}
+                        updateTaskWhileDrag={updateTaskWhileDrag}
+                        handleTaskClick={handleTaskClick}
+                        updateTaskBeforeDrag={updateTaskBeforeDrag}
+                        displayConfig={{ displayedHours: settings.displayedHours, firstDisplayedHour: settings.firstDisplayedHour }}
+                      />
+                    )
+                  );
+                })}
+              {/* Render visual time indicators for each hour in the displayed range */}
+              {visualTimeIndicators &&
+                visualTimeIndicators.map((time) => (
+                  <VisualTimeIndicator
+                    key={time.toISOString() + Math.random()}
+                    time={time}
+                    firstDisplayedHour={settings.firstDisplayedHour}
+                    displayedHours={settings.displayedHours}
+                  />
+                ))}
+            </Paper>
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'space-evenly',
+                paddingTop: 2,
+                minHeight: afterDisplayedTasks.length * 64 + 'px', // Adjust height based on the number of tasks
+              }}
+            >
+              {afterDisplayedTasks.map((task) => {
+                return isSameDay(date, task.taskStartDate) && <OutsideHoursTask key={task.id + '_after'} task={task} />;
+              })}
+            </Box>
+          </Box>
         ))}
       </Box>
-      <Box sx={{ textAlign: 'center' }}>
+      <Box sx={{ textAlign: 'center', mt: 2 }}>
         <Button variant="contained" color="success" onClick={() => handleAddTask(true)}>
           Add Task
         </Button>
