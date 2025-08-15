@@ -15,7 +15,7 @@ services:
     build:
       context: ./dailyorg-frontend-react
     ports:
-      - "80:80"
+      - "81:80"
     networks:
       - dailyorg-app-network
 
