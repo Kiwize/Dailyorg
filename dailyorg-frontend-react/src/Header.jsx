@@ -18,6 +18,12 @@ const handleLogout = async (navigate) => {
 function Header() {
   const navigate = useNavigate();
   const toolBar = useToolbar();
+  try {
+    var filename = sha256(localStorage.getItem('username')) + '.webp';
+  } catch (e) {
+    filename = 'user_dark.webp'; // Fallback in case of error
+    console.error('Error generating filename:', e);
+  }
 
   useEffect(() => {
     toolBar.setToolbarEnabled(false);
@@ -39,13 +45,13 @@ function Header() {
       </header>
       <div style={{ marginLeft: '16px', backgroundColor: '#38383866', borderRadius: '20px', padding: '0px' }}>
         <img
-          src={`${BASE_URL}/uploads/profile_pictures/${sha256(localStorage.getItem('username')) + '.webp'}`}
+          src={`${BASE_URL}/uploads/profile_pictures/${filename}`}
           alt="Profile Picture"
           style={{ borderRadius: '50%', width: '56px', aspectRatio: '1/1', padding: '3px' }}
           onClick={() => navigate('/profilepage')}
           onError={(e) => {
             e.target.onerror = null;
-            e.target.src = "images\\user_dark.webp";
+            e.target.src = 'images\\user_dark.webp';
           }}
         />
       </div>
