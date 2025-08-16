@@ -1,19 +1,24 @@
 version: "3.9"
 services:
   backend:
+    container_name: backend
     image: dailyorg_backend
     build:
       context: ./eclipse-workspace/dailyorg_java
     ports:
       - "8080:8080"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - dailyorg-app-network
 
   frontend:
-    container_name: dailyorg_frontend
+    container_name: frontend
     image: dailyorg_frontend
     build:
       context: ./dailyorg-frontend-react
+      args:
+        APP_API_URL: https://dailyorg-api.thomaspradeau.com
     ports:
       - "81:80"
     networks:
