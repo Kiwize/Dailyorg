@@ -32,7 +32,7 @@ function Header() {
   return (
     //Header sticks to the top of the page
     <div style={{ position: 'sticky', top: 16, zIndex: 1000, display: 'flex', alignItems: 'center', maxHeight: '56px' }}>
-      <header style={{ backgroundColor: '#38383866', borderRadius: '20px', flexGrow: 1 }}>
+      <header style={{ backgroundColor: '#383838bb', borderRadius: '20px', flexGrow: 1 }}>
         <nav style={{ display: 'flex' }}>
           <List>
             <ListItem>
@@ -47,7 +47,7 @@ function Header() {
         <img
           src={`${BASE_URL}/uploads/profile_pictures/${filename}`}
           alt="Profile Picture"
-          style={{ borderRadius: '50%', width: '56px', aspectRatio: '1/1', padding: '3px' }}
+          style={{ borderRadius: '50%', width: '56px', aspectRatio: '1/1', objectFit: 'cover', padding: '3px' }}
           onClick={() => navigate('/profilepage')}
           onError={(e) => {
             e.target.onerror = null;

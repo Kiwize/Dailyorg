@@ -112,10 +112,10 @@ function DOHomePage() {
         <WeekViewCalendar calendarRefreshCallback={handleCalendarWeekTaskRefresh} settings={settings} />
       </Box>
 
-      <Grid2 container spacing={2} sx={{ mt: 2 }} justifyContent="center" alignItems="center" direction="row">
+      <Grid2 container columns={12} spacing={2} sx={{ mt: 2 }} justifyContent="center" alignItems="center" direction="row">
         {/* Widgets */}
         <Grid2
-          size={{ xs: 12, sm: 6, md: 4 }}
+          size={{ xs: 8, sm: 8, md: 4, lg: 3, xl: 3 }}
           sx={{
             backgroundColor: '#383838',
             aspectRatio: '1/1',
@@ -128,9 +128,7 @@ function DOHomePage() {
           }}
         >
           {todayNumberOfTasks > 0 ? (
-            <Typography variant="h6" sx={{ mb: 1 }}>
               <TasksCompletedGauge totalTasks={todayNumberOfTasks} completedTasks={todayCompletedTasks} />
-            </Typography>
           ) : (
             <Typography variant="h6" sx={{ mb: 1 }}>
               No tasks for today 👍

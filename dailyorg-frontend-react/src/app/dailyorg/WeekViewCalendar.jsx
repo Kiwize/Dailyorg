@@ -346,7 +346,7 @@ export default function WeekViewCalendar({ calendarRefreshCallback, settings }) 
   }
 
   return (
-    <Box className="h-full" sx={{ margin: '0 auto', p: 2, width: { xs: '100%', md: '80%' } }}>
+    <Box className="h-full" id="week-view-calendar" sx={{ margin: '0 auto', p: 2, width: { xs: '100%', md: '90%' }, overflow: 'hidden' }} >
       {isAddFormShown && (
         <TaskAddUpdateForm
           handleAddTask={handleAddTask}
@@ -367,10 +367,10 @@ export default function WeekViewCalendar({ calendarRefreshCallback, settings }) 
           Next ›
         </Button>
       </Box>
-      <Box className="grid h-full" gridTemplateColumns="repeat(7, 1fr)" gap={1}>
+      <Box className="grid h-full" sx={{maxWidth: '100vw', overflowX: 'auto'}} gridTemplateColumns={{ xs: 'repeat(7, 120px)', md: 'repeat(7, 1fr)' }} gap={1}>
         {weekDays.map(({ date, label, isToday }) => (
           <Box key={date.toISOString() + '-box'}>
-            <Typography variant="subtitle1" sx={{ textAlign: 'center', fontWeight: 'bold', color: isToday ? 'primary.main' : 'text.primary' }}>
+            <Typography variant="subtitle1" sx={{ textAlign: 'center', textWrap: 'nowrap', fontWeight: 'bold', color: isToday ? 'primary.main' : 'text.primary' }}>
               {label}
             </Typography>
             <Box
@@ -398,7 +398,7 @@ export default function WeekViewCalendar({ calendarRefreshCallback, settings }) 
                 border: isToday ? '2px solid' : '1px solid',
                 borderColor: isToday ? 'primary.main' : 'grey.300',
                 textAlign: 'center',
-                height: { xs: 'auto', md: '70vh' },
+                height: { xs: '70vh', md: '70vh' },
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'center',

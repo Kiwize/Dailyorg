@@ -4,10 +4,23 @@ import callApi from '../hooks/api';
 import useAlert from '../hooks/useAlert';
 import DriveFolderUploadIcon from '@mui/icons-material/DriveFolderUpload';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
+import useWindowSize from '../hooks/useWindowSize';
+import { sha256 } from 'js-sha256';
 
 export default function ProfilePage() {
   const [profilePicture, setProfilePicture] = useState(null);
   const alert = useAlert();
+
+  const { width } = useWindowSize();
+
+  const BASE_URL = import.meta.env.VITE_API_URL;
+
+  try {
+    var filename = sha256(localStorage.getItem('username')) + '.webp';
+  } catch (e) {
+    filename = 'user_dark.webp'; // Fallback in case of error
+    console.error('Error generating filename:', e);
+  }
 
   const [editMode, setEditMode] = useState(false);
   const [userFirstName, setUserFirstName] = useState('');
@@ -48,7 +61,7 @@ export default function ProfilePage() {
     const data = {
       surname: userFirstName,
       username: userLastName,
-      email: userEmail
+      email: userEmail,
     };
 
     const result = await callApi('POST', 'user/update_user', data, {}, false, true);
@@ -91,7 +104,7 @@ export default function ProfilePage() {
             top: '50%',
             left: '50%',
             transform: 'translate(-50%, -50%)',
-            minWidth: '70%',
+            width: { xs: '90%', sm: '70%', md: '50%' },
             minHeight: '200px',
             backgroundColor: 'background.paper',
             boxShadow: 24,
@@ -117,28 +130,39 @@ export default function ProfilePage() {
               <Typography variant="body1" sx={{ mb: 2 }}>
                 Update profile picture
               </Typography>
-              <Box>
-                <Input
-                  type="file"
-                  name="profilePicture"
-                  accept="image/*"
-                  style={{ marginBottom: '16px' }}
-                  onChange={(e) => setProfilePicture(e.target.files[0])}
-                />
-                <DriveFolderUploadIcon sx={{ fontSize: 40 }} />
+              <Box sx={{ display: 'flex', flexDirection: width >= 800 ? 'row' : 'column', alignItems: 'center', gap: 2 }}>
+                <Box>
+                  <Box>
+                    <Input
+                      type="file"
+                      name="profilePicture"
+                      accept="image/*"
+                      style={{ marginBottom: '16px' }}
+                      onChange={(e) => setProfilePicture(e.target.files[0])}
+                    />
+                  </Box>
+                  <Typography variant="body2" color="text.secondary">
+                    Supported formats: JPG, PNG, WEBP
+                  </Typography>
+                </Box>
+                <Box>
+                  {
+                    <img
+                      src={
+                        `${BASE_URL}/uploads/profile_pictures/${filename}` && !profilePicture
+                          ? `${BASE_URL}/uploads/profile_pictures/${filename}`
+                          : URL.createObjectURL(profilePicture)
+                      }
+                      alt="Profile Preview"
+                      style={{ width: '200px', height: '200px', borderRadius: '8px', maskRepeat: 'no-repeat', maskSize: 'cover', objectFit: 'cover' }}
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = 'images\\user_dark.webp';
+                      }}
+                    />
+                  }
+                </Box>
               </Box>
-              <Typography variant="body2" color="text.secondary">
-                Supported formats: JPG, PNG, WEBP
-              </Typography>
-            </Box>
-            <Box>
-              {profilePicture && (
-                <img
-                  src={URL.createObjectURL(profilePicture)}
-                  alt="Profile Preview"
-                  style={{ width: '200px', height: '200px', borderRadius: '8px', maskRepeat: 'no-repeat', maskSize: 'cover', objectFit: 'cover' }}
-                />
-              )}
             </Box>
           </Box>
           <Box

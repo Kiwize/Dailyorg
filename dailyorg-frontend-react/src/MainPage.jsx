@@ -49,9 +49,9 @@ function MainPage() {
       </Typography>
 
       <Box>
-        <Grid2 container spacing={2}>
+        <Grid2 container spacing={2} justifyContent="center" alignItems="center" direction="row">
           {apps.map((app) => (
-            <Grid2 key={app.name} size={{ xs: 12, sm: 4 }}>
+            <Grid2 key={app.name} size={{ xs: 9, sm: 4 }}>
               <Paper elevation={3}>
                 <CardActionArea onClick={() => navigate(app.navigateTo)}>
                   <CardMedia component="img" height="140" image={app.img} alt={app.imgAlt} />
