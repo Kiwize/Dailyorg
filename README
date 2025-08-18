@@ -1,0 +1,32 @@
+# Daily Organization Java Project
+
+### Structure du projet
+Le projet est organisé en plusieurs répertoires suivants
+
+- `dailyorg-frontend-react` : Contient l'application React frontend.
+- `eclipse-workspace/dailyorg-java` : Contient l'application Java backend.
+
+### Pour tester l'application : 
+
+1. Assurez-vous d'avoir installé Docker et Docker Compose au préalable.
+2. Mettez en place une base de données MySQL et configurez les variables d'environnement en conséquence.
+3. Créez un fichier .env dans le repertoire `eclipse-workspace/dailyorg-java` et y ajouter les variables d'environnement suivantes :
+```
+    - JWT_SECRET
+    - DB_USERNAME
+    - DB_PASSWORD
+    - DB_NAME
+    - DB_URL
+    - ALLOWED_ORIGINS
+    - REDIS_HOST
+    - REDIS_PASSWORD
+    - REDIS_PORT
+```
+4. Configurez l'URL de l'API dans le fichier `docker-compose.yml` :
+```yaml
+    services:
+      backend:
+        environment:
+          - API_URL=http://localhost:8080
+```
+5. Démarrez le projet avec `docker-compose up` depuis le répertoire racine du projet.
