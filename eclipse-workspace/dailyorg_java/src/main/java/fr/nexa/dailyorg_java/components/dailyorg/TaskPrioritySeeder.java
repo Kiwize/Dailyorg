@@ -1,6 +1,6 @@
 package fr.nexa.dailyorg_java.components.dailyorg;
 
-import java.util.List;
+import java.util.Arrays;
 
 import org.springframework.stereotype.Component;
 
@@ -16,14 +16,10 @@ public class TaskPrioritySeeder {
     private final ITaskPriorityRepository taskPriorityRepository;
 
     @PostConstruct
-    public void populateMuscles() {
-        List<String> priorities = List.of(
-            "Low", "Medium", "High", "Urgent"
-        );
-
-        priorities.forEach(priority -> {
-            if (taskPriorityRepository.findByTaskPriorityName(priority).isEmpty()) {
-            	taskPriorityRepository.save(TaskPriority.builder().taskPriorityName(priority).build());
+    public void populateTaskPriorities() {
+        Arrays.asList(ETaskPriorities.values()).forEach(priority -> {
+            if (taskPriorityRepository.findByTaskPriorityName(priority.getPriorityName()).isEmpty()) {
+            	taskPriorityRepository.save(TaskPriority.builder().taskPriorityName(priority.getPriorityName()).taskPriorityLevel(priority.getPriorityLevel()).build());
             }
         });
 

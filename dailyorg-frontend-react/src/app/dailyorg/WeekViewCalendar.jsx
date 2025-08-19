@@ -29,6 +29,7 @@ export default function WeekViewCalendar({ calendarRefreshCallback, settings }) 
     isCompleted: false,
     priority: 'Low',
     energy: '',
+    wasTaskMarkedDone: false,
     isRecurrent: false,
     repeatFrequency: null,
     repeatEndDate: '',
@@ -106,6 +107,7 @@ export default function WeekViewCalendar({ calendarRefreshCallback, settings }) 
         isCompleted: false,
         priority: 'Low',
         energy: '',
+        wasTaskMarkedDone: false,
         isRecurrent: false,
         repeatFrequency: null,
         repeatEndDate: '',
@@ -129,6 +131,7 @@ export default function WeekViewCalendar({ calendarRefreshCallback, settings }) 
       isCompleted: task.taskCompleted,
       priority: task.taskPriority.taskPriorityName,
       energy: task.taskRequiredEnergy,
+      wasTaskMarkedDone: task.taskCompleted,
       isRecurrent: task.recurringTaskState !== null,
       repeatFrequency: task.recurringTaskState ? task.recurringTaskState.recurringTaskStateId : null,
       repeatEndDate: task.recurringTaskState ? task.recurrenceEndDate.split('T')[0] : null,
@@ -171,7 +174,7 @@ export default function WeekViewCalendar({ calendarRefreshCallback, settings }) 
     event.preventDefault();
     console.log('Submitting task data:', taskData);
 
-    if(taskData.isRecurrent && (taskData.repeatEndDate == null)) {
+    if (taskData.isRecurrent && taskData.repeatEndDate == null) {
       alert.setAlert('Please provide both repeat frequency and end date for recurring tasks.', 'error');
       return;
     }
@@ -253,6 +256,7 @@ export default function WeekViewCalendar({ calendarRefreshCallback, settings }) 
     setSelectedWeekTasks(
       taskData.map((task) => ({
         ...task,
+        wasTaskMarkedDone: task.taskCompleted,
         start: parseISO(task.taskStartDate),
         end: parseISO(task.taskEndDate),
       }))
@@ -346,7 +350,7 @@ export default function WeekViewCalendar({ calendarRefreshCallback, settings }) 
   }
 
   return (
-    <Box className="h-full" id="week-view-calendar" sx={{ margin: '0 auto', p: 2, width: { xs: '100%', md: '90%' }, overflow: 'hidden' }} >
+    <Box className="h-full" id="week-view-calendar" sx={{ margin: '0 auto', p: 2, width: { xs: '100%', md: '90%' }, overflow: 'hidden' }}>
       {isAddFormShown && (
         <TaskAddUpdateForm
           handleAddTask={handleAddTask}
@@ -367,10 +371,18 @@ export default function WeekViewCalendar({ calendarRefreshCallback, settings }) 
           Next ›
         </Button>
       </Box>
-      <Box className="grid h-full" sx={{maxWidth: '100vw', overflowX: 'auto'}} gridTemplateColumns={{ xs: 'repeat(7, 120px)', md: 'repeat(7, 1fr)' }} gap={1}>
+      <Box
+        className="grid h-full"
+        sx={{ maxWidth: '100vw', overflowX: 'auto' }}
+        gridTemplateColumns={{ xs: 'repeat(7, 120px)', md: 'repeat(7, 1fr)' }}
+        gap={1}
+      >
         {weekDays.map(({ date, label, isToday }) => (
           <Box key={date.toISOString() + '-box'}>
-            <Typography variant="subtitle1" sx={{ textAlign: 'center', textWrap: 'nowrap', fontWeight: 'bold', color: isToday ? 'primary.main' : 'text.primary' }}>
+            <Typography
+              variant="subtitle1"
+              sx={{ textAlign: 'center', textWrap: 'nowrap', fontWeight: 'bold', color: isToday ? 'primary.main' : 'text.primary' }}
+            >
               {label}
             </Typography>
             <Box

@@ -1,4 +1,4 @@
-package fr.nexa.dailyorg_java.components.dailyorg;
+package fr.nexa.dailyorg_java.components.dailyorg.event;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

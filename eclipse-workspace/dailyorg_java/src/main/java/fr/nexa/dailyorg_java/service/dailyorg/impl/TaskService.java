@@ -7,7 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
-import fr.nexa.dailyorg_java.components.dailyorg.TaskChangedEvent;
+import fr.nexa.dailyorg_java.components.dailyorg.event.TaskChangedEvent;
+import fr.nexa.dailyorg_java.components.dailyorg.event.TaskUpdateStatsEvent;
 import fr.nexa.dailyorg_java.model.dailyorg.OrganizerUser;
 import fr.nexa.dailyorg_java.model.dailyorg.Task;
 import fr.nexa.dailyorg_java.repository.dailyorg.ITaskRepository;
@@ -39,19 +40,25 @@ public class TaskService implements ITaskService {
 	@Override
 	public Task updateTask(Task task) {
 		boolean recurringTaskStateChanged = isRecurringTaskStateChanged(task); // True if the recurring task state mutated from a value to another
+		boolean taskCompletionStateChanged = isTaskCompletionStateChanged(task); // True if the task completion state mutated from a value to another
 
 		Task updatedTask = taskRepository.save(task);
 		eventPublisher.publishEvent(new TaskChangedEvent(TaskChangedEvent.TaskChangeType.UPDATED, task.getId(), recurringTaskStateChanged));
+		eventPublisher.publishEvent(new TaskUpdateStatsEvent(updatedTask.getOrganizerUser().getOrganizerUserId(), 1, updatedTask.getTaskRequiredEnergy(), updatedTask.getTaskPriority().getTaskPriorityLevel(), updatedTask.isTaskCompleted(), taskCompletionStateChanged));
 		return updatedTask;
 	}
 
 	@Override
 	public Task updateTask(Task task, boolean triggerEvent) {
 		boolean recurringTaskStateChanged = isRecurringTaskStateChanged(task); // True if the recurring task state mutated from a value to another
+		boolean taskCompletionStateChanged = isTaskCompletionStateChanged(task); // True if the task completion state mutated from a value to another
 
 		Task updatedTask = taskRepository.save(task);
-		if (triggerEvent)
+
+		if (triggerEvent) {
 			eventPublisher.publishEvent(new TaskChangedEvent(TaskChangedEvent.TaskChangeType.UPDATED, task.getId(), recurringTaskStateChanged));
+			eventPublisher.publishEvent(new TaskUpdateStatsEvent(updatedTask.getOrganizerUser().getOrganizerUserId(), 1, updatedTask.getTaskRequiredEnergy(), updatedTask.getTaskPriority().getTaskPriorityLevel(), updatedTask.isTaskCompleted(), taskCompletionStateChanged));
+		}
 		return updatedTask;
 	}
 
@@ -59,33 +66,47 @@ public class TaskService implements ITaskService {
 	@Transactional
 	public void deleteTask(Task task) {
 		eventPublisher.publishEvent(new TaskChangedEvent(TaskChangedEvent.TaskChangeType.DELETED, task.getId(), false));
+		eventPublisher.publishEvent(new TaskUpdateStatsEvent(task.getOrganizerUser().getOrganizerUserId(), 1, task.getTaskRequiredEnergy(), task.getTaskPriority().getTaskPriorityLevel(), false, true));
 		taskRepository.delete(task);
 	}
 
 	@Override
 	@Transactional
 	public void deleteTask(Task task, boolean triggerEvent) {
-		if (triggerEvent)
+		if (triggerEvent) {
 			eventPublisher.publishEvent(new TaskChangedEvent(TaskChangedEvent.TaskChangeType.DELETED, task.getId(), false));
+			eventPublisher.publishEvent(new TaskUpdateStatsEvent(task.getOrganizerUser().getOrganizerUserId(), 1, task.getTaskRequiredEnergy(), task.getTaskPriority().getTaskPriorityLevel(), false, true));
+		}
+
 		taskRepository.delete(task);
 	}
 
 	@Override
 	@Transactional
 	public void deleteAllTasks(List<Task> tasks) {
-		for (Task task : tasks) {
-			eventPublisher.publishEvent(new TaskChangedEvent(TaskChangedEvent.TaskChangeType.DELETED, task.getId(), false));
+		if (!tasks.isEmpty()) {
+			for (Task task : tasks) {
+				eventPublisher.publishEvent(new TaskChangedEvent(TaskChangedEvent.TaskChangeType.DELETED, task.getId(), false));
+				eventPublisher.publishEvent(new TaskUpdateStatsEvent(task.getOrganizerUser().getOrganizerUserId(), 1, task.getTaskRequiredEnergy(), task.getTaskPriority().getTaskPriorityLevel(), false, true));
+			}
+
+			taskRepository.deleteAll(tasks);
 		}
-		taskRepository.deleteAll(tasks);
 	}
 
 	@Override
 	@Transactional
 	public void deleteAllTasks(List<Task> tasks, boolean triggerEvent) {
-		if (triggerEvent)
-			for (Task task : tasks)
-				eventPublisher.publishEvent(new TaskChangedEvent(TaskChangedEvent.TaskChangeType.DELETED, task.getId(), false));
-		taskRepository.deleteAll(tasks);
+		if (!tasks.isEmpty()) {
+			if (triggerEvent) {
+				for (Task task : tasks) {
+					eventPublisher.publishEvent(new TaskChangedEvent(TaskChangedEvent.TaskChangeType.DELETED, task.getId(), false));
+					eventPublisher.publishEvent(new TaskUpdateStatsEvent(task.getOrganizerUser().getOrganizerUserId(), 1, task.getTaskRequiredEnergy(), task.getTaskPriority().getTaskPriorityLevel(), false, true));
+				}
+			}
+
+			taskRepository.deleteAll(tasks);
+		}
 	}
 
 	@Override
@@ -107,6 +128,14 @@ public class TaskService implements ITaskService {
 	public List<Task> getAllTasksByOcurrenceUniqueId(String occurrenceUniqueId) {
 		return taskRepository.findAllByOcurrenceUniqueId(occurrenceUniqueId);
 	}
+	
+	private boolean isTaskCompletionStateChanged(Task task) {
+		Task existingTask = taskRepository.findById(task.getId()).orElse(null);
+		if (existingTask != null) {
+			return existingTask.isTaskCompleted() != task.isTaskCompleted();
+		}
+		return false;
+	}
 
 	private boolean isRecurringTaskStateChanged(Task task) {
 		Task existingTask = taskRepository.findById(task.getId()).orElse(null);
@@ -118,12 +147,10 @@ public class TaskService implements ITaskService {
 				return true;
 			} else if (existingTask.getRecurringTaskState() == null && task.getRecurringTaskState() == null) {
 				return false;
-			}else {
+			} else {
 				// Check if the recurring task state has changed
-				if (existingTask.getRecurringTaskState().getRecurringTaskStateId() != task.getRecurringTaskState().getRecurringTaskStateId() ||
-						existingTask.getRecurringTaskState().getFrequency() != task.getRecurringTaskState().getFrequency() ||
-						existingTask.getRecurringTaskState().getTimeInterval() != task.getRecurringTaskState().getTimeInterval() ||
-						!(existingTask.getRecurrenceEndDate().isEqual(task.getRecurrenceEndDate()))) {
+				if (existingTask.getRecurringTaskState().getRecurringTaskStateId() != task.getRecurringTaskState().getRecurringTaskStateId() || existingTask.getRecurringTaskState().getFrequency() != task.getRecurringTaskState().getFrequency() || existingTask.getRecurringTaskState().getTimeInterval() != task.getRecurringTaskState().getTimeInterval()
+						|| !(existingTask.getRecurrenceEndDate().isEqual(task.getRecurrenceEndDate()))) {
 					return true;
 				}
 			}

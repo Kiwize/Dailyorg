@@ -6,6 +6,7 @@ import DriveFolderUploadIcon from '@mui/icons-material/DriveFolderUpload';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
 import useWindowSize from '../hooks/useWindowSize';
 import { sha256 } from 'js-sha256';
+import DOProfileSection from './dailyorg/DOProfileSection';
 
 export default function ProfilePage() {
   const [profilePicture, setProfilePicture] = useState(null);
@@ -22,7 +23,10 @@ export default function ProfilePage() {
     console.error('Error generating filename:', e);
   }
 
+  const [organizerProfile, setOrganizerProfile] = useState(null);
+
   const [editMode, setEditMode] = useState(false);
+
   const [userFirstName, setUserFirstName] = useState('');
   const [userLastName, setUserLastName] = useState('');
   const [userEmail, setUserEmail] = useState('');
@@ -34,6 +38,10 @@ export default function ProfilePage() {
         setUserFirstName(result.content.surname);
         setUserLastName(result.content.username);
         setUserEmail(result.content.email);
+
+        if (result.content.organizerUser != null) {
+          setOrganizerProfile(result.content.organizerUser);
+        }
       }
     } catch (error) {
       console.error('Error fetching user profile:', error);
@@ -230,6 +238,11 @@ export default function ProfilePage() {
               />
             </Box>
           </Box>
+          {organizerProfile && (
+            <Box sx={{ borderRadius: 6, border: '1px solid #ccc', padding: 2, marginBottom: 2 }}>
+              <DOProfileSection organizerProfile={organizerProfile} />
+            </Box>
+          )}
           <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
             <button
               onClick={handleProfileUpdate}

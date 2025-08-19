@@ -175,6 +175,7 @@ export default function TaskAddUpdateForm({
               placeholder="Energy Required (1-10)"
               min={1}
               max={10}
+              disabled={taskData.wasTaskMarkedDone}
               value={taskData.energy}
               onChange={(event) => setTaskData({ ...taskData, energy: event.target.value })}
               required
@@ -184,6 +185,7 @@ export default function TaskAddUpdateForm({
               labelId="Priority"
               value={taskData.priority}
               name="priority"
+              disabled={taskData.wasTaskMarkedDone}
               onChange={(event) => setTaskData({ ...taskData, priority: event.target.value })}
               required
             >

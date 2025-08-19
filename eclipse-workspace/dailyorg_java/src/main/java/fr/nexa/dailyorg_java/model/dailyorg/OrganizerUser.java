@@ -31,11 +31,11 @@ public class OrganizerUser {
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long organizerUserId;
 
-	@Column(nullable = false, length = 255)
-	private String energy_profile;
+	@Column(nullable = false)
+	private int calendarFirstShownHour;
 	
 	@Column(nullable = false)
-	private int level;
+	private int calendarTotalShownHours;
 	
 	@Column(nullable = false)
 	private int exp_points;

@@ -30,6 +30,9 @@ public class TaskPriority {
 	@Column(nullable = false, length = 50)
 	private String taskPriorityName;
 	
+	@Column(nullable = false)
+	private int taskPriorityLevel;
+	
 	@OneToMany(mappedBy = "taskPriority", fetch = FetchType.EAGER)
 	@JsonIgnore
 	private List<Task> tasks;

@@ -1,5 +1,7 @@
 package fr.nexa.dailyorg_java.service.dailyorg.impl;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +19,11 @@ public class OrganizerUserService implements IOrganizerUserService{
 	@Override
 	public OrganizerUser findByAppUserId(AppUser userId) {
 		return organizerUserRepository.findByAppUser(userId);
+	}
+	
+	@Override
+	public Optional<OrganizerUser> findByAppUserId(long userId) {
+		return organizerUserRepository.findById(userId);
 	}
 	
 	@Override

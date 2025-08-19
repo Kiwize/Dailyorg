@@ -1,5 +1,6 @@
 package fr.nexa.dailyorg_java.DTO;
 
+import fr.nexa.dailyorg_java.DTO.dailyorg.OrganizerUserDTO;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,6 +13,7 @@ public class AppUserDTO {
 	private String email;
 	private String password;
 	private String profilePictureLink;
+	private OrganizerUserDTO organizerUser; // Optional, can be null
 
 	// Constructor
 	public AppUserDTO(String surname, String username, String email, String password, String profilePictureLink) {

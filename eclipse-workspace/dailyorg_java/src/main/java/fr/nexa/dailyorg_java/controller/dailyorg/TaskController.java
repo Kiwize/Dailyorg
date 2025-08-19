@@ -287,7 +287,7 @@ public class TaskController {
 	private boolean checkProfile(AppUser appUser) throws Exception {
 		if (appUser.getOrganizerUser() == null) {
 			// Create an organizer profile for the user TODO change that later if needed
-			OrganizerUser organizerUser = OrganizerUser.builder().appUser(appUser).energy_profile("Normal").level(1).exp_points(0).build();
+			OrganizerUser organizerUser = OrganizerUser.builder().appUser(appUser).calendarFirstShownHour(0).calendarTotalShownHours(24).build();
 			appUser.setOrganizerUser(organizerUser);
 			organizerUserService.create(organizerUser);
 			appUserService.updateUser(appUser);

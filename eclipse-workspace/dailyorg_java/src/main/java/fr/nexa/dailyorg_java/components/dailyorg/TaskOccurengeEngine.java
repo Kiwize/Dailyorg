@@ -8,6 +8,7 @@ import java.util.UUID;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
+import fr.nexa.dailyorg_java.components.dailyorg.event.TaskChangedEvent;
 import fr.nexa.dailyorg_java.model.dailyorg.RecurringTaskState;
 import fr.nexa.dailyorg_java.model.dailyorg.Task;
 import fr.nexa.dailyorg_java.service.dailyorg.impl.RecurringTaskStateService;
@@ -28,7 +29,6 @@ public class TaskOccurengeEngine {
 	public void handleTaskChangedEvent(TaskChangedEvent event) {
 		// Handle the task change event
 		// This method will be called when a task is created, updated or deleted
-		System.out.println("Task change event received: " + event.getChangeType() + " for task ID: " + event.getTaskId());
 		String uuid = UUID.randomUUID().toString();
 
 		List<Task> tasksToDelete = new ArrayList<>();
