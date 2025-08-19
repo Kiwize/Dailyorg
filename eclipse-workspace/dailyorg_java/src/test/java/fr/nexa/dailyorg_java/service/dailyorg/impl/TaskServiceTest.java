@@ -56,7 +56,7 @@ public class TaskServiceTest {
 
 		when(taskRepository.save(task)).thenReturn(task);
 
-		Task result = taskService.updateTask(task);
+		Task result = taskService.updateTask(task, false);
 
 		assertThat(result.getTaskName()).isEqualTo("Test Task");
 	}
@@ -65,7 +65,7 @@ public class TaskServiceTest {
 	void testDeleteTask() {
 		Task task = Task.builder().id(1L).taskName("Test Task").taskDescription("Test Description").build();
 
-		taskService.deleteTask(task);
+		taskService.deleteTask(task, false);
 	}
 
 	@Test
