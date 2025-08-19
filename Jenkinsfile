@@ -18,7 +18,9 @@ pipeline {
                 withCredentials([file(credentialsId: 'dailyorg-env', variable: 'DOTENV_FILE')]) {
                     sh """
                         echo "Copie du fichier .env depuis les credentials Jenkins"
+                        rm -f .env || true
                         cp $DOTENV_FILE .env
+                        ls -l .env
                     """
                 }
             }
