@@ -22,7 +22,13 @@ pipeline {
                     sh 'mvn install'
                 }
 
-                sh 'docker-compose build'
+                withCredentials([file(credentialsId: 'dailyorg-env', variable: 'DOTENV_FILE')]) {
+                    sh """
+                        cp $DOTENV_FILE .env
+                        docker-compose --env-file .env up --build -d
+                    """
+                }
+
                 sh 'docker-compose up -d'
             }
         }
