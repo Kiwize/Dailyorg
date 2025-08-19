@@ -53,7 +53,9 @@ pipeline {
     post {
         always {
             echo 'Pipeline terminé.'
-            sh 'docker-compose down'
+            script {
+                sh 'docker-compose down'
+            }
         }
     }
 }
