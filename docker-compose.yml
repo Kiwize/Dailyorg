@@ -3,6 +3,8 @@ services:
   backend:
     container_name: backend
     image: dailyorg_backend
+    env_file:
+      - .env
     build:
       context: ./eclipse-workspace/dailyorg_java
     ports:
@@ -15,10 +17,12 @@ services:
   frontend:
     container_name: frontend
     image: dailyorg_frontend
+    env_file:
+      - .env
     build:
       context: ./dailyorg-frontend-react
       args:
-        APP_API_URL: https://dailyorg-api.thomaspradeau.com
+        APP_API_URL: ${APP_API_URL}
     ports:
       - "81:80"
     networks:
