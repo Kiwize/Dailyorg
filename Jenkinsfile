@@ -17,7 +17,7 @@ pipeline {
             steps {
                 sh 'docker-compose down'
 
-                dir('eclipse-workspace/dailyorg-java') {
+                dir('eclipse-workspace/dailyorg_java') {
                     sh 'mvn clean'
                     sh 'mvn install'
                 }
@@ -40,8 +40,8 @@ pipeline {
                     sh """
                       ${SCANNER_HOME}/bin/sonar-scanner \
                       -Dsonar.projectKey=Dailyorg-backend \
-                      -Dsonar.sources=eclipse-workspace/dailyorg-java/src \
-                      -Dsonar.java.binaries=eclipse-workspace/dailyorg-java/target/classes
+                      -Dsonar.sources=eclipse-workspace/dailyorg_java/src \
+                      -Dsonar.java.binaries=eclipse-workspace/dailyorg_java/target/classes
                     """
                 }
             }
@@ -49,7 +49,7 @@ pipeline {
 
         stage('Backend Tests') {
             steps {
-                dir('eclipse-workspace/dailyorg-java') {
+                dir('eclipse-workspace/dailyorg_java') {
                     sh 'mvn test'
                 }
             }
