@@ -16,6 +16,12 @@ pipeline {
         stage('Build & Launch Docker Compose') {
             steps {
                 sh 'docker-compose down'
+
+                dir('eclipse-workspace/dailyorg-java') {
+                    sh 'mvn clean'
+                    sh 'mvn install'
+                }
+
                 sh 'docker-compose build'
                 sh 'docker-compose up -d'
             }
