@@ -10,7 +10,7 @@
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>fr.nexa</groupId>
-	<artifactId>dailyorg_java</artifactId>
+	<artifactId>dailyorg</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>dailyorg_java</name>
 	<description>NEXA Project, DailyORG Java</description>

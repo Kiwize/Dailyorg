@@ -1,0 +1,28 @@
+package fr.nexa.dailyorg.components;
+
+import java.util.logging.Logger;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Component;
+
+import jakarta.annotation.PostConstruct;
+import lombok.AllArgsConstructor;
+
+@Component
+@AllArgsConstructor(onConstructor = @__(@Autowired))
+public class RedisPingTest {
+
+    private final StringRedisTemplate redisTemplate;
+
+    @PostConstruct
+    public void ping() {
+        try {
+            redisTemplate.opsForValue().set("pingkey", "pong");
+            System.out.println("Redis test OK");
+        } catch (Exception e) {
+            System.err.println("Redis test KO");
+            Logger.getLogger(RedisPingTest.class.getName()).severe("Redis connection failed: " + e.getMessage());
+        }
+    }
+}

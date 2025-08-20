@@ -1,0 +1,20 @@
+package fr.nexa.dailyorg.repository.dailyorg;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import fr.nexa.dailyorg.model.dailyorg.OrganizerUser;
+import fr.nexa.dailyorg.model.dailyorg.Task;
+
+@Repository
+public interface ITaskRepository extends JpaRepository<Task, Long> {
+
+	List<Task> findAllByOrganizerUser(OrganizerUser organizerUser);
+	List<Task> findAllByOrganizerUserAndTaskStartDate(OrganizerUser organizerUser, LocalDateTime taskStartDate);
+	List<Task> findAllByOrganizerUserAndTaskStartDateBetween(OrganizerUser organizerUser, LocalDateTime startDate, LocalDateTime endDate);
+	List<Task> findAllByOcurrenceUniqueId(String ocurrenceUniqueId);
+	
+}
