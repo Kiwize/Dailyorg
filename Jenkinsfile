@@ -53,7 +53,8 @@ pipeline {
                         sh """
                             mvn clean verify sonar:sonar \
                             -Dsonar.projectKey=DailyOrganizer \
-                            -Dsonar.sources=src \
+                            -Dsonar.sources=src/main/java \
+                            -Dsonar.tests=src/test/java \
                             -Dsonar.java.binaries=target/classes
                         """
                     }
