@@ -49,12 +49,14 @@ pipeline {
         stage('SonarQube Analysis (Java Backend)') {
             steps {
                 withSonarQubeEnv("${SONARQUBE}") {
-                    sh """
-                      mvn clean verify sonar:sonar \
-                      -Dsonar.projectKey=DailyOrganizer \
-                      -Dsonar.sources=eclipse-workspace/dailyorg_java/src \
-                      -Dsonar.java.binaries=eclipse-workspace/dailyorg_java/target/classes
-                    """
+                    dir('eclipse-workspace/dailyorg_java') {
+                        sh """
+                            mvn clean verify sonar:sonar \
+                            -Dsonar.projectKey=DailyOrganizer \
+                            -Dsonar.sources=eclipse-workspace/dailyorg_java/src \
+                            -Dsonar.java.binaries=eclipse-workspace/dailyorg_java/target/classes
+                        """
+                    }
                 }
             }
         }
