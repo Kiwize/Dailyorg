@@ -21,5 +21,13 @@ public class StrengthRecord extends WorkoutRecord {
 	
 	@OneToMany(mappedBy = "strengthRecordId", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<WorkoutSerie> workoutSeries;
+	
+	@Override
+	public boolean equals(Object o) {
+		if(!super.equals(o)) return false;
+		if (!(o instanceof StrengthRecord)) return false;
+		StrengthRecord that = (StrengthRecord) o;
+		return workoutSeries.equals(that.getWorkoutSeries());
+	}
 }
 

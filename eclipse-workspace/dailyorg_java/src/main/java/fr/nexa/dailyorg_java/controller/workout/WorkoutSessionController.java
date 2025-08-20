@@ -30,6 +30,7 @@ import fr.nexa.dailyorg_java.service.workout.impl.ExerciseService;
 import fr.nexa.dailyorg_java.service.workout.impl.StrengthExerciseService;
 import fr.nexa.dailyorg_java.service.workout.impl.WorkoutRecordService;
 import fr.nexa.dailyorg_java.service.workout.impl.WorkoutSessionService;
+import fr.nexa.dailyorg_java.utils.EErrorMessages;
 import lombok.AllArgsConstructor;
 
 @RestController
@@ -53,8 +54,8 @@ public class WorkoutSessionController {
 		try {
 			return ResponseEntity.status(HttpStatus.OK).body(workoutSessionService.getWorkoutSessionsByEmail(email));
 		} catch (Exception e) {
-			Logger.getLogger(WorkoutSessionController.class.getName()).severe("Error while getting workout sessions: " + e.getMessage());
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal error...");
+			Logger.getLogger(WorkoutSessionController.class.getName()).severe(EErrorMessages.INTERNAL_SERVER_ERROR.getMessage() + e.getMessage());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(EErrorMessages.INTERNAL_SERVER_ERROR.getMessage());
 		}
 	}
 
@@ -63,15 +64,15 @@ public class WorkoutSessionController {
 	public ResponseEntity getWorkoutSessionsExercises(@RequestBody Map<String, String> data) {
 		Map<String, List<WorkoutRecordDTO>> exercisesPerType;
 		try {
-			if (!data.containsKey("email") || !data.containsKey("workout_session_id")) {
-				return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Missing data...");
+			if (!data.containsKey("email") || !data.containsKey(EWorkoutControllerFields.WORKOUT_SESSION_ID.getFieldName())) {
+				return ResponseEntity.status(HttpStatus.FORBIDDEN).body(EErrorMessages.INVALID_INPUT.getMessage());
 			}
 
-			String workoutSessionId = data.get("workout_session_id");
+			String workoutSessionId = data.get(EWorkoutControllerFields.WORKOUT_SESSION_ID.getFieldName());
 
 			exercisesPerType = new HashMap<>();
-			exercisesPerType.put("cardio", new ArrayList<WorkoutRecordDTO>());
-			exercisesPerType.put("strength", new ArrayList<WorkoutRecordDTO>());
+			exercisesPerType.put(EWorkoutControllerFields.CARDIO.getFieldName(), new ArrayList<WorkoutRecordDTO>());
+			exercisesPerType.put(EWorkoutControllerFields.STRENGTH.getFieldName(), new ArrayList<WorkoutRecordDTO>());
 
 			List<WorkoutRecord> records = workoutRecordService.getRecordsByWorkoutSession(Long.parseLong(workoutSessionId));
 
@@ -93,68 +94,68 @@ public class WorkoutSessionController {
 						workoutRecordDTO.setExerciseId(exerciseDTO);
 					}
 
-					exercisesPerType.get(strengthExerciseService.isStrengthExercise(record.getExerciseId().getId()) ? "strength" : "cardio").add(workoutRecordDTO);
+					exercisesPerType.get(strengthExerciseService.isStrengthExercise(record.getExerciseId().getId()) ? EWorkoutControllerFields.STRENGTH.getFieldName() : EWorkoutControllerFields.CARDIO.getFieldName()).add(workoutRecordDTO);
 				} catch (Exception e) {
-					Logger.getLogger(WorkoutSessionController.class.getName()).severe("Error while processing workout record: " + e.getMessage());
+					Logger.getLogger(WorkoutSessionController.class.getName()).severe(EErrorMessages.INTERNAL_SERVER_ERROR.getMessage() + e.getMessage());
 				}
 			});
 
 			return ResponseEntity.ok(exercisesPerType);
 		} catch (NumberFormatException e) {
-			Logger.getLogger(WorkoutSessionController.class.getName()).severe("Invalid data submitted: " + e.getMessage());
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal error...");
+			Logger.getLogger(WorkoutSessionController.class.getName()).severe(EErrorMessages.INVALID_INPUT.getMessage() + e.getMessage());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(EErrorMessages.INTERNAL_SERVER_ERROR.getMessage());
 		} catch (Exception e) {
-			Logger.getLogger(WorkoutSessionController.class.getName()).severe("Error while getting workout exercises: " + e.getMessage());
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal error...");
+			Logger.getLogger(WorkoutSessionController.class.getName()).severe(EErrorMessages.INVALID_INPUT.getMessage() + e.getMessage());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(EErrorMessages.INTERNAL_SERVER_ERROR.getMessage());
 		}
 	}
 
 	@SuppressWarnings("rawtypes")
 	@PutMapping("/add_exercise_to_workout")
 	public ResponseEntity addExerciseToWorkout(@RequestBody Map<String, String> data) {
-		if (!data.containsKey("email") || !data.containsKey("workout_session_id") || !data.containsKey("exercise_id")) {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Missing data...");
+		if (!data.containsKey("email") || !data.containsKey(EWorkoutControllerFields.WORKOUT_SESSION_ID.getFieldName()) || !data.containsKey(EWorkoutControllerFields.EXERCISE_ID.getFieldName())) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(EErrorMessages.DATA_NOT_FOUND.getMessage());
 		}
 		try {
-			long workoutSessionId = Long.parseLong(data.get("workout_session_id"));
-			long exerciseID = Long.parseLong(data.get("exercise_id"));
-			String exerciseType = data.get("exercise_type");
+			long workoutSessionId = Long.parseLong(data.get(EWorkoutControllerFields.WORKOUT_SESSION_ID.getFieldName()));
+			long exerciseID = Long.parseLong(data.get(EWorkoutControllerFields.EXERCISE_ID.getFieldName()));
+			String exerciseType = data.get(EWorkoutControllerFields.EXERCISE_TYPE.getFieldName());
 
 			if (workoutRecordService.isExerciseAlreadyAdded(workoutSessionId, exerciseID))
 				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Exercise already added !");
 
-			if (exerciseType.equalsIgnoreCase("strength")) {
+			if (exerciseType.equalsIgnoreCase(EWorkoutControllerFields.STRENGTH.getFieldName())) {
 				workoutRecordService.addStrengthExerciseToWorkout(workoutSessionId, (StrengthExercise) strengthExerciseService.getStrengthExerciseByID(exerciseID));
 				return ResponseEntity.status(HttpStatus.OK).body("Strength exercise added !");
-			} else if (exerciseType.equalsIgnoreCase("cardio")) {
-				int cardioTimeSpentInMins = Integer.parseInt(data.get("time_spent_in_mins"));
-				int cardioIntensity = Integer.parseInt(data.get("intensity"));
-				int cardioCaloriesBurnt = Integer.parseInt(data.get("calories_burnt"));
+			} else if (exerciseType.equalsIgnoreCase(EWorkoutControllerFields.CARDIO.getFieldName())) {
+				int cardioTimeSpentInMins = Integer.parseInt(data.get(EWorkoutControllerFields.TIME_SPENT_IN_MINS.getFieldName()));
+				int cardioIntensity = Integer.parseInt(data.get(EWorkoutControllerFields.INTENSITY.getFieldName()));
+				int cardioCaloriesBurnt = Integer.parseInt(data.get(EWorkoutControllerFields.CALORIES_BURNT.getFieldName()));
 
 				workoutRecordService.addCardioExerciseToWorkout(workoutSessionId, (CardioExercise) cardioExerciseService.getCardioExerciseByID(exerciseID), cardioTimeSpentInMins, cardioCaloriesBurnt, cardioIntensity);
 				return ResponseEntity.status(HttpStatus.OK).body("Cardio exercise added !");
 			} else {
-				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Invalid exercise type : " + exerciseType + ", types allowed : strength, cardio");
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(EErrorMessages.INVALID_EXERCISE_TYPE.getMessage());
 			}
 		} catch (NumberFormatException e) {
-			Logger.getLogger(WorkoutSessionController.class.getName()).severe("Invalid data submitted: " + e.getMessage());
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Invalid data submitted...");
+			Logger.getLogger(WorkoutSessionController.class.getName()).severe(EErrorMessages.INVALID_INPUT.getMessage() + e.getMessage());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(EErrorMessages.INVALID_INPUT.getMessage());
 		} catch (Exception e) {
-			Logger.getLogger(WorkoutSessionController.class.getName()).severe("Error while adding exercise to workout: " + e.getMessage());
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal error...");
+			Logger.getLogger(WorkoutSessionController.class.getName()).severe(EErrorMessages.INTERNAL_SERVER_ERROR.getMessage() + e.getMessage());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(EErrorMessages.INTERNAL_SERVER_ERROR.getMessage());
 		}
 	}
 
 	@SuppressWarnings("rawtypes")
 	@DeleteMapping("/delete_exercise_from_workout")
 	public ResponseEntity deleteExerciseFromWorkout(@RequestBody Map<String, String> data) {
-		if (!data.containsKey("email") || !data.containsKey("workout_session_id") || !data.containsKey("exercise_id")) {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Missing data...");
+		if (!data.containsKey("email") || !data.containsKey(EWorkoutControllerFields.WORKOUT_SESSION_ID.getFieldName()) || !data.containsKey(EWorkoutControllerFields.EXERCISE_ID.getFieldName())) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(EErrorMessages.DATA_NOT_FOUND.getMessage());
 		}
 
 		try {
-			long workoutSessionId = Long.parseLong(data.get("workout_session_id"));
-			long exerciseID = Long.parseLong(data.get("exercise_id"));
+			long workoutSessionId = Long.parseLong(data.get(EWorkoutControllerFields.WORKOUT_SESSION_ID.getFieldName()));
+			long exerciseID = Long.parseLong(data.get(EWorkoutControllerFields.EXERCISE_ID.getFieldName()));
 
 			if (workoutRecordService.isExerciseAlreadyAdded(workoutSessionId, exerciseID)) {
 				workoutRecordService.removeExerciseFromWorkout(workoutSessionId, exerciseID);
@@ -163,11 +164,11 @@ public class WorkoutSessionController {
 
 			return ResponseEntity.status(HttpStatus.OK).body("Nothing has been performed...");
 		} catch (NumberFormatException e) {
-			Logger.getLogger(WorkoutSessionController.class.getName()).severe("Invalid data submitted: " + e.getMessage());
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Invalid data submitted...");
+			Logger.getLogger(WorkoutSessionController.class.getName()).severe(EErrorMessages.INVALID_INPUT.getMessage() + e.getMessage());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(EErrorMessages.INVALID_INPUT.getMessage());
 		} catch (Exception e) {
-			Logger.getLogger(WorkoutSessionController.class.getName()).severe("Error while deleting exercise from workout: " + e.getMessage());
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal error...");
+			Logger.getLogger(WorkoutSessionController.class.getName()).severe(EErrorMessages.INTERNAL_SERVER_ERROR.getMessage() + e.getMessage());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(EErrorMessages.INTERNAL_SERVER_ERROR.getMessage());
 		}
 	}
 
@@ -182,30 +183,30 @@ public class WorkoutSessionController {
 				workoutSessionService.addWorkoutSession(WorkoutSession.builder().userId(optionalUser.get()).build());
 				return ResponseEntity.status(HttpStatus.OK).body("");
 			} else {
-				return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid user...");
+				return ResponseEntity.status(HttpStatus.FORBIDDEN).body(EErrorMessages.USER_NOT_FOUND.getMessage());
 			}
 
 		} catch (Exception e) {
-			Logger.getLogger(WorkoutSessionController.class.getName()).severe("Error while creating workout session: " + e.getMessage());
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal error...");
+			Logger.getLogger(WorkoutSessionController.class.getName()).severe(EErrorMessages.INTERNAL_SERVER_ERROR.getMessage() + e.getMessage());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(EErrorMessages.INTERNAL_SERVER_ERROR.getMessage());
 		}
 	}
 
 	@DeleteMapping("/delete_workout")
 	public ResponseEntity<String> deleteWorkout(@RequestBody Map<String, String> data) {
 
-		if (!data.containsKey("workout_session_id")) {
-			return ResponseEntity.internalServerError().body("Missing data...");
+		if (!data.containsKey(EWorkoutControllerFields.WORKOUT_SESSION_ID.getFieldName())) {
+			return ResponseEntity.internalServerError().body(EErrorMessages.DATA_NOT_FOUND.getMessage());
 		}
 
-		long workoutSessionID = Long.parseLong(data.get("workout_session_id"));
+		long workoutSessionID = Long.parseLong(data.get(EWorkoutControllerFields.WORKOUT_SESSION_ID.getFieldName()));
 
 		try {
 			workoutSessionService.deleteWorkoutSession(workoutSessionID);
 			return ResponseEntity.ok("");
 		} catch (Exception e) {
-			Logger.getLogger(WorkoutSessionController.class.getName()).severe("Error while deleting workout session: " + e.getMessage());
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal error...");
+			Logger.getLogger(WorkoutSessionController.class.getName()).severe(EErrorMessages.INTERNAL_SERVER_ERROR.getMessage() + e.getMessage());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(EErrorMessages.INTERNAL_SERVER_ERROR.getMessage());
 		}
 	}
 }

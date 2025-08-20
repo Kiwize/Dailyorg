@@ -26,4 +26,10 @@ public class StrengthExercise extends Exercise {
 	@JoinTable(name = "trains", joinColumns = @JoinColumn(name = "strength_exercise_id"), inverseJoinColumns = @JoinColumn(name = "muscle_id"))
 	@JsonIgnore
 	private Set<Muscle> muscles;
+	
+	@Override
+	public boolean equals(Object o) {
+		if(!super.equals(o)) return false;
+		return muscles.equals(((StrengthExercise) o).getMuscles());
+	}
 }

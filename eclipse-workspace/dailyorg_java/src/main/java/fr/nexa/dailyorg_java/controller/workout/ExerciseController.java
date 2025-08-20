@@ -21,6 +21,7 @@ import fr.nexa.dailyorg_java.service.workout.impl.CardioExerciseService;
 import fr.nexa.dailyorg_java.service.workout.impl.ExerciseService;
 import fr.nexa.dailyorg_java.service.workout.impl.MuscleService;
 import fr.nexa.dailyorg_java.service.workout.impl.StrengthExerciseService;
+import fr.nexa.dailyorg_java.utils.EErrorMessages;
 import lombok.AllArgsConstructor;
 
 @RestController
@@ -41,7 +42,7 @@ public class ExerciseController {
 		try {
 			return ResponseEntity.status(HttpStatus.OK).body(strengthExerciseService.getExercisesByMuscle(muscleService.findByName(muscleName).getId()));
 		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Invalid muscle name provided...");
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(EErrorMessages.INVALID_MUSCLE_NAME.getMessage());
 		}
 	}
 
@@ -52,7 +53,7 @@ public class ExerciseController {
 			if (data.containsKey("type")) {
 				String type = data.get("type");
 				if (!type.equalsIgnoreCase("cardio") && !type.equalsIgnoreCase("strength")) {
-					return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Invalid type provided... Allowed types : cardio, strength");
+					return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(EErrorMessages.INVALID_EXERCISE_TYPE.getMessage());
 				}
 
 				if (type.equalsIgnoreCase("cardio")) {
@@ -64,8 +65,8 @@ public class ExerciseController {
 				return ResponseEntity.status(HttpStatus.OK).body(exerciseService.getAllExercises());
 			}
 		} catch (Exception e) {
-			Logger.getLogger(ExerciseController.class.getName()).severe("Error while getting all exercises: " + e.getMessage());
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal error...");
+			Logger.getLogger(ExerciseController.class.getName()).severe(EErrorMessages.INTERNAL_SERVER_ERROR.getMessage());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(EErrorMessages.INTERNAL_SERVER_ERROR.getMessage());
 		}
 	}
 
@@ -81,10 +82,10 @@ public class ExerciseController {
 		}
 
 		try {
-			strengthExerciseService.addStrengthExercise((StrengthExercise) StrengthExercise.builder().exerciseImage(exerciseImage).exerciseName(exerciseName).muscles(muscles).build());
+			strengthExerciseService.addStrengthExercise(StrengthExercise.builder().exerciseImage(exerciseImage).exerciseName(exerciseName).muscles(muscles).build());
 			return ResponseEntity.status(HttpStatus.OK).body("Successfully added !");
 		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occured...");
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(EErrorMessages.INTERNAL_SERVER_ERROR.getMessage());
 		}
 	}
 
@@ -94,10 +95,10 @@ public class ExerciseController {
 		String exerciseImage = cardioExercise.getExerciseImagePath();
 
 		try {
-			cardioExerciseService.addCardioExercise((CardioExercise) CardioExercise.builder().exerciseImage(exerciseImage).exerciseName(exerciseName).build());
+			cardioExerciseService.addCardioExercise(CardioExercise.builder().exerciseImage(exerciseImage).exerciseName(exerciseName).build());
 			return ResponseEntity.status(HttpStatus.OK).body("Successfully added !");
 		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occured...");
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(EErrorMessages.INTERNAL_SERVER_ERROR.getMessage());
 		}
 	}
 	
