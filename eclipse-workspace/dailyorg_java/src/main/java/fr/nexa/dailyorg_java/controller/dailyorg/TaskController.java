@@ -68,7 +68,7 @@ public class TaskController {
 			}
 
 			// Check and initialize the recurring task state if needed
-			boolean isRecurrent = data.containsKey(ETaskControllerFields.TASK_IS_RECURRENT.getFieldName()) ? Boolean.parseBoolean(data.get(ETaskControllerFields.TASK_IS_RECURRENT.getFieldName())) : false;
+			boolean isRecurrent = Boolean.parseBoolean(data.get(ETaskControllerFields.TASK_IS_RECURRENT.getFieldName()));
 
 			if (isRecurrent && data.containsKey(ETaskControllerFields.TASK_REPEAT_FREQUENCY.getFieldName()) && data.containsKey(ETaskControllerFields.TASK_REPEAT_END_DATE.getFieldName())) {
 				long repeatFrequencyID = Long.parseLong(data.get(ETaskControllerFields.TASK_REPEAT_FREQUENCY.getFieldName()));
@@ -125,7 +125,7 @@ public class TaskController {
 				Task task = taskService.getTaskById(Long.parseLong(data.get(ETaskControllerFields.TASK_ID.getFieldName())));
 
 				// Check and initialize the recurring task state if needed
-				boolean isRecurrent = data.containsKey(ETaskControllerFields.TASK_IS_RECURRENT.getFieldName()) ? Boolean.parseBoolean(data.get(ETaskControllerFields.TASK_IS_RECURRENT.getFieldName())) : false;
+				boolean isRecurrent = Boolean.parseBoolean(data.get(ETaskControllerFields.TASK_IS_RECURRENT.getFieldName()));
 
 				if (task != null && task.getOrganizerUser().getAppUser().getUserId() == appUser.getUserId()) {
 					task.setTaskName(data.get(ETaskControllerFields.TASK_NAME.getFieldName()));

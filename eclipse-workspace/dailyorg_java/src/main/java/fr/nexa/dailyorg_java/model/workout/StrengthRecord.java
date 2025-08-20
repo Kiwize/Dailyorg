@@ -29,5 +29,10 @@ public class StrengthRecord extends WorkoutRecord {
 		StrengthRecord that = (StrengthRecord) o;
 		return workoutSeries.equals(that.getWorkoutSeries());
 	}
+	
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }
 

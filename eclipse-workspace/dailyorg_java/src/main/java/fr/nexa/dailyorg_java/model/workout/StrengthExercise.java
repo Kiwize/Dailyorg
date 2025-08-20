@@ -32,4 +32,9 @@ public class StrengthExercise extends Exercise {
 		if(!super.equals(o)) return false;
 		return muscles.equals(((StrengthExercise) o).getMuscles());
 	}
+	
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

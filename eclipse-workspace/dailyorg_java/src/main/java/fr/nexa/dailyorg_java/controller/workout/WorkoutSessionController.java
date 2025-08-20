@@ -19,9 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import fr.nexa.dailyorg_java.DTO.workout.ExerciseDTO;
 import fr.nexa.dailyorg_java.DTO.workout.WorkoutRecordDTO;
 import fr.nexa.dailyorg_java.model.AppUser;
-import fr.nexa.dailyorg_java.model.workout.CardioExercise;
 import fr.nexa.dailyorg_java.model.workout.Exercise;
-import fr.nexa.dailyorg_java.model.workout.StrengthExercise;
 import fr.nexa.dailyorg_java.model.workout.WorkoutRecord;
 import fr.nexa.dailyorg_java.model.workout.WorkoutSession;
 import fr.nexa.dailyorg_java.service.AppUserService;
@@ -71,8 +69,8 @@ public class WorkoutSessionController {
 			String workoutSessionId = data.get(EWorkoutControllerFields.WORKOUT_SESSION_ID.getFieldName());
 
 			exercisesPerType = new HashMap<>();
-			exercisesPerType.put(EWorkoutControllerFields.CARDIO.getFieldName(), new ArrayList<WorkoutRecordDTO>());
-			exercisesPerType.put(EWorkoutControllerFields.STRENGTH.getFieldName(), new ArrayList<WorkoutRecordDTO>());
+			exercisesPerType.put(EWorkoutControllerFields.CARDIO.getFieldName(), new ArrayList<>());
+			exercisesPerType.put(EWorkoutControllerFields.STRENGTH.getFieldName(), new ArrayList<>());
 
 			List<WorkoutRecord> records = workoutRecordService.getRecordsByWorkoutSession(Long.parseLong(workoutSessionId));
 
@@ -101,9 +99,6 @@ public class WorkoutSessionController {
 			});
 
 			return ResponseEntity.ok(exercisesPerType);
-		} catch (NumberFormatException e) {
-			Logger.getLogger(WorkoutSessionController.class.getName()).severe(EErrorMessages.INVALID_INPUT.getMessage() + e.getMessage());
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(EErrorMessages.INTERNAL_SERVER_ERROR.getMessage());
 		} catch (Exception e) {
 			Logger.getLogger(WorkoutSessionController.class.getName()).severe(EErrorMessages.INVALID_INPUT.getMessage() + e.getMessage());
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(EErrorMessages.INTERNAL_SERVER_ERROR.getMessage());
@@ -125,14 +120,14 @@ public class WorkoutSessionController {
 				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Exercise already added !");
 
 			if (exerciseType.equalsIgnoreCase(EWorkoutControllerFields.STRENGTH.getFieldName())) {
-				workoutRecordService.addStrengthExerciseToWorkout(workoutSessionId, (StrengthExercise) strengthExerciseService.getStrengthExerciseByID(exerciseID));
+				workoutRecordService.addStrengthExerciseToWorkout(workoutSessionId, strengthExerciseService.getStrengthExerciseByID(exerciseID));
 				return ResponseEntity.status(HttpStatus.OK).body("Strength exercise added !");
 			} else if (exerciseType.equalsIgnoreCase(EWorkoutControllerFields.CARDIO.getFieldName())) {
 				int cardioTimeSpentInMins = Integer.parseInt(data.get(EWorkoutControllerFields.TIME_SPENT_IN_MINS.getFieldName()));
 				int cardioIntensity = Integer.parseInt(data.get(EWorkoutControllerFields.INTENSITY.getFieldName()));
 				int cardioCaloriesBurnt = Integer.parseInt(data.get(EWorkoutControllerFields.CALORIES_BURNT.getFieldName()));
 
-				workoutRecordService.addCardioExerciseToWorkout(workoutSessionId, (CardioExercise) cardioExerciseService.getCardioExerciseByID(exerciseID), cardioTimeSpentInMins, cardioCaloriesBurnt, cardioIntensity);
+				workoutRecordService.addCardioExerciseToWorkout(workoutSessionId, cardioExerciseService.getCardioExerciseByID(exerciseID), cardioTimeSpentInMins, cardioCaloriesBurnt, cardioIntensity);
 				return ResponseEntity.status(HttpStatus.OK).body("Cardio exercise added !");
 			} else {
 				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(EErrorMessages.INVALID_EXERCISE_TYPE.getMessage());
