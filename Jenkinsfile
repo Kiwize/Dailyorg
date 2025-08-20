@@ -42,7 +42,7 @@ pipeline {
         stage('Wait Services Ready') {
             steps {
                 echo 'Attente des services…'
-                sleep time: 20, unit: 'SECONDS'
+                sleep time: 10, unit: 'SECONDS'
             }
         }
 
@@ -50,8 +50,8 @@ pipeline {
             steps {
                 withSonarQubeEnv("${SONARQUBE}") {
                     sh """
-                      ${SCANNER_HOME}/bin/sonar-scanner \
-                      -Dsonar.projectKey=Dailyorg-backend \
+                      mvn clean verify sonar:sonar \
+                      -Dsonar.projectKey=DailyOrganizer \
                       -Dsonar.sources=eclipse-workspace/dailyorg_java/src \
                       -Dsonar.java.binaries=eclipse-workspace/dailyorg_java/target/classes
                     """
