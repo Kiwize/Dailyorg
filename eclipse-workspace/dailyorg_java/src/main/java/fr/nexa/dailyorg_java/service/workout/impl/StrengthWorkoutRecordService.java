@@ -14,16 +14,16 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor(onConstructor = @__(@Autowired))
 public class StrengthWorkoutRecordService implements IStrengthWorkoutRecordService{
 	
-	private final IStrengthWorkoutRecordRepository strengthWorkoutRecordService;
+	private final IStrengthWorkoutRecordRepository strengthWorkoutRecordRepository;
 	
 	@Override
 	public Optional<StrengthRecord> getStrengthRecordByID(Long workoutRecordID) {
-		return strengthWorkoutRecordService.findById(workoutRecordID);
+		return strengthWorkoutRecordRepository.findById(workoutRecordID);
 	}
 	
 	@Override
 	public StrengthRecord updateStrengthRecord(StrengthRecord strengthRecord) {
-		return strengthWorkoutRecordService.save(strengthRecord);
+		return strengthWorkoutRecordRepository.save(strengthRecord);
 	}
 	
 }

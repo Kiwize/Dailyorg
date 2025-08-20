@@ -55,7 +55,8 @@ pipeline {
                             -Dsonar.projectKey=DailyOrganizer \
                             -Dsonar.sources=src/main/java \
                             -Dsonar.tests=src/test/java \
-                            -Dsonar.java.binaries=target/classes
+                            -Dsonar.java.binaries=target/classes \
+                            -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
                         """
                     }
                 }
