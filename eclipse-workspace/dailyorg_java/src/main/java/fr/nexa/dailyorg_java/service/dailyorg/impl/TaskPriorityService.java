@@ -11,15 +11,15 @@ import org.springframework.stereotype.Service;
 import fr.nexa.dailyorg_java.model.dailyorg.TaskPriority;
 import fr.nexa.dailyorg_java.repository.dailyorg.ITaskPriorityRepository;
 import fr.nexa.dailyorg_java.service.dailyorg.ITaskPriorityService;
+import lombok.AllArgsConstructor;
 
 @Service
+@AllArgsConstructor(onConstructor = @__(@Autowired))
 public class TaskPriorityService implements ITaskPriorityService {
 
 	private List<TaskPriority> prioritiesListBuffer = new ArrayList<>();
 	
-
-	@Autowired
-	private ITaskPriorityRepository taskPriorityRepository;
+	private final ITaskPriorityRepository taskPriorityRepository;
 
 	@Override
 	public Optional<TaskPriority> findTaskPriorityById(long taskPriorityId) {

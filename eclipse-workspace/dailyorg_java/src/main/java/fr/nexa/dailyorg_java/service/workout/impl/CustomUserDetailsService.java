@@ -11,11 +11,13 @@ import org.springframework.stereotype.Service;
 
 import fr.nexa.dailyorg_java.model.AppUser;
 import fr.nexa.dailyorg_java.repository.IAppUserRepository;
+import lombok.AllArgsConstructor;
 
 @Service
+@AllArgsConstructor(onConstructor = @__(@Autowired))
 public class CustomUserDetailsService implements UserDetailsService {
-    @Autowired
-    private IAppUserRepository userRepository;
+	
+    private final IAppUserRepository userRepository;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {

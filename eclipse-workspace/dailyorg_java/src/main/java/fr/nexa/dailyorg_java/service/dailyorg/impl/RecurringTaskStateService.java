@@ -10,12 +10,13 @@ import org.springframework.stereotype.Service;
 import fr.nexa.dailyorg_java.model.dailyorg.RecurringTaskState;
 import fr.nexa.dailyorg_java.repository.dailyorg.IRecurringTaskStateRepository;
 import fr.nexa.dailyorg_java.service.dailyorg.IRecurringTaskStateService;
+import lombok.AllArgsConstructor;
 
 @Service
+@AllArgsConstructor(onConstructor = @__(@Autowired))
 public class RecurringTaskStateService implements IRecurringTaskStateService {
 
-	@Autowired
-	private IRecurringTaskStateRepository recurringTaskStateRepository; 
+	private final IRecurringTaskStateRepository recurringTaskStateRepository; 
 
 	@Override
 	public Optional<RecurringTaskState> findById(Long id) {

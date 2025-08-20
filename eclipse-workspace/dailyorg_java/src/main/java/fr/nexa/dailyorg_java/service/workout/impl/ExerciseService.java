@@ -9,12 +9,13 @@ import org.springframework.stereotype.Service;
 import fr.nexa.dailyorg_java.model.workout.Exercise;
 import fr.nexa.dailyorg_java.repository.workout.IExerciseRepository;
 import fr.nexa.dailyorg_java.service.workout.IExerciseService;
+import lombok.AllArgsConstructor;
 
 @Service
+@AllArgsConstructor(onConstructor = @__(@Autowired))
 public class ExerciseService implements IExerciseService {
 
-	@Autowired
-	private IExerciseRepository exerciseRepository;
+	private final IExerciseRepository exerciseRepository;
 
 	@Override
 	public void addExercise(Exercise exercise) throws Exception {

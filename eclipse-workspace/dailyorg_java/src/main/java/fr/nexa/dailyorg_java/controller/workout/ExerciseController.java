@@ -2,6 +2,7 @@ package fr.nexa.dailyorg_java.controller.workout;
 
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -39,8 +40,13 @@ public class ExerciseController {
 	public ResponseEntity getWorkoutSessions(@RequestBody Map<String, String> data) {
 		String muscleName = data.get("muscleName");
 
+		Optional<Muscle> muscleOptional = muscleService.findByName(muscleName);
+		if (muscleOptional.isEmpty()) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(EErrorMessages.INVALID_MUSCLE_NAME.getMessage());
+		}
+
 		try {
-			return ResponseEntity.status(HttpStatus.OK).body(strengthExerciseService.getExercisesByMuscle(muscleService.findByName(muscleName).getId()));
+			return ResponseEntity.status(HttpStatus.OK).body(strengthExerciseService.getExercisesByMuscle(muscleOptional.get().getId()));
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(EErrorMessages.INVALID_MUSCLE_NAME.getMessage());
 		}
@@ -78,7 +84,9 @@ public class ExerciseController {
 		Set<Muscle> muscles = new HashSet<>();
 
 		for (String s : strengthExercise.getMuscles()) {
-			muscles.add(muscleService.findByName(s));
+			Optional<Muscle> muscleOpt = muscleService.findByName(s);
+			if (muscleOpt.isPresent())
+				muscles.add(muscleOpt.get());
 		}
 
 		try {
@@ -101,6 +109,5 @@ public class ExerciseController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(EErrorMessages.INTERNAL_SERVER_ERROR.getMessage());
 		}
 	}
-	
-	
+
 }

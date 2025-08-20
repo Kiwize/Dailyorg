@@ -7,12 +7,13 @@ import org.springframework.stereotype.Service;
 
 import fr.nexa.dailyorg_java.model.AppUser;
 import fr.nexa.dailyorg_java.repository.IAppUserRepository;
+import lombok.AllArgsConstructor;
 
 @Service
+@AllArgsConstructor(onConstructor = @__(@Autowired))
 public class AppUserService implements IAppUserService {
 
-	@Autowired
-	private IAppUserRepository appUserRepository;
+	private final IAppUserRepository appUserRepository;
 	
 	@Override
 	public AppUser addUser(AppUser appuser) throws Exception {

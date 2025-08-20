@@ -8,12 +8,13 @@ import org.springframework.stereotype.Service;
 import fr.nexa.dailyorg_java.model.workout.StrengthRecord;
 import fr.nexa.dailyorg_java.repository.workout.IStrengthWorkoutRecordRepository;
 import fr.nexa.dailyorg_java.service.workout.IStrengthWorkoutRecordService;
+import lombok.AllArgsConstructor;
 
 @Service
+@AllArgsConstructor(onConstructor = @__(@Autowired))
 public class StrengthWorkoutRecordService implements IStrengthWorkoutRecordService{
 	
-	@Autowired
-	private IStrengthWorkoutRecordRepository strengthWorkoutRecordService;
+	private final IStrengthWorkoutRecordRepository strengthWorkoutRecordService;
 	
 	@Override
 	public Optional<StrengthRecord> getStrengthRecordByID(Long workoutRecordID) {

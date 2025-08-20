@@ -7,11 +7,13 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 import jakarta.annotation.PostConstruct;
+import lombok.AllArgsConstructor;
 
 @Component
+@AllArgsConstructor(onConstructor = @__(@Autowired))
 public class RedisPingTest {
-    @Autowired
-    private StringRedisTemplate redisTemplate;
+
+    private final StringRedisTemplate redisTemplate;
 
     @PostConstruct
     public void ping() {

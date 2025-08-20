@@ -13,16 +13,16 @@ import fr.nexa.dailyorg_java.model.workout.WorkoutSession;
 import fr.nexa.dailyorg_java.repository.IAppUserRepository;
 import fr.nexa.dailyorg_java.repository.workout.IWorkoutRepository;
 import fr.nexa.dailyorg_java.service.workout.IWorkoutSessionService;
+import fr.nexa.dailyorg_java.utils.EErrorMessages;
 import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
 
 @Service
+@AllArgsConstructor(onConstructor = @__(@Autowired))
 public class WorkoutSessionService implements IWorkoutSessionService{
 	
-	@Autowired
-	private IWorkoutRepository workoutSessionRepository;
-	
-	@Autowired
-	private IAppUserRepository appUserRepository;
+	private final IWorkoutRepository workoutSessionRepository;
+	private final IAppUserRepository appUserRepository;
 
 	@Override
 	public List<WorkoutSession> getWorkoutSessionsByEmail(String appUserEmail) throws Exception {
@@ -31,7 +31,7 @@ public class WorkoutSessionService implements IWorkoutSessionService{
 			return workoutSessionRepository.findByUserId(optionalUser.get());
 		}
 		
-		throw new InaccessibleObjectException("Invalid or non-existent username...");
+		throw new InaccessibleObjectException(EErrorMessages.USER_NOT_FOUND.getMessage());
 	}
 	
 	@Override

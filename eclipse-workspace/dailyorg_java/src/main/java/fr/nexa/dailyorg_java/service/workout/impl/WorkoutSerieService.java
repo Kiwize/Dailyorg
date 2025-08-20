@@ -8,12 +8,13 @@ import org.springframework.stereotype.Service;
 import fr.nexa.dailyorg_java.model.workout.WorkoutSerie;
 import fr.nexa.dailyorg_java.repository.workout.IWorkoutSerieRepository;
 import fr.nexa.dailyorg_java.service.workout.IWorkoutSerieService;
+import lombok.AllArgsConstructor;
 
 @Service
+@AllArgsConstructor(onConstructor = @__(@Autowired))
 public class WorkoutSerieService implements IWorkoutSerieService {
 
-	@Autowired
-	private IWorkoutSerieRepository workoutSerieRepository;
+	private final IWorkoutSerieRepository workoutSerieRepository;
 
 	@Override
 	public Optional<WorkoutSerie> getWorkoutSerie(Long workoutSerieID) throws Exception {

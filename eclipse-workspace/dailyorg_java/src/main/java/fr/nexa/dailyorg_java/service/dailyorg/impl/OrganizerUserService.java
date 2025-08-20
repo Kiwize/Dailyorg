@@ -9,12 +9,13 @@ import fr.nexa.dailyorg_java.model.AppUser;
 import fr.nexa.dailyorg_java.model.dailyorg.OrganizerUser;
 import fr.nexa.dailyorg_java.repository.dailyorg.IOrganizerUserRepository;
 import fr.nexa.dailyorg_java.service.dailyorg.IOrganizerUserService;
+import lombok.AllArgsConstructor;
 
 @Service
+@AllArgsConstructor(onConstructor = @__(@Autowired))
 public class OrganizerUserService implements IOrganizerUserService{
 
-	@Autowired
-	private IOrganizerUserRepository organizerUserRepository;
+	private final IOrganizerUserRepository organizerUserRepository;
 	
 	@Override
 	public OrganizerUser findByAppUserId(AppUser userId) {

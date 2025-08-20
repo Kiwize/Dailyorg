@@ -9,12 +9,13 @@ import fr.nexa.dailyorg_java.model.workout.CardioRecord;
 import fr.nexa.dailyorg_java.repository.workout.ICardioWorkoutRecordRepository;
 import fr.nexa.dailyorg_java.service.workout.ICardioWorkoutRecordService;
 import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
 
 @Service
+@AllArgsConstructor(onConstructor = @__(@Autowired))
 public class CardioWorkoutRecordService implements ICardioWorkoutRecordService {
 
-	@Autowired
-	private ICardioWorkoutRecordRepository cardioWorkoutRecordRepository;
+	private final ICardioWorkoutRecordRepository cardioWorkoutRecordRepository;
 	
 	@Override
 	@Transactional

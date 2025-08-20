@@ -15,15 +15,14 @@ import fr.nexa.dailyorg_java.model.workout.WorkoutSession;
 import fr.nexa.dailyorg_java.repository.workout.IWorkoutRecordRepository;
 import fr.nexa.dailyorg_java.repository.workout.IWorkoutRepository;
 import fr.nexa.dailyorg_java.service.workout.IWorkoutRecordService;
+import lombok.AllArgsConstructor;
 
 @Service
+@AllArgsConstructor(onConstructor = @__(@Autowired))
 public class WorkoutRecordService implements IWorkoutRecordService {
 
-	@Autowired
-	private IWorkoutRecordRepository workoutRecordRepository;
-
-	@Autowired
-	private IWorkoutRepository workoutSessionRepository;
+	private final IWorkoutRecordRepository workoutRecordRepository;
+	private final IWorkoutRepository workoutSessionRepository;
 
 	@Override
 	public List<Exercise> getExercisesByWorkoutSession(Long workoutSessionId) {
@@ -40,7 +39,7 @@ public class WorkoutRecordService implements IWorkoutRecordService {
 		List<Exercise> exercises = getExercisesByWorkoutSession(workoutSessionID);
 		
 		for(Exercise exercise : exercises) {
-			if(exercise.getId() == exerciseToCheckID) {
+			if(exercise.getId().equals(exerciseToCheckID)) {
 				return true;
 			}
 		}

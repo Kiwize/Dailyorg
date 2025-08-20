@@ -8,12 +8,13 @@ import org.springframework.stereotype.Service;
 import fr.nexa.dailyorg_java.model.workout.CardioExercise;
 import fr.nexa.dailyorg_java.repository.workout.ICardioExerciseRepository;
 import fr.nexa.dailyorg_java.service.workout.ICardioExerciseService;
+import lombok.AllArgsConstructor;
 
 @Service
+@AllArgsConstructor(onConstructor = @__(@Autowired))
 public class CardioExerciseService implements ICardioExerciseService{
 	
-	@Autowired
-	private ICardioExerciseRepository cardioExerciseRepository;
+	private final ICardioExerciseRepository cardioExerciseRepository;
 	
 	@Override
 	public void addCardioExercise(CardioExercise cardioExercise) throws Exception {
