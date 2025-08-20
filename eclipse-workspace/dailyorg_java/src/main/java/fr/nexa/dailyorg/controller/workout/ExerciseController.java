@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import fr.nexa.dailyorg.DTO.workout.CardioExerciseDTO;
-import fr.nexa.dailyorg.DTO.workout.StrengthExerciseDTO;
+import fr.nexa.dailyorg.dto.workout.CardioExerciseDTO;
+import fr.nexa.dailyorg.dto.workout.StrengthExerciseDTO;
 import fr.nexa.dailyorg.model.workout.CardioExercise;
 import fr.nexa.dailyorg.model.workout.Muscle;
 import fr.nexa.dailyorg.model.workout.StrengthExercise;

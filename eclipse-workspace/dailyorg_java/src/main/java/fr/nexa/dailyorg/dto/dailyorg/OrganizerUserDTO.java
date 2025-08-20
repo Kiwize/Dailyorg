@@ -1,4 +1,4 @@
-package fr.nexa.dailyorg.DTO.dailyorg;
+package fr.nexa.dailyorg.dto.dailyorg;
 
 import lombok.Getter;
 import lombok.Setter;

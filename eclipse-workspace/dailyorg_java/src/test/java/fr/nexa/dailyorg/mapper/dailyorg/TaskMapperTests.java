@@ -10,7 +10,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import fr.nexa.dailyorg.DTO.dailyorg.TaskDTO;
+import fr.nexa.dailyorg.dto.dailyorg.TaskDTO;
 import fr.nexa.dailyorg.model.dailyorg.Task;
 
 class TaskMapperTests {

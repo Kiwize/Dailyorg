@@ -15,11 +15,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import fr.nexa.dailyorg.DTO.workout.CardioRecordDTO;
-import fr.nexa.dailyorg.DTO.workout.ExerciseDTO;
-import fr.nexa.dailyorg.DTO.workout.StrengthRecordDTO;
-import fr.nexa.dailyorg.DTO.workout.StrengthWorkoutSerieDTO;
-import fr.nexa.dailyorg.DTO.workout.WorkoutSerieDTO;
+import fr.nexa.dailyorg.dto.workout.CardioRecordDTO;
+import fr.nexa.dailyorg.dto.workout.ExerciseDTO;
+import fr.nexa.dailyorg.dto.workout.StrengthRecordDTO;
+import fr.nexa.dailyorg.dto.workout.StrengthWorkoutSerieDTO;
+import fr.nexa.dailyorg.dto.workout.WorkoutSerieDTO;
 import fr.nexa.dailyorg.model.workout.CardioRecord;
 import fr.nexa.dailyorg.model.workout.Exercise;
 import fr.nexa.dailyorg.model.workout.StrengthRecord;

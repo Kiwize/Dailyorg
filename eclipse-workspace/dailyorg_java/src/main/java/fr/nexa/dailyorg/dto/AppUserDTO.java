@@ -1,6 +1,6 @@
-package fr.nexa.dailyorg.DTO;
+package fr.nexa.dailyorg.dto;
 
-import fr.nexa.dailyorg.DTO.dailyorg.OrganizerUserDTO;
+import fr.nexa.dailyorg.dto.dailyorg.OrganizerUserDTO;
 import lombok.Getter;
 import lombok.Setter;
 

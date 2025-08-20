@@ -2,8 +2,8 @@ package fr.nexa.dailyorg.mapper;
 
 import org.springframework.stereotype.Service;
 
-import fr.nexa.dailyorg.DTO.AppUserDTO;
-import fr.nexa.dailyorg.DTO.dailyorg.OrganizerUserDTO;
+import fr.nexa.dailyorg.dto.AppUserDTO;
+import fr.nexa.dailyorg.dto.dailyorg.OrganizerUserDTO;
 import fr.nexa.dailyorg.model.AppUser;
 
 @Service

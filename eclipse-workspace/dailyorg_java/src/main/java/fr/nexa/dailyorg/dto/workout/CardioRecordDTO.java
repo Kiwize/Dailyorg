@@ -1,4 +1,4 @@
-package fr.nexa.dailyorg.DTO.workout;
+package fr.nexa.dailyorg.dto.workout;
 
 import java.time.LocalDateTime;
 

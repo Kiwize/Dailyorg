@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import fr.nexa.dailyorg.DTO.dailyorg.TaskDTO;
+import fr.nexa.dailyorg.dto.dailyorg.TaskDTO;
 import fr.nexa.dailyorg.model.dailyorg.Task;
 
 @Service

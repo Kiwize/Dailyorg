@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import fr.nexa.dailyorg.DTO.AppUserDTO;
 import fr.nexa.dailyorg.components.JwtRedisService;
 import fr.nexa.dailyorg.config.JwtUtil;
+import fr.nexa.dailyorg.dto.AppUserDTO;
 import fr.nexa.dailyorg.mapper.AppUserMapper;
 import fr.nexa.dailyorg.model.AppUser;
 import fr.nexa.dailyorg.service.AppUserService;

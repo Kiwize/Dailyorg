@@ -1,4 +1,4 @@
-package fr.nexa.dailyorg.DTO.workout;
+package fr.nexa.dailyorg.dto.workout;
 
 import fr.nexa.dailyorg.model.workout.Exercise;
 import lombok.Getter;

@@ -1,12 +1,14 @@
-package fr.nexa.dailyorg.DTO.workout;
+package fr.nexa.dailyorg.dto.workout;
+
+import java.util.List;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class CardioExerciseDTO {
+public class StrengthExerciseDTO {
 	private String exerciseName;
     private String exerciseImagePath;
-    
+    private List<String> muscles; 
 }
