@@ -3,6 +3,7 @@ package fr.nexa.dailyorg_java.controller;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -136,7 +137,7 @@ public class AuthController {
 			result.put("message", "User registered successfully");
 			return ResponseEntity.ok(result);
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.getLogger(AuthController.class.getName()).severe("Error during user registration: " + e.getMessage());
 			return ResponseEntity.badRequest().body("Internal server error during user registration...");
 		}
 	}

@@ -7,13 +7,14 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 @Entity
-@Data
 @NoArgsConstructor
+@Getter @Setter
 @SuperBuilder
 @AllArgsConstructor
 public class StrengthRecord extends WorkoutRecord {

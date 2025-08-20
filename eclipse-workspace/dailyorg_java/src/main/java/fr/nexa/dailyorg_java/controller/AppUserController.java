@@ -2,6 +2,7 @@ package fr.nexa.dailyorg_java.controller;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -58,7 +59,7 @@ public class AppUserController {
 
 			return ResponseEntity.ok(appUserService.addUser(user));
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.getLogger(AppUserController.class.getName()).severe("Error creating user: " + e.getMessage());
 			return ResponseEntity.internalServerError().body("Internal error...");
 		}
 	}
@@ -122,7 +123,7 @@ public class AppUserController {
 			}
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.getLogger(AppUserController.class.getName()).severe("Error updating user: " + e.getMessage());
 			return ResponseEntity.internalServerError().body("Internal error...");
 		}
 	}
@@ -138,7 +139,7 @@ public class AppUserController {
 				return ResponseEntity.notFound().build();
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.getLogger(AppUserController.class.getName()).severe("Error fetching current user: " + e.getMessage());
 			return ResponseEntity.internalServerError().body("Internal error...");
 		}
 	}

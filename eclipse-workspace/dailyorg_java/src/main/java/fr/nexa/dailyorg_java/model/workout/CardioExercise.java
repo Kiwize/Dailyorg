@@ -1,14 +1,15 @@
 package fr.nexa.dailyorg_java.model.workout;
 
 import jakarta.persistence.Entity;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 @Entity
-@Data
 @NoArgsConstructor
 @SuperBuilder
+@Getter @Setter
 //@AllArgsConstructor
 public class CardioExercise extends Exercise {
 	

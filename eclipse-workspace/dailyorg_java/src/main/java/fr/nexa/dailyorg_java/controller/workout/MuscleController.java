@@ -1,6 +1,7 @@
 package fr.nexa.dailyorg_java.controller.workout;
 
 import java.util.Map;
+import java.util.logging.Logger;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,7 +25,7 @@ public class MuscleController {
 		try {
 			return ResponseEntity.ok(muscleService.findAll());
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.getLogger(MuscleController.class.getName()).severe("Error while getting all muscles: " + e.getMessage());
 			return ResponseEntity.internalServerError().body("Internal error...");
 		}
 	}

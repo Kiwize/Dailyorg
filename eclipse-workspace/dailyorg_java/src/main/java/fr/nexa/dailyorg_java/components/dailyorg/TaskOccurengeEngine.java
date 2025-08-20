@@ -3,7 +3,6 @@ package fr.nexa.dailyorg_java.components.dailyorg;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -29,8 +28,6 @@ public class TaskOccurengeEngine {
 	public void handleTaskChangedEvent(TaskChangedEvent event) {
 		// Handle the task change event
 		// This method will be called when a task is created, updated or deleted
-		String uuid = UUID.randomUUID().toString();
-
 		List<Task> tasksToDelete = new ArrayList<>();
 
 		Task task = taskService.getTaskById(event.getTaskId());

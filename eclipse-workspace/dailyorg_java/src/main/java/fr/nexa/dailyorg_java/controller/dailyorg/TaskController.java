@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
@@ -99,10 +100,10 @@ public class TaskController {
 			}
 
 		} catch (NumberFormatException e) {
-			e.printStackTrace();
+			Logger.getLogger(TaskController.class.getName()).severe("Invalid number format for task_required_energy: " + e.getMessage());
 			return ResponseEntity.badRequest().body("Invalid number format for task_required_energy...");
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.getLogger(TaskController.class.getName()).severe("Internal error: " + e.getMessage());
 			return ResponseEntity.internalServerError().body("Internal error...");
 		}
 	}
@@ -166,10 +167,10 @@ public class TaskController {
 				return ResponseEntity.badRequest().body("User not found...");
 			}
 		} catch (NumberFormatException e) {
-			e.printStackTrace();
+			Logger.getLogger(TaskController.class.getName()).severe("Invalid number format for task_id or task_required_energy: " + e.getMessage());
 			return ResponseEntity.badRequest().body("Invalid number format for task_required_energy...");
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.getLogger(TaskController.class.getName()).severe("Internal error: " + e.getMessage());
 			return ResponseEntity.internalServerError().body("Internal error...");
 		}
 	}
@@ -198,10 +199,10 @@ public class TaskController {
 				return ResponseEntity.badRequest().body("User not found...");
 			}
 		} catch (NumberFormatException e) {
-			e.printStackTrace();
+			Logger.getLogger(TaskController.class.getName()).severe("Invalid number format for task_id: " + e.getMessage());
 			return ResponseEntity.badRequest().body("Invalid number format for task_id...");
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.getLogger(TaskController.class.getName()).severe("Internal error: " + e.getMessage());
 			return ResponseEntity.internalServerError().body("Internal error...");
 		}
 	}
@@ -225,7 +226,7 @@ public class TaskController {
 				return ResponseEntity.badRequest().body("User not found...");
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.getLogger(TaskController.class.getName()).severe("Internal error: " + e.getMessage());
 			return ResponseEntity.internalServerError().body("Internal error...");
 		}
 	}
@@ -245,7 +246,7 @@ public class TaskController {
 
 			return ResponseEntity.ok(response);
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.getLogger(TaskController.class.getName()).severe("Internal error: " + e.getMessage());
 			return ResponseEntity.internalServerError().body("Internal error...");
 		}
 	}
@@ -273,7 +274,7 @@ public class TaskController {
 				return ResponseEntity.badRequest().body("User not found...");
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.getLogger(TaskController.class.getName()).severe("Internal error: " + e.getMessage());
 			return ResponseEntity.internalServerError().body("Internal error...");
 		}
 	}
@@ -291,6 +292,7 @@ public class TaskController {
 			appUser.setOrganizerUser(organizerUser);
 			organizerUserService.create(organizerUser);
 			appUserService.updateUser(appUser);
+			Logger.getLogger(TaskController.class.getName()).info("Organizer profile created for user: " + appUser.getEmail());
 			return true;
 		}
 

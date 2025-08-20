@@ -2,13 +2,14 @@ package fr.nexa.dailyorg_java.model.workout;
 
 import jakarta.persistence.Entity;
 import jakarta.transaction.Transactional;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 @Entity
-@Data
 @NoArgsConstructor
+@Getter @Setter
 @SuperBuilder
 @Transactional
 //@AllArgsConstructor

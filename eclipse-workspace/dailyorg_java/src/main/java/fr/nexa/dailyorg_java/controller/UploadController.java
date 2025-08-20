@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 
@@ -71,7 +72,7 @@ public class UploadController {
 			}
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.getLogger(UploadController.class.getName()).severe("Error saving profile picture: " + e.getMessage());
 			return ResponseEntity.status(500).body("Error saving profile picture: " + e.getMessage());
 		}
 

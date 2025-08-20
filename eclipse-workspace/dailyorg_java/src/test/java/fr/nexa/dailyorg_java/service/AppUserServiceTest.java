@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
+import java.util.logging.Logger;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,7 +36,7 @@ public class AppUserServiceTest {
 			
 			assertThat(result).isNotNull();
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.getLogger(AppUserServiceTest.class.getName()).severe("Error in testAddUser: " + e.getMessage());
 		}
 	}
 	
@@ -50,7 +51,7 @@ public class AppUserServiceTest {
 			
 			assertThat(appUser).isNotNull();
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.getLogger(AppUserServiceTest.class.getName()).severe("Error in testUpdateUser: " + e.getMessage());
 		}
 	}
 	
@@ -63,7 +64,7 @@ public class AppUserServiceTest {
 			
 			assertThat(appUser).isNotNull();
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.getLogger(AppUserServiceTest.class.getName()).severe("Error in testRemoveUser: " + e.getMessage());
 		}
 	}
 	
@@ -78,7 +79,7 @@ public class AppUserServiceTest {
 			
 			assertThat(result).isNotNull();
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.getLogger(AppUserServiceTest.class.getName()).severe("Error in testGetAppUserByID: " + e.getMessage());
 		}
 	}
 	
@@ -95,7 +96,7 @@ public class AppUserServiceTest {
 			assertThat(result.get()).isNotNull();
 			assertThat(result.get().getEmail()).isEqualTo("test@test.fr");
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.getLogger(AppUserServiceTest.class.getName()).severe("Error in testFindByEmail: " + e.getMessage());
 		}
 	}
 }

@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import fr.nexa.dailyorg_java.model.workout.StrengthExercise;
-import fr.nexa.dailyorg_java.repository.workout.IMuscleRepository;
 import fr.nexa.dailyorg_java.repository.workout.IStrengthExerciseRepository;
 import fr.nexa.dailyorg_java.service.workout.IStrengthExerciseService;
 
@@ -15,9 +14,6 @@ public class StrengthExerciseService implements IStrengthExerciseService{
 	
 	@Autowired
 	private IStrengthExerciseRepository strengthExerciseRepository;
-	
-	@Autowired
-	private IMuscleRepository muscleRepository;
 	
 	@Override
 	public void addStrengthExercise(StrengthExercise strengthExercise) throws Exception {

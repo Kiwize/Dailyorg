@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -80,7 +82,7 @@ public class WorkoutRecordController {
 				return ResponseEntity.internalServerError().body("The strength record couldn't be found...");
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.getLogger(WorkoutRecordController.class.getName()).log(Level.SEVERE, "Error adding strength series", e);
 			return ResponseEntity.internalServerError().body("Internal error...");
 		}
 	}
@@ -100,7 +102,7 @@ public class WorkoutRecordController {
 
 			return ResponseEntity.ok("Strength record deleted!");
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.getLogger(WorkoutRecordController.class.getName()).log(Level.SEVERE, "Error deleting strength series", e);
 			return ResponseEntity.internalServerError().body("Internal error...");
 		}
 	}
@@ -135,7 +137,7 @@ public class WorkoutRecordController {
 				return ResponseEntity.internalServerError().body("Strength serie not found...");
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.getLogger(WorkoutRecordController.class.getName()).log(Level.SEVERE, "Error updating strength series", e);
 			return ResponseEntity.internalServerError().body("Internal error...");
 		}
 	}
@@ -171,10 +173,10 @@ public class WorkoutRecordController {
 				return ResponseEntity.internalServerError().body("The cardio record couldn't be found...");
 			}
 		} catch (NumberFormatException e) {
-			e.printStackTrace();
+			Logger.getLogger(WorkoutRecordController.class.getName()).log(Level.SEVERE, "Invalid cardio record ID format", e);
 			return ResponseEntity.internalServerError().body("Invalid data submitted...");
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.getLogger(WorkoutRecordController.class.getName()).log(Level.SEVERE, "Error fetching cardio record", e);
 			return ResponseEntity.internalServerError().body("Internal error...");
 		}
 	}
@@ -221,10 +223,10 @@ public class WorkoutRecordController {
 				return ResponseEntity.internalServerError().body("The strength record couldn't be found...");
 			}
 		} catch (NumberFormatException e) {
-			e.printStackTrace();
+			Logger.getLogger(WorkoutRecordController.class.getName()).log(Level.SEVERE, "Invalid strength record ID format", e);
 			return ResponseEntity.internalServerError().body("Invalid data submitted...");
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.getLogger(WorkoutRecordController.class.getName()).log(Level.SEVERE, "Error fetching strength record", e);
 			return ResponseEntity.internalServerError().body("Internal server error...");
 		}
 	}

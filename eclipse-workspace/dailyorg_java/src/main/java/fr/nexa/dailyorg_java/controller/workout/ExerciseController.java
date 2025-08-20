@@ -3,6 +3,7 @@ package fr.nexa.dailyorg_java.controller.workout;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -63,7 +64,7 @@ public class ExerciseController {
 				return ResponseEntity.status(HttpStatus.OK).body(exerciseService.getAllExercises());
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.getLogger(ExerciseController.class.getName()).severe("Error while getting all exercises: " + e.getMessage());
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal error...");
 		}
 	}
