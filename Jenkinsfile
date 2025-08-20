@@ -30,7 +30,7 @@ pipeline {
             steps {
                 sh 'docker-compose --env-file .env down'
 
-                dir('eclipse-workspace/dailyorg') {
+                dir('eclipse-workspace/dailyorg_java') {
                     sh 'mvn clean'
                     sh 'mvn install'
                 }
@@ -49,7 +49,7 @@ pipeline {
         stage('SonarQube Analysis (Java Backend)') {
             steps {
                 withSonarQubeEnv("${SONARQUBE}") {
-                    dir('eclipse-workspace/dailyorg') {
+                    dir('eclipse-workspace/dailyorg_java') {
                         sh """
                             mvn clean verify sonar:sonar \
                             -Dsonar.projectKey=DailyOrganizer \
@@ -65,7 +65,7 @@ pipeline {
 
         stage('Backend Tests') {
             steps {
-                dir('eclipse-workspace/dailyorg') {
+                dir('eclipse-workspace/dailyorg_java') {
                     sh 'mvn test'
                 }
             }
