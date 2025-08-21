@@ -18,14 +18,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import fr.nexa.dailyorg.components.factory.dailyorg.RecurringTaskStateFactory;
 import fr.nexa.dailyorg.components.factory.dailyorg.TaskFactory;
 import fr.nexa.dailyorg.model.dailyorg.Task;
-import fr.nexa.dailyorg.repository.dailyorg.ITaskRepository;
 
 @SpringBootTest
 @ActiveProfiles("test")
 @ExtendWith(SpringExtension.class)
 public class TaskServiceTest {
-
-	private final ITaskRepository taskRepository;
 
 	private final TaskService taskService;
 
@@ -34,8 +31,7 @@ public class TaskServiceTest {
 	private final RecurringTaskStateFactory recurringTaskStateFactory;
 	
 	@Autowired
-	public TaskServiceTest(ITaskRepository taskRepository, TaskService taskService, TaskFactory taskFactory, RecurringTaskStateFactory recurringTaskStateFactory) {
-		this.taskRepository = taskRepository;
+	public TaskServiceTest(TaskService taskService, TaskFactory taskFactory, RecurringTaskStateFactory recurringTaskStateFactory) {
 		this.taskService = taskService;
 		this.taskFactory = taskFactory;
 		this.recurringTaskStateFactory = recurringTaskStateFactory;
@@ -45,7 +41,7 @@ public class TaskServiceTest {
 	void testGetTaskByID() {
 		Task task = taskFactory.createOneTask();
 
-		Task insertedTask = taskRepository.save(task);
+		Task insertedTask = taskService.addTask(task);
 		Task result = taskService.getTaskById(insertedTask.getId());
 
 		assertThat(result.getTaskName()).isEqualTo(task.getTaskName());
@@ -153,33 +149,33 @@ public class TaskServiceTest {
 	void testDeleteTask() {
 		Task task = taskFactory.createAndInsertOneTask();
 
-		assertNotNull(taskRepository.findById(task.getId()).orElse(null));
+		assertNotNull(taskService.getTaskById(task.getId()));
 
 		taskService.deleteTask(task);
 
-		assertNull(taskRepository.findById(task.getId()).orElse(null));
+		assertNull(taskService.getTaskById(task.getId()));
 	}
 
 	@Test
 	void testDeleteTask_withoutEvent() {
 		Task task = taskFactory.createAndInsertOneTask();
 
-		assertNotNull(taskRepository.findById(task.getId()).orElse(null));
+		assertNotNull(taskService.getTaskById(task.getId()));
 
 		taskService.deleteTask(task, false);
 
-		assertNull(taskRepository.findById(task.getId()).orElse(null));
+		assertNull(taskService.getTaskById(task.getId()));
 	}
 
 	@Test
 	void testDeleteTask_withEvent() {
 		Task task = taskFactory.createAndInsertOneTask();
 
-		assertNotNull(taskRepository.findById(task.getId()).orElse(null));
+		assertNotNull(taskService.getTaskById(task.getId()));
 
 		taskService.deleteTask(task, true);
 
-		assertNull(taskRepository.findById(task.getId()).orElse(null));
+		assertNull(taskService.getTaskById(task.getId()));
 	}
 
 	@Test
@@ -193,13 +189,13 @@ public class TaskServiceTest {
 
 		tasks.addAll(List.of(task1, task2));
 
-		assertNotNull(taskRepository.findById(task1.getId()).orElse(null));
-		assertNotNull(taskRepository.findById(task2.getId()).orElse(null));
+		assertNotNull(taskService.getTaskById(task1.getId()));
+		assertNotNull(taskService.getTaskById(task2.getId()));
 
 		taskService.deleteAllTasks(tasks);
 
-		assertNull(taskRepository.findById(task1.getId()).orElse(null));
-		assertNull(taskRepository.findById(task2.getId()).orElse(null));
+		assertNull(taskService.getTaskById(task1.getId()));
+		assertNull(taskService.getTaskById(task2.getId()));
 	}
 
 	@Test
@@ -213,13 +209,13 @@ public class TaskServiceTest {
 
 		tasks.addAll(List.of(task1, task2));
 
-		assertNotNull(taskRepository.findById(task1.getId()).orElse(null));
-		assertNotNull(taskRepository.findById(task2.getId()).orElse(null));
+		assertNotNull(taskService.getTaskById(task1.getId()));
+		assertNotNull(taskService.getTaskById(task2.getId()));
 
 		taskService.deleteAllTasks(tasks, true);
 
-		assertNull(taskRepository.findById(task1.getId()).orElse(null));
-		assertNull(taskRepository.findById(task2.getId()).orElse(null));
+		assertNull(taskService.getTaskById(task1.getId()));
+		assertNull(taskService.getTaskById(task2.getId()));
 	}
 
 	@Test
@@ -233,13 +229,13 @@ public class TaskServiceTest {
 
 		tasks.addAll(List.of(task1, task2));
 
-		assertNotNull(taskRepository.findById(task1.getId()).orElse(null));
-		assertNotNull(taskRepository.findById(task2.getId()).orElse(null));
+		assertNotNull(taskService.getTaskById(task1.getId()));
+		assertNotNull(taskService.getTaskById(task2.getId()));
 
 		taskService.deleteAllTasks(tasks, false);
 
-		assertNull(taskRepository.findById(task1.getId()).orElse(null));
-		assertNull(taskRepository.findById(task2.getId()).orElse(null));
+		assertNull(taskService.getTaskById(task1.getId()));
+		assertNull(taskService.getTaskById(task2.getId()));
 	}
 
 	@Test
@@ -267,7 +263,7 @@ public class TaskServiceTest {
 		for (int i = 0; i < 5; i++) {
 			Task task = taskFactory.createOneTask();
 			task.setOcurrenceUniqueId("unique-id-12345");
-			taskRepository.save(task);
+			taskService.addTask(task);
 		}
 
 		List<Task> result = taskService.getAllTasksByOcurrenceUniqueId("unique-id-12345");
