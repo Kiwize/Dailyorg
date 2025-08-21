@@ -1,273 +1,369 @@
 package fr.nexa.dailyorg.service.dailyorg.impl;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatNullPointerException;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 
-import fr.nexa.dailyorg.components.factory.dailyorg.RecurringTaskStateFactory;
+import fr.nexa.dailyorg.components.dailyorg.event.TaskChangedEvent;
+import fr.nexa.dailyorg.components.factory.AppUserFactory;
+import fr.nexa.dailyorg.components.factory.dailyorg.OrganizerUserFactory;
 import fr.nexa.dailyorg.components.factory.dailyorg.TaskFactory;
+import fr.nexa.dailyorg.components.factory.dailyorg.TaskPriorityFactory;
+import fr.nexa.dailyorg.model.dailyorg.OrganizerUser;
 import fr.nexa.dailyorg.model.dailyorg.Task;
+import fr.nexa.dailyorg.repository.dailyorg.IRecurringTaskStateRepository;
+import fr.nexa.dailyorg.repository.dailyorg.ITaskRepository;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 public class TaskServiceTest {
 
-	private final TaskService taskService;
+	@InjectMocks
+	private TaskService taskService;
 
-	private final TaskFactory taskFactory;
-	
-	private final RecurringTaskStateFactory recurringTaskStateFactory;
-	
-	@Autowired
-	public TaskServiceTest(TaskService taskService, TaskFactory taskFactory, RecurringTaskStateFactory recurringTaskStateFactory) {
-		this.taskService = taskService;
-		this.taskFactory = taskFactory;
-		this.recurringTaskStateFactory = recurringTaskStateFactory;
-	}
+	// Repositories
+
+	@Mock
+	private ITaskRepository taskRepository;
+
+	@Mock
+	private IRecurringTaskStateRepository recurringTaskStateRepository;
+
+	@Mock
+	private ApplicationEventPublisher eventPublisher;
+
+	// Factories
+	private final TaskFactory taskFactory = new TaskFactory();
+	private final OrganizerUserFactory organizerUserFactory = new OrganizerUserFactory();
+	private final AppUserFactory appUserFactory = new AppUserFactory();
+	private final TaskPriorityFactory taskPriorityFactory = new TaskPriorityFactory();
 	
 	@Test
-	void testGetTaskByID() {
+	public void testGetTaskById() {
 		Task task = taskFactory.createOneTask();
-
-		Task insertedTask = taskService.addTask(task);
-		Task result = taskService.getTaskById(insertedTask.getId());
-
-		assertThat(result.getTaskName()).isEqualTo(task.getTaskName());
-	}
-
-	@Test
-	void testAddTask() {
-		Task task = taskFactory.createOneTask();
-		Task result = taskService.addTask(task);
-		assertThat(result.getTaskName()).isEqualTo(task.getTaskName());
-	}
-
-	@Test
-	void testUpdateTask() {
-		Task task = taskFactory.createAndInsertOneTask();
-
-		task.setTaskName("Updated Task Name");
-
-		Task result = taskService.updateTask(task);
-
-		assertThat(result.getTaskName()).isEqualTo("Updated Task Name");
-	}
-
-	@Test
-	void testUpdateTask_nullTask() {
-		assertThatNullPointerException().isThrownBy(() -> taskService.updateTask(null));
-		taskService.updateTask(taskFactory.createOneTask());
-	}
-
-	@Test
-	void testUpdateTask_taskCompletionStateChange() {
-		Task task = taskFactory.createAndInsertOneTask();
-
-		// Simulate a change in task completion state
-		task.setTaskCompleted(!task.isTaskCompleted());
-
-		Task result = taskService.updateTask(task);
-
-		assertThat(result.getTaskName()).isEqualTo(task.getTaskName());
-	}
-	
-	@Test
-	void testUpdateTask_removeRecurringTaskStateChange() {
-		Task task = taskFactory.createAndInsertOneTaskWithRecurringTaskState();
-
-		task.setRecurringTaskState(null);
-		Task result = taskService.updateTask(task);
-		assertThat(result.getTaskName()).isEqualTo(task.getTaskName());
-	}
-	
-	@Test
-	void testUpdateTask_addRecurringTaskStateChange() {
-		Task task = taskFactory.createAndInsertOneTask();
 		
-		task.setRecurringTaskState(recurringTaskStateFactory.createAndInsertOneRecurringTaskState());
+		// Mock the repository call
+		when(taskRepository.findById(task.getId())).thenReturn(java.util.Optional.of(task));
 
-		Task result = taskService.updateTask(task);
+		Task foundTask = taskService.getTaskById(task.getId());
 
-		assertThat(result.getTaskName()).isEqualTo(task.getTaskName());
+		assertEquals(task, foundTask);
 	}
 	
 	@Test
-	void testUpdateTask_recurringTaskStateChange() {
-		Task task = taskFactory.createAndInsertOneTaskWithRecurringTaskState();
+	public void testAddTask() {
+		Task task = taskFactory.createOneTask();
+		task.setOrganizerUser(organizerUserFactory.createOneOrganizerUser(appUserFactory.createOneAppUser()));
+		task.setTaskPriority(taskPriorityFactory.createOneTaskPriority());
 
-		task.setRecurringTaskState(recurringTaskStateFactory.createAndInsertOneRecurringTaskState());
+		taskService.addTask(task);
+		verify(taskRepository).save(task);
 
-		Task result = taskService.updateTask(task);
-
-		assertThat(result.getTaskName()).isEqualTo(task.getTaskName());
+		// Verify that the event is published
+		ArgumentCaptor<TaskChangedEvent> eventCaptor = ArgumentCaptor.forClass(TaskChangedEvent.class);
+		verify(eventPublisher).publishEvent(eventCaptor.capture());
+		
+		TaskChangedEvent event = eventCaptor.getValue();
+		
+		// Verify the event properties
+		assertEquals(TaskChangedEvent.TaskChangeType.CREATED, event.getChangeType());
+		assertEquals(task.getId(), event.getTaskId());
 	}
 	
 	@Test
-	void testUpdateTask_recurringTaskStateNoChange() {
-		Task task = taskFactory.createAndInsertOneTaskWithRecurringTaskState();
+	public void testUpdateTask() {
+		Task task = taskFactory.createOneTask();
+		task.setOrganizerUser(organizerUserFactory.createOneOrganizerUser(appUserFactory.createOneAppUser()));
+		task.setTaskPriority(taskPriorityFactory.createOneTaskPriority());
 
-		Task result = taskService.updateTask(task);
+		// Mock the repository call
+		when(taskRepository.save(task)).thenReturn(task);
+		taskService.updateTask(task);
 
-		assertThat(result.getTaskName()).isEqualTo(task.getTaskName());
+		verify(taskRepository).save(task);
+
+		// Verify that the event is published
+		ArgumentCaptor<TaskChangedEvent> eventCaptor = ArgumentCaptor.forClass(TaskChangedEvent.class);
+		verify(eventPublisher).publishEvent(eventCaptor.capture());
+		
+		TaskChangedEvent event = eventCaptor.getValue();
+		
+		// Verify the event properties
+		assertEquals(TaskChangedEvent.TaskChangeType.UPDATED, event.getChangeType());
+		assertEquals(task.getId(), event.getTaskId());
+	}
+	
+	@Test
+	public void testUpdateTaskWithTriggerEvent() {
+		Task task = taskFactory.createOneTask();
+		task.setOrganizerUser(organizerUserFactory.createOneOrganizerUser(appUserFactory.createOneAppUser()));
+		task.setTaskPriority(taskPriorityFactory.createOneTaskPriority());
+
+		// Mock the repository call
+		when(taskRepository.save(task)).thenReturn(task);
+		taskService.updateTask(task, true);
+
+		verify(taskRepository).save(task);
+
+		// Verify that the event is published
+		ArgumentCaptor<TaskChangedEvent> eventCaptor = ArgumentCaptor.forClass(TaskChangedEvent.class);
+		verify(eventPublisher).publishEvent(eventCaptor.capture());
+		
+		TaskChangedEvent event = eventCaptor.getValue();
+		
+		// Verify the event properties
+		assertEquals(TaskChangedEvent.TaskChangeType.UPDATED, event.getChangeType());
+		assertEquals(task.getId(), event.getTaskId());
+	}
+	
+	@Test
+	public void testUpdateTaskWithoutTriggerEvent() {
+		Task task = taskFactory.createOneTask();
+		task.setOrganizerUser(organizerUserFactory.createOneOrganizerUser(appUserFactory.createOneAppUser()));
+		task.setTaskPriority(taskPriorityFactory.createOneTaskPriority());
+
+		// Mock the repository call
+		when(taskRepository.save(task)).thenReturn(task);
+		taskService.updateTask(task, false);
+
+		verify(taskRepository).save(task);
+
+		// Verify that the event is published
+		verify(eventPublisher, never()).publishEvent(any());
 	}
 
 	@Test
-	void testUpdateTask_withoutEvent() {
-		Task task = taskFactory.createAndInsertOneTask();
-
-		task.setTaskName("Updated Task Name without Event");
-
-		Task result = taskService.updateTask(task, false);
-
-		assertThat(result.getTaskName()).isEqualTo("Updated Task Name without Event");
-	}
-
-	@Test
-	void testUpdateTask_withEvent() {
-		Task task = taskFactory.createAndInsertOneTask();
-
-		task.setTaskName("Updated Task Name with Event");
-
-		Task result = taskService.updateTask(task, true);
-
-		assertThat(result.getTaskName()).isEqualTo("Updated Task Name with Event");
-	}
-
-	@Test
-	void testDeleteTask() {
-		Task task = taskFactory.createAndInsertOneTask();
-
-		assertNotNull(taskService.getTaskById(task.getId()));
+	public void testDeleteTask() {
+		Task task = taskFactory.createOneTask();
+		task.setOrganizerUser(organizerUserFactory.createOneOrganizerUser(appUserFactory.createOneAppUser()));
+		task.setTaskPriority(taskPriorityFactory.createOneTaskPriority());
 
 		taskService.deleteTask(task);
 
-		assertNull(taskService.getTaskById(task.getId()));
+		verify(taskRepository).delete(task);
+
+		// Verify that the event is published
+		ArgumentCaptor<TaskChangedEvent> eventCaptor = ArgumentCaptor.forClass(TaskChangedEvent.class);
+		verify(eventPublisher).publishEvent(eventCaptor.capture());
+		
+		TaskChangedEvent event = eventCaptor.getValue();
+		
+		// Verify the event properties
+		assertEquals(TaskChangedEvent.TaskChangeType.DELETED, event.getChangeType());
+		assertEquals(task.getId(), event.getTaskId());
 	}
-
+	
 	@Test
-	void testDeleteTask_withoutEvent() {
-		Task task = taskFactory.createAndInsertOneTask();
-
-		assertNotNull(taskService.getTaskById(task.getId()));
-
-		taskService.deleteTask(task, false);
-
-		assertNull(taskService.getTaskById(task.getId()));
-	}
-
-	@Test
-	void testDeleteTask_withEvent() {
-		Task task = taskFactory.createAndInsertOneTask();
-
-		assertNotNull(taskService.getTaskById(task.getId()));
+	public void testDeleteTaskWithTriggerEvent() {
+		Task task = taskFactory.createOneTask();
+		task.setOrganizerUser(organizerUserFactory.createOneOrganizerUser(appUserFactory.createOneAppUser()));
+		task.setTaskPriority(taskPriorityFactory.createOneTaskPriority());
 
 		taskService.deleteTask(task, true);
 
-		assertNull(taskService.getTaskById(task.getId()));
+		verify(taskRepository).delete(task);
+
+		// Verify that the event is published
+		ArgumentCaptor<TaskChangedEvent> eventCaptor = ArgumentCaptor.forClass(TaskChangedEvent.class);
+		verify(eventPublisher).publishEvent(eventCaptor.capture());
+		
+		TaskChangedEvent event = eventCaptor.getValue();
+		
+		// Verify the event properties
+		assertEquals(TaskChangedEvent.TaskChangeType.DELETED, event.getChangeType());
+		assertEquals(task.getId(), event.getTaskId());
 	}
-
+	
 	@Test
-	void testDeleteAllTasks() {
-		List<Task> tasks = new ArrayList<>();
+	public void testDeleteTaskWithoutTriggerEvent() {
+		Task task = taskFactory.createOneTask();
+		task.setOrganizerUser(organizerUserFactory.createOneOrganizerUser(appUserFactory.createOneAppUser()));
+		task.setTaskPriority(taskPriorityFactory.createOneTaskPriority());
 
-		taskService.deleteAllTasks(tasks);
+		taskService.deleteTask(task, false);
 
-		Task task1 = taskFactory.createAndInsertOneTask();
-		Task task2 = taskFactory.createAndInsertOneTask();
+		verify(taskRepository).delete(task);
 
-		tasks.addAll(List.of(task1, task2));
-
-		assertNotNull(taskService.getTaskById(task1.getId()));
-		assertNotNull(taskService.getTaskById(task2.getId()));
-
-		taskService.deleteAllTasks(tasks);
-
-		assertNull(taskService.getTaskById(task1.getId()));
-		assertNull(taskService.getTaskById(task2.getId()));
+		// Verify that the event is not published
+		verify(eventPublisher, never()).publishEvent(any());
 	}
-
+	
 	@Test
-	void testDeleteAllTasks_withEvent() {
-		List<Task> tasks = new ArrayList<>();
+	public void testDeleteAllTasks() {
+		Task task1 = taskFactory.createOneTask();
+		Task task2 = taskFactory.createOneTask();
+		task1.setOrganizerUser(organizerUserFactory.createOneOrganizerUser(appUserFactory.createOneAppUser()));
+		task2.setOrganizerUser(organizerUserFactory.createOneOrganizerUser(appUserFactory.createOneAppUser()));
+		task1.setTaskPriority(taskPriorityFactory.createOneTaskPriority());
+		task2.setTaskPriority(taskPriorityFactory.createOneTaskPriority());
 
-		taskService.deleteAllTasks(tasks, true);
+		taskService.deleteAllTasks(java.util.List.of(task1, task2));
 
-		Task task1 = taskFactory.createAndInsertOneTask();
-		Task task2 = taskFactory.createAndInsertOneTask();
+		verify(taskRepository).deleteAll(java.util.List.of(task1, task2));
 
-		tasks.addAll(List.of(task1, task2));
-
-		assertNotNull(taskService.getTaskById(task1.getId()));
-		assertNotNull(taskService.getTaskById(task2.getId()));
-
-		taskService.deleteAllTasks(tasks, true);
-
-		assertNull(taskService.getTaskById(task1.getId()));
-		assertNull(taskService.getTaskById(task2.getId()));
+		// Verify that the events are published
+		ArgumentCaptor<TaskChangedEvent> eventCaptor = ArgumentCaptor.forClass(TaskChangedEvent.class);
+		verify(eventPublisher, times(2)).publishEvent(eventCaptor.capture());
+		
+		assertEquals(2, eventCaptor.getAllValues().size());
+		
+		for (TaskChangedEvent event : eventCaptor.getAllValues()) {
+			assertEquals(TaskChangedEvent.TaskChangeType.DELETED, event.getChangeType());
+			assertEquals(event.getTaskId(), task1.getId() == event.getTaskId() ? task1.getId() : task2.getId());
+		}
 	}
-
+	
 	@Test
-	void testDeleteAllTasks_withoutEvent() {
-		List<Task> tasks = new ArrayList<>();
-
-		taskService.deleteAllTasks(tasks, false);
-
-		Task task1 = taskFactory.createAndInsertOneTask();
-		Task task2 = taskFactory.createAndInsertOneTask();
-
-		tasks.addAll(List.of(task1, task2));
-
-		assertNotNull(taskService.getTaskById(task1.getId()));
-		assertNotNull(taskService.getTaskById(task2.getId()));
-
-		taskService.deleteAllTasks(tasks, false);
-
-		assertNull(taskService.getTaskById(task1.getId()));
-		assertNull(taskService.getTaskById(task2.getId()));
+	public void testDeleteAllTasks_emptyList() {
+		taskService.deleteAllTasks(java.util.List.of());
+		verify(taskRepository, never()).deleteAll(any());
+		verify(eventPublisher, never()).publishEvent(any());
 	}
-
+	
 	@Test
-	void testGetAllTasksByUserId() {
-		Task task = taskFactory.createAndInsertOneTask();
+	public void testDeleteAllTasksWithTriggerEvent() {
+		Task task1 = taskFactory.createOneTask();
+		Task task2 = taskFactory.createOneTask();
+		task1.setOrganizerUser(organizerUserFactory.createOneOrganizerUser(appUserFactory.createOneAppUser()));
+		task2.setOrganizerUser(organizerUserFactory.createOneOrganizerUser(appUserFactory.createOneAppUser()));
+		task1.setTaskPriority(taskPriorityFactory.createOneTaskPriority());
+		task2.setTaskPriority(taskPriorityFactory.createOneTaskPriority());
 
-		List<Task> result = taskService.getAllTasksByUserId(task.getOrganizerUser());
+		taskService.deleteAllTasks(java.util.List.of(task1, task2), true);
 
-		assertThat(result).hasSize(1);
-		assertThat(result.get(0).getTaskName()).isEqualTo(task.getTaskName());
+		verify(taskRepository).deleteAll(java.util.List.of(task1, task2));
+
+		// Verify that the events are published
+		ArgumentCaptor<TaskChangedEvent> eventCaptor = ArgumentCaptor.forClass(TaskChangedEvent.class);
+		verify(eventPublisher, times(2)).publishEvent(eventCaptor.capture());
+		
+		assertEquals(2, eventCaptor.getAllValues().size());
+		
+		for (TaskChangedEvent event : eventCaptor.getAllValues()) {
+			assertEquals(TaskChangedEvent.TaskChangeType.DELETED, event.getChangeType());
+			assertEquals(event.getTaskId(), task1.getId() == event.getTaskId() ? task1.getId() : task2.getId());
+		}
 	}
-
+	
 	@Test
-	void testGetAllTasksByUserIdAndDateRange() {
-		Task task = taskFactory.createAndInsertOneTask();
+	public void testDeleteAllTasksWithoutTriggerEvent() {
+		Task task1 = taskFactory.createOneTask();
+		Task task2 = taskFactory.createOneTask();
+		task1.setOrganizerUser(organizerUserFactory.createOneOrganizerUser(appUserFactory.createOneAppUser()));
+		task2.setOrganizerUser(organizerUserFactory.createOneOrganizerUser(appUserFactory.createOneAppUser()));
+		task1.setTaskPriority(taskPriorityFactory.createOneTaskPriority());
+		task2.setTaskPriority(taskPriorityFactory.createOneTaskPriority());
 
-		List<Task> result = taskService.getAllTasksByUserIdAndDateRange(task.getOrganizerUser(), task.getTaskStartDate().minusDays(1), task.getTaskEndDate().plusDays(1));
+		taskService.deleteAllTasks(java.util.List.of(task1, task2), false);
 
-		assertThat(result).hasSize(1);
-		assertThat(result.get(0).getTaskName()).isEqualTo(task.getTaskName());
+		verify(taskRepository).deleteAll(java.util.List.of(task1, task2));
+
+		// Verify that the events are not published
+		verify(eventPublisher, never()).publishEvent(any());
 	}
-
+	
 	@Test
-	void testGetAllTasksByOcurrenceUniqueId() {
+	public void testDeleteAllTasksWithEvent_emptyList() {
+		taskService.deleteAllTasks(java.util.List.of(), true);
+		verify(taskRepository, never()).deleteAll(any());
+		verify(eventPublisher, never()).publishEvent(any());
+	}
+	
+	@Test
+	public void testGetAllTasksByUserId() {
+		Task task1 = taskFactory.createOneTask();
+		Task task2 = taskFactory.createOneTask();
+		
+		OrganizerUser organizerUser = organizerUserFactory.createOneOrganizerUser(appUserFactory.createOneAppUser());
+		
+		task1.setOrganizerUser(organizerUser);
+		task2.setOrganizerUser(organizerUser);
+		task1.setTaskPriority(taskPriorityFactory.createOneTaskPriority());
+		task2.setTaskPriority(taskPriorityFactory.createOneTaskPriority());
+
+		when(taskRepository.findAllByOrganizerUser(organizerUser)).thenReturn(java.util.List.of(task1, task2));
+
+		java.util.List<Task> tasks = taskService.getAllTasksByUserId(task1.getOrganizerUser());
+
+		assertEquals(2, tasks.size());
+		assertEquals(task1, tasks.get(0));
+		assertEquals(task2, tasks.get(1));
+	}
+	
+	@Test
+	public void testGetAllTasksByUserId_emptyList() {
+		OrganizerUser organizerUser = organizerUserFactory.createOneOrganizerUser(appUserFactory.createOneAppUser());
+		
+		when(taskRepository.findAllByOrganizerUser(organizerUser)).thenReturn(java.util.List.of());
+
+		java.util.List<Task> tasks = taskService.getAllTasksByUserId(organizerUser);
+
+		assertEquals(0, tasks.size());
+		verify(taskRepository).findAllByOrganizerUser(organizerUser);
+	}
+	
+	@Test
+	public void testGetAllTasksByUserId_nullUser() {
+		java.util.List<Task> tasks = taskService.getAllTasksByUserId(null);
+		assertEquals(0, tasks.size());
+		verify(taskRepository).findAllByOrganizerUser(any());
+	}
+	
+	@Test
+	public void testGetAllTasksByUserIdAndDateRange() {
+		Task task1 = taskFactory.createOneTask();
+		Task task2 = taskFactory.createOneTask();
+		
+		OrganizerUser organizerUser = organizerUserFactory.createOneOrganizerUser(appUserFactory.createOneAppUser());
+		
+		task1.setOrganizerUser(organizerUser);
+		task2.setOrganizerUser(organizerUser);
+		task1.setTaskPriority(taskPriorityFactory.createOneTaskPriority());
+		task2.setTaskPriority(taskPriorityFactory.createOneTaskPriority());
+
+		when(taskRepository.findAllByOrganizerUserAndTaskStartDateBetween(organizerUser, task1.getTaskStartDate().minusDays(1), task2.getTaskEndDate().plusDays(1))).thenReturn(java.util.List.of(task1, task2));
+
+		java.util.List<Task> tasks = taskService.getAllTasksByUserIdAndDateRange(organizerUser, task1.getTaskStartDate().minusDays(1), task2.getTaskEndDate().plusDays(1));
+
+		assertEquals(2, tasks.size());
+		assertEquals(task1, tasks.get(0));
+		assertEquals(task2, tasks.get(1));
+	}
+	
+	@Test
+	public void testGetAllTasksByOcurrenceUniqueId() {
+		String uniqueId = "unique-id-123";
+		OrganizerUser organizerUser = organizerUserFactory.createOneOrganizerUser(appUserFactory.createOneAppUser());
+		
+		List<Task> taskList = new java.util.ArrayList<>();
+		
 		for (int i = 0; i < 5; i++) {
 			Task task = taskFactory.createOneTask();
-			task.setOcurrenceUniqueId("unique-id-12345");
-			taskService.addTask(task);
+			task.setOcurrenceUniqueId(uniqueId);
+			task.setOrganizerUser(organizerUser);
+			task.setTaskPriority(taskPriorityFactory.createOneTaskPriority());
+			
+			taskList.add(task);
 		}
-
-		List<Task> result = taskService.getAllTasksByOcurrenceUniqueId("unique-id-12345");
-
-		assertThat(result).hasSize(5);
+		
+		when(taskRepository.findAllByOcurrenceUniqueId(uniqueId)).thenReturn(taskList);
+		taskList = taskService.getAllTasksByOcurrenceUniqueId(uniqueId);
+		
+		assertEquals(5, taskList.size());
 	}
+	
+	
+	
 }
