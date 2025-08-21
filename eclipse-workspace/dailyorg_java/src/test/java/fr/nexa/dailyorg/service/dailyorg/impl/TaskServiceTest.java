@@ -1,7 +1,6 @@
 package fr.nexa.dailyorg.service.dailyorg.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -18,11 +17,9 @@ import fr.nexa.dailyorg.components.factory.dailyorg.RecurringTaskStateFactory;
 import fr.nexa.dailyorg.components.factory.dailyorg.TaskFactory;
 import fr.nexa.dailyorg.model.dailyorg.Task;
 import fr.nexa.dailyorg.repository.dailyorg.ITaskRepository;
-import lombok.AllArgsConstructor;
 
 @SpringBootTest
 @ActiveProfiles("test")
-@AllArgsConstructor(onConstructor = @__({ @Autowired }))
 public class TaskServiceTest {
 
 	private final ITaskRepository taskRepository;
@@ -32,6 +29,14 @@ public class TaskServiceTest {
 	private final TaskFactory taskFactory;
 	
 	private final RecurringTaskStateFactory recurringTaskStateFactory;
+	
+	@Autowired
+	public TaskServiceTest(ITaskRepository taskRepository, TaskService taskService, TaskFactory taskFactory, RecurringTaskStateFactory recurringTaskStateFactory) {
+		this.taskRepository = taskRepository;
+		this.taskService = taskService;
+		this.taskFactory = taskFactory;
+		this.recurringTaskStateFactory = recurringTaskStateFactory;
+	}
 	
 	@Test
 	void testGetTaskByID() {
