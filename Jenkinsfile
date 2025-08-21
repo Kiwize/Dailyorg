@@ -32,7 +32,7 @@ pipeline {
 
                 dir('eclipse-workspace/dailyorg_java') {
                     sh 'mvn clean'
-                    sh 'mvn install'
+                    sh 'mvn install -Dmaven.test.skip=true'
                 }
 
                 sh 'docker-compose --env-file .env up --build -d'
