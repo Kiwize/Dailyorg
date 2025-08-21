@@ -25,21 +25,17 @@ import fr.nexa.dailyorg.repository.dailyorg.ITaskRepository;
 @ExtendWith(SpringExtension.class)
 public class TaskServiceTest {
 
-	private final ITaskRepository taskRepository;
+	@Autowired
+	private ITaskRepository taskRepository;
 
-	private final TaskService taskService;
+	@Autowired
+	private TaskService taskService;
 
-	private final TaskFactory taskFactory;
-	
-	private final RecurringTaskStateFactory recurringTaskStateFactory;
+	@Autowired
+	private TaskFactory taskFactory;
 	
 	@Autowired
-	public TaskServiceTest(ITaskRepository taskRepository, TaskService taskService, TaskFactory taskFactory, RecurringTaskStateFactory recurringTaskStateFactory) {
-		this.taskRepository = taskRepository;
-		this.taskService = taskService;
-		this.taskFactory = taskFactory;
-		this.recurringTaskStateFactory = recurringTaskStateFactory;
-	}
+	private RecurringTaskStateFactory recurringTaskStateFactory;
 	
 	@Test
 	void testGetTaskByID() {

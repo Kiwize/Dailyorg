@@ -1,3 +1,34 @@
 {
-    "java.compile.nullAnalysis.mode": "automatic"
+    "java.compile.nullAnalysis.mode": "automatic",
+    "jenkins.url": "http://192.168.1.34:8080/",
+    "jenkins.pipeline.linter.connector.url": "http://192.168.1.34:8080/pipeline-model-converter/validate",
+    "jenkins.pipeline.linter.connector.pass": "X8dQevHz9o4uZbaGyQvG2A600NiULaGl",
+    "jenkins.pipeline.linter.connector.token": "sqa_86a4476add4746cf8f937ed7bbf59d56e92abc6c",
+    "jenkins.pipeline.linter.connector.user": "Thomas",
+    "jenkins-runner.hostConfigs": {
+
+
+        "host-with-password": {
+            "url": "http://192.168.1.34:8080/",
+            "user": "Thomas",
+            "password": "X8dQevHz9o4uZbaGyQvG2A600NiULaGl",
+            "useCrumbIssuer": true,
+            "rejectUnauthorizedCert": false
+        },
+        "host-prompt-for-password": {
+            "url": "http://server:8090",
+            "user": "admin"
+        },
+        "host-no-password": {
+            "url": "http://server-no-auth:8090"
+        }
+    },
+    "jenkins-runner.jobs": {
+
+        "test-1": {
+            "isDefault": true,
+            "runWith": "host-with-password",
+            "name": "DailyOrganizer"
+        }
+    }
 }
