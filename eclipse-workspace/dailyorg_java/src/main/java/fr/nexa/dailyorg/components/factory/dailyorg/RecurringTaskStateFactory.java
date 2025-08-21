@@ -5,13 +5,16 @@ import org.springframework.stereotype.Component;
 
 import fr.nexa.dailyorg.model.dailyorg.RecurringTaskState;
 import fr.nexa.dailyorg.repository.dailyorg.IRecurringTaskStateRepository;
-import lombok.AllArgsConstructor;
 
 @Component
-@AllArgsConstructor(onConstructor = @__({@Autowired}))
 public class RecurringTaskStateFactory {
 	
 	private final IRecurringTaskStateRepository recurringTaskStateRepository;
+	
+	@Autowired
+	public RecurringTaskStateFactory(IRecurringTaskStateRepository recurringTaskStateRepository) {
+		this.recurringTaskStateRepository = recurringTaskStateRepository;
+	}
 	
 	public RecurringTaskState createOneRecurringTaskState() {
 		return RecurringTaskState.builder()

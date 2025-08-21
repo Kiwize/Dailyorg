@@ -12,10 +12,8 @@ import fr.nexa.dailyorg.model.dailyorg.OrganizerUser;
 import fr.nexa.dailyorg.model.dailyorg.Task;
 import fr.nexa.dailyorg.model.dailyorg.TaskPriority;
 import fr.nexa.dailyorg.repository.dailyorg.ITaskRepository;
-import lombok.AllArgsConstructor;
 
 @Component
-@AllArgsConstructor(onConstructor = @__({@Autowired}))
 public class TaskFactory {
 	
 	private final Faker faker = Faker.instance();
@@ -25,6 +23,14 @@ public class TaskFactory {
 	private final OrganizerUserFactory organizerUserFactory;
 	private final TaskPriorityFactory taskPriorityFactory;
 	private final RecurringTaskStateFactory recurringTaskStateFactory;
+	
+	@Autowired
+	public TaskFactory(ITaskRepository taskRepository, OrganizerUserFactory organizerUserFactory, TaskPriorityFactory taskPriorityFactory, RecurringTaskStateFactory recurringTaskStateFactory) {
+		this.taskRepository = taskRepository;
+		this.organizerUserFactory = organizerUserFactory;
+		this.taskPriorityFactory = taskPriorityFactory;
+		this.recurringTaskStateFactory = recurringTaskStateFactory;
+	}
 
 	public Task createOneTask() {
 		OrganizerUser organizerUser = organizerUserFactory.createAndInsertOneOrganizerUser();

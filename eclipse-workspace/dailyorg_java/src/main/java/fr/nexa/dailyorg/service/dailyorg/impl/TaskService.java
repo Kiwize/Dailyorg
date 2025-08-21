@@ -15,14 +15,18 @@ import fr.nexa.dailyorg.model.dailyorg.Task;
 import fr.nexa.dailyorg.repository.dailyorg.ITaskRepository;
 import fr.nexa.dailyorg.service.dailyorg.ITaskService;
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
 
-@AllArgsConstructor(onConstructor = @__(@Autowired))
 @Service
 public class TaskService implements ITaskService {
 
 	private final ApplicationEventPublisher eventPublisher;
 	private final ITaskRepository taskRepository;
+	
+	@Autowired
+	public TaskService(ApplicationEventPublisher eventPublisher, ITaskRepository taskRepository) {
+		this.eventPublisher = eventPublisher;
+		this.taskRepository = taskRepository;
+	}
 
 	@Override
 	public Task getTaskById(long id) {
