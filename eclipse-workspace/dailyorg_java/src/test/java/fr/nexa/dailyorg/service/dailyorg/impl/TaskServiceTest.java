@@ -1,95 +1,269 @@
 package fr.nexa.dailyorg.service.dailyorg.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import static org.assertj.core.api.Assertions.assertThatNullPointerException;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
+import fr.nexa.dailyorg.components.factory.dailyorg.RecurringTaskStateFactory;
+import fr.nexa.dailyorg.components.factory.dailyorg.TaskFactory;
 import fr.nexa.dailyorg.model.dailyorg.Task;
 import fr.nexa.dailyorg.repository.dailyorg.ITaskRepository;
+import lombok.AllArgsConstructor;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
+@ActiveProfiles("test")
+@AllArgsConstructor(onConstructor = @__({ @Autowired }))
 public class TaskServiceTest {
 
-	@Mock
-	private ITaskRepository taskRepository;
+	private final ITaskRepository taskRepository;
 
-	@Mock
-	private ApplicationEventPublisher eventPublisher;
+	private final TaskService taskService;
 
-	@InjectMocks
-	private TaskService taskService;
-
+	private final TaskFactory taskFactory;
+	
+	private final RecurringTaskStateFactory recurringTaskStateFactory;
+	
 	@Test
 	void testGetTaskByID() {
-		Task task = Task.builder().id(1L).taskName("Test Task").taskDescription("Test Description").build();
+		Task task = taskFactory.createOneTask();
 
-		when(taskRepository.findById(1L)).thenReturn(Optional.of(task));
+		Task insertedTask = taskRepository.save(task);
+		Task result = taskService.getTaskById(insertedTask.getId());
 
-		Task result = taskService.getTaskById(1L);
-
-		assertThat(result.getTaskName()).isEqualTo("Test Task");
+		assertThat(result.getTaskName()).isEqualTo(task.getTaskName());
 	}
 
 	@Test
 	void testAddTask() {
-		Task task = Task.builder().id(1L).taskName("Test Task").taskDescription("Test Description").build();
-
-		when(taskRepository.save(task)).thenReturn(task);
-
+		Task task = taskFactory.createOneTask();
 		Task result = taskService.addTask(task);
-
-		assertThat(result.getTaskName()).isEqualTo("Test Task");
+		assertThat(result.getTaskName()).isEqualTo(task.getTaskName());
 	}
 
 	@Test
 	void testUpdateTask() {
-		Task task = Task.builder().id(1L).taskName("Test Task").taskDescription("Test Description").build();
+		Task task = taskFactory.createAndInsertOneTask();
 
-		when(taskRepository.save(task)).thenReturn(task);
+		task.setTaskName("Updated Task Name");
+
+		Task result = taskService.updateTask(task);
+
+		assertThat(result.getTaskName()).isEqualTo("Updated Task Name");
+	}
+
+	@Test
+	void testUpdateTask_nullTask() {
+		assertThatNullPointerException().isThrownBy(() -> taskService.updateTask(null));
+		taskService.updateTask(taskFactory.createOneTask());
+	}
+
+	@Test
+	void testUpdateTask_taskCompletionStateChange() {
+		Task task = taskFactory.createAndInsertOneTask();
+
+		// Simulate a change in task completion state
+		task.setTaskCompleted(!task.isTaskCompleted());
+
+		Task result = taskService.updateTask(task);
+
+		assertThat(result.getTaskName()).isEqualTo(task.getTaskName());
+	}
+	
+	@Test
+	void testUpdateTask_removeRecurringTaskStateChange() {
+		Task task = taskFactory.createAndInsertOneTaskWithRecurringTaskState();
+
+		task.setRecurringTaskState(null);
+		Task result = taskService.updateTask(task);
+		assertThat(result.getTaskName()).isEqualTo(task.getTaskName());
+	}
+	
+	@Test
+	void testUpdateTask_addRecurringTaskStateChange() {
+		Task task = taskFactory.createAndInsertOneTask();
+		
+		task.setRecurringTaskState(recurringTaskStateFactory.createAndInsertOneRecurringTaskState());
+
+		Task result = taskService.updateTask(task);
+
+		assertThat(result.getTaskName()).isEqualTo(task.getTaskName());
+	}
+	
+	@Test
+	void testUpdateTask_recurringTaskStateChange() {
+		Task task = taskFactory.createAndInsertOneTaskWithRecurringTaskState();
+
+		task.setRecurringTaskState(recurringTaskStateFactory.createAndInsertOneRecurringTaskState());
+
+		Task result = taskService.updateTask(task);
+
+		assertThat(result.getTaskName()).isEqualTo(task.getTaskName());
+	}
+	
+	@Test
+	void testUpdateTask_recurringTaskStateNoChange() {
+		Task task = taskFactory.createAndInsertOneTaskWithRecurringTaskState();
+
+		Task result = taskService.updateTask(task);
+
+		assertThat(result.getTaskName()).isEqualTo(task.getTaskName());
+	}
+
+	@Test
+	void testUpdateTask_withoutEvent() {
+		Task task = taskFactory.createAndInsertOneTask();
+
+		task.setTaskName("Updated Task Name without Event");
 
 		Task result = taskService.updateTask(task, false);
 
-		assertThat(result.getTaskName()).isEqualTo("Test Task");
+		assertThat(result.getTaskName()).isEqualTo("Updated Task Name without Event");
+	}
+
+	@Test
+	void testUpdateTask_withEvent() {
+		Task task = taskFactory.createAndInsertOneTask();
+
+		task.setTaskName("Updated Task Name with Event");
+
+		Task result = taskService.updateTask(task, true);
+
+		assertThat(result.getTaskName()).isEqualTo("Updated Task Name with Event");
 	}
 
 	@Test
 	void testDeleteTask() {
-		Task task = Task.builder().id(1L).taskName("Test Task").taskDescription("Test Description").build();
+		Task task = taskFactory.createAndInsertOneTask();
+
+		assertNotNull(taskRepository.findById(task.getId()).orElse(null));
+
+		taskService.deleteTask(task);
+
+		assertNull(taskRepository.findById(task.getId()).orElse(null));
+	}
+
+	@Test
+	void testDeleteTask_withoutEvent() {
+		Task task = taskFactory.createAndInsertOneTask();
+
+		assertNotNull(taskRepository.findById(task.getId()).orElse(null));
 
 		taskService.deleteTask(task, false);
+
+		assertNull(taskRepository.findById(task.getId()).orElse(null));
+	}
+
+	@Test
+	void testDeleteTask_withEvent() {
+		Task task = taskFactory.createAndInsertOneTask();
+
+		assertNotNull(taskRepository.findById(task.getId()).orElse(null));
+
+		taskService.deleteTask(task, true);
+
+		assertNull(taskRepository.findById(task.getId()).orElse(null));
+	}
+
+	@Test
+	void testDeleteAllTasks() {
+		List<Task> tasks = new ArrayList<>();
+
+		taskService.deleteAllTasks(tasks);
+
+		Task task1 = taskFactory.createAndInsertOneTask();
+		Task task2 = taskFactory.createAndInsertOneTask();
+
+		tasks.addAll(List.of(task1, task2));
+
+		assertNotNull(taskRepository.findById(task1.getId()).orElse(null));
+		assertNotNull(taskRepository.findById(task2.getId()).orElse(null));
+
+		taskService.deleteAllTasks(tasks);
+
+		assertNull(taskRepository.findById(task1.getId()).orElse(null));
+		assertNull(taskRepository.findById(task2.getId()).orElse(null));
+	}
+
+	@Test
+	void testDeleteAllTasks_withEvent() {
+		List<Task> tasks = new ArrayList<>();
+
+		taskService.deleteAllTasks(tasks, true);
+
+		Task task1 = taskFactory.createAndInsertOneTask();
+		Task task2 = taskFactory.createAndInsertOneTask();
+
+		tasks.addAll(List.of(task1, task2));
+
+		assertNotNull(taskRepository.findById(task1.getId()).orElse(null));
+		assertNotNull(taskRepository.findById(task2.getId()).orElse(null));
+
+		taskService.deleteAllTasks(tasks, true);
+
+		assertNull(taskRepository.findById(task1.getId()).orElse(null));
+		assertNull(taskRepository.findById(task2.getId()).orElse(null));
+	}
+
+	@Test
+	void testDeleteAllTasks_withoutEvent() {
+		List<Task> tasks = new ArrayList<>();
+
+		taskService.deleteAllTasks(tasks, false);
+
+		Task task1 = taskFactory.createAndInsertOneTask();
+		Task task2 = taskFactory.createAndInsertOneTask();
+
+		tasks.addAll(List.of(task1, task2));
+
+		assertNotNull(taskRepository.findById(task1.getId()).orElse(null));
+		assertNotNull(taskRepository.findById(task2.getId()).orElse(null));
+
+		taskService.deleteAllTasks(tasks, false);
+
+		assertNull(taskRepository.findById(task1.getId()).orElse(null));
+		assertNull(taskRepository.findById(task2.getId()).orElse(null));
 	}
 
 	@Test
 	void testGetAllTasksByUserId() {
-		Task task = Task.builder().id(1L).taskName("Test Task").taskDescription("Test Description").build();
-
-		when(taskRepository.findAllByOrganizerUser(task.getOrganizerUser())).thenReturn(List.of(task));
+		Task task = taskFactory.createAndInsertOneTask();
 
 		List<Task> result = taskService.getAllTasksByUserId(task.getOrganizerUser());
 
 		assertThat(result).hasSize(1);
-		assertThat(result.get(0).getTaskName()).isEqualTo("Test Task");
+		assertThat(result.get(0).getTaskName()).isEqualTo(task.getTaskName());
 	}
 
 	@Test
-	void testGetAllTasksByUserIdAndDate() {
-		Task task = Task.builder().id(1L).taskName("Test Task").taskDescription("Test Description").build();
+	void testGetAllTasksByUserIdAndDateRange() {
+		Task task = taskFactory.createAndInsertOneTask();
 
-		when(taskRepository.findAllByOrganizerUserAndTaskStartDate(task.getOrganizerUser(), task.getTaskStartDate()))
-				.thenReturn(List.of(task));
-
-		List<Task> result = taskService.getAllTasksByUserIdAndDate(task.getOrganizerUser(), task.getTaskStartDate());
+		List<Task> result = taskService.getAllTasksByUserIdAndDateRange(task.getOrganizerUser(), task.getTaskStartDate().minusDays(1), task.getTaskEndDate().plusDays(1));
 
 		assertThat(result).hasSize(1);
-		assertThat(result.get(0).getTaskName()).isEqualTo("Test Task");
+		assertThat(result.get(0).getTaskName()).isEqualTo(task.getTaskName());
+	}
+
+	@Test
+	void testGetAllTasksByOcurrenceUniqueId() {
+		for (int i = 0; i < 5; i++) {
+			Task task = taskFactory.createOneTask();
+			task.setOcurrenceUniqueId("unique-id-12345");
+			taskRepository.save(task);
+		}
+
+		List<Task> result = taskService.getAllTasksByOcurrenceUniqueId("unique-id-12345");
+
+		assertThat(result).hasSize(5);
 	}
 }

@@ -17,7 +17,6 @@ public interface ITaskService {
 	void deleteAllTasks(List<Task> tasks);
 	void deleteAllTasks(List<Task> tasks, boolean triggerEvent);
 	List<Task> getAllTasksByUserId(OrganizerUser userId);
-	List<Task> getAllTasksByUserIdAndDate(OrganizerUser userId, LocalDateTime date);
 	List<Task> getAllTasksByUserIdAndDateRange(OrganizerUser userId, LocalDateTime startDate, LocalDateTime endDate);
 	List<Task> getAllTasksByOcurrenceUniqueId(String occurrenceUniqueId);
 

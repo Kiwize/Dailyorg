@@ -2,6 +2,7 @@ package fr.nexa.dailyorg.service.dailyorg.impl;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -36,7 +37,7 @@ public class TaskService implements ITaskService {
 	}
 
 	@Override
-	public Task updateTask(Task task) {
+	public Task updateTask(Task task) throws IllegalArgumentException {
 		boolean recurringTaskStateChanged = isRecurringTaskStateChanged(task); // True if the recurring task state mutated from a value to another
 		boolean taskCompletionStateChanged = isTaskCompletionStateChanged(task); // True if the task completion state mutated from a value to another
 
@@ -113,11 +114,6 @@ public class TaskService implements ITaskService {
 	}
 
 	@Override
-	public List<Task> getAllTasksByUserIdAndDate(OrganizerUser userId, LocalDateTime date) {
-		return taskRepository.findAllByOrganizerUserAndTaskStartDate(userId, date);
-	}
-
-	@Override
 	public List<Task> getAllTasksByUserIdAndDateRange(OrganizerUser userId, LocalDateTime startDate, LocalDateTime endDate) {
 		return taskRepository.findAllByOrganizerUserAndTaskStartDateBetween(userId, startDate, endDate);
 	}
@@ -126,19 +122,22 @@ public class TaskService implements ITaskService {
 	public List<Task> getAllTasksByOcurrenceUniqueId(String occurrenceUniqueId) {
 		return taskRepository.findAllByOcurrenceUniqueId(occurrenceUniqueId);
 	}
-	
+
 	private boolean isTaskCompletionStateChanged(Task task) {
-		Task existingTask = taskRepository.findById(task.getId()).orElse(null);
-		if (existingTask != null) {
+		Optional<Task> existingTaskOpt = taskRepository.findById(task.getId());
+		if (existingTaskOpt.isPresent()) {
+			Task existingTask = existingTaskOpt.get();
 			return existingTask.isTaskCompleted() != task.isTaskCompleted();
 		}
+
 		return false;
 	}
 
 	private boolean isRecurringTaskStateChanged(Task task) {
-		Task existingTask = taskRepository.findById(task.getId()).orElse(null);
+		Optional<Task> existingTaskOpt = taskRepository.findById(task.getId());
+		if (existingTaskOpt.isPresent()) {
+			Task existingTask = existingTaskOpt.get();
 
-		if (existingTask != null) {
 			if (existingTask.getRecurringTaskState() == null && task.getRecurringTaskState() != null) {
 				return true;
 			} else if (existingTask.getRecurringTaskState() != null && task.getRecurringTaskState() == null) {

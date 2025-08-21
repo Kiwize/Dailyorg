@@ -204,30 +204,6 @@ public class TaskController {
 		}
 	}
 
-	@PostMapping("/get_tasks_by_date")
-	public ResponseEntity<?> getTasksByDate(@RequestBody Map<String, String> data, @NonNull HttpServletRequest request) {
-		try {
-			if (!data.containsKey("date")) {
-				return ResponseEntity.badRequest().body(EErrorMessages.INVALID_INPUT.getMessage());
-			}
-
-			String userEmail = jwtUtil.extractUsernameFromCookies(request.getCookies());
-
-			Optional<AppUser> user = appUserService.findByEmail(userEmail);
-
-			if (user.isPresent()) {
-				AppUser appUser = user.get();
-				OrganizerUser organizerUser = organizerUserService.findByAppUserId(appUser);
-				return ResponseEntity.ok(taskService.getAllTasksByUserIdAndDate(organizerUser, LocalDateTime.parse(data.get("date"))));
-			} else {
-				return ResponseEntity.badRequest().body(EErrorMessages.USER_NOT_FOUND.getMessage());
-			}
-		} catch (Exception e) {
-			Logger.getLogger(TaskController.class.getName()).severe(EErrorMessages.INTERNAL_SERVER_ERROR.getMessage() + e.getMessage());
-			return ResponseEntity.internalServerError().body(EErrorMessages.INTERNAL_SERVER_ERROR.getMessage());
-		}
-	}
-
 	@GetMapping("/get_all_tasks_recurring_states")
 	public ResponseEntity<?> getAllRecurringTaskStates() {
 		try {
