@@ -27,8 +27,7 @@ public class TaskPriorityService implements ITaskPriorityService {
 	}
 	
 	@Override
-	public TaskPriority createTaskPriority(String taskPriorityName) {
-		TaskPriority taskPriority = TaskPriority.builder().taskPriorityName(taskPriorityName).build();
+	public TaskPriority createTaskPriority(TaskPriority taskPriority) {
 		return taskPriorityRepository.save(taskPriority);
 	}
 

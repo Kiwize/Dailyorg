@@ -28,7 +28,7 @@ import fr.nexa.dailyorg.repository.dailyorg.IRecurringTaskStateRepository;
 import fr.nexa.dailyorg.repository.dailyorg.ITaskRepository;
 
 @ExtendWith(MockitoExtension.class)
-public class TaskServiceTest {
+class TaskServiceTest {
 
 	@InjectMocks
 	private TaskService taskService;
@@ -51,7 +51,7 @@ public class TaskServiceTest {
 	private final TaskPriorityFactory taskPriorityFactory = new TaskPriorityFactory();
 	
 	@Test
-	public void testGetTaskById() {
+	void testGetTaskById() {
 		Task task = taskFactory.createOneTask();
 		
 		// Mock the repository call
@@ -63,7 +63,7 @@ public class TaskServiceTest {
 	}
 	
 	@Test
-	public void testAddTask() {
+	void testAddTask() {
 		Task task = taskFactory.createOneTask();
 		task.setOrganizerUser(organizerUserFactory.createOneOrganizerUser(appUserFactory.createOneAppUser()));
 		task.setTaskPriority(taskPriorityFactory.createOneTaskPriority());
@@ -83,7 +83,7 @@ public class TaskServiceTest {
 	}
 	
 	@Test
-	public void testUpdateTask() {
+	void testUpdateTask() {
 		Task task = taskFactory.createOneTask();
 		task.setOrganizerUser(organizerUserFactory.createOneOrganizerUser(appUserFactory.createOneAppUser()));
 		task.setTaskPriority(taskPriorityFactory.createOneTaskPriority());
@@ -106,7 +106,7 @@ public class TaskServiceTest {
 	}
 	
 	@Test
-	public void testUpdateTaskWithTriggerEvent() {
+	void testUpdateTaskWithTriggerEvent() {
 		Task task = taskFactory.createOneTask();
 		task.setOrganizerUser(organizerUserFactory.createOneOrganizerUser(appUserFactory.createOneAppUser()));
 		task.setTaskPriority(taskPriorityFactory.createOneTaskPriority());
@@ -129,7 +129,7 @@ public class TaskServiceTest {
 	}
 	
 	@Test
-	public void testUpdateTaskWithoutTriggerEvent() {
+	void testUpdateTaskWithoutTriggerEvent() {
 		Task task = taskFactory.createOneTask();
 		task.setOrganizerUser(organizerUserFactory.createOneOrganizerUser(appUserFactory.createOneAppUser()));
 		task.setTaskPriority(taskPriorityFactory.createOneTaskPriority());
@@ -145,7 +145,7 @@ public class TaskServiceTest {
 	}
 
 	@Test
-	public void testDeleteTask() {
+	void testDeleteTask() {
 		Task task = taskFactory.createOneTask();
 		task.setOrganizerUser(organizerUserFactory.createOneOrganizerUser(appUserFactory.createOneAppUser()));
 		task.setTaskPriority(taskPriorityFactory.createOneTaskPriority());
@@ -166,7 +166,7 @@ public class TaskServiceTest {
 	}
 	
 	@Test
-	public void testDeleteTaskWithTriggerEvent() {
+	void testDeleteTaskWithTriggerEvent() {
 		Task task = taskFactory.createOneTask();
 		task.setOrganizerUser(organizerUserFactory.createOneOrganizerUser(appUserFactory.createOneAppUser()));
 		task.setTaskPriority(taskPriorityFactory.createOneTaskPriority());
@@ -187,7 +187,7 @@ public class TaskServiceTest {
 	}
 	
 	@Test
-	public void testDeleteTaskWithoutTriggerEvent() {
+	void testDeleteTaskWithoutTriggerEvent() {
 		Task task = taskFactory.createOneTask();
 		task.setOrganizerUser(organizerUserFactory.createOneOrganizerUser(appUserFactory.createOneAppUser()));
 		task.setTaskPriority(taskPriorityFactory.createOneTaskPriority());
@@ -201,7 +201,7 @@ public class TaskServiceTest {
 	}
 	
 	@Test
-	public void testDeleteAllTasks() {
+	void testDeleteAllTasks() {
 		Task task1 = taskFactory.createOneTask();
 		Task task2 = taskFactory.createOneTask();
 		task1.setOrganizerUser(organizerUserFactory.createOneOrganizerUser(appUserFactory.createOneAppUser()));
@@ -226,14 +226,14 @@ public class TaskServiceTest {
 	}
 	
 	@Test
-	public void testDeleteAllTasks_emptyList() {
+	void testDeleteAllTasks_emptyList() {
 		taskService.deleteAllTasks(java.util.List.of());
 		verify(taskRepository, never()).deleteAll(any());
 		verify(eventPublisher, never()).publishEvent(any());
 	}
 	
 	@Test
-	public void testDeleteAllTasksWithTriggerEvent() {
+	void testDeleteAllTasksWithTriggerEvent() {
 		Task task1 = taskFactory.createOneTask();
 		Task task2 = taskFactory.createOneTask();
 		task1.setOrganizerUser(organizerUserFactory.createOneOrganizerUser(appUserFactory.createOneAppUser()));
@@ -258,7 +258,7 @@ public class TaskServiceTest {
 	}
 	
 	@Test
-	public void testDeleteAllTasksWithoutTriggerEvent() {
+	void testDeleteAllTasksWithoutTriggerEvent() {
 		Task task1 = taskFactory.createOneTask();
 		Task task2 = taskFactory.createOneTask();
 		task1.setOrganizerUser(organizerUserFactory.createOneOrganizerUser(appUserFactory.createOneAppUser()));
@@ -275,14 +275,14 @@ public class TaskServiceTest {
 	}
 	
 	@Test
-	public void testDeleteAllTasksWithEvent_emptyList() {
+	void testDeleteAllTasksWithEvent_emptyList() {
 		taskService.deleteAllTasks(java.util.List.of(), true);
 		verify(taskRepository, never()).deleteAll(any());
 		verify(eventPublisher, never()).publishEvent(any());
 	}
 	
 	@Test
-	public void testGetAllTasksByUserId() {
+	void testGetAllTasksByUserId() {
 		Task task1 = taskFactory.createOneTask();
 		Task task2 = taskFactory.createOneTask();
 		
@@ -303,7 +303,7 @@ public class TaskServiceTest {
 	}
 	
 	@Test
-	public void testGetAllTasksByUserId_emptyList() {
+	void testGetAllTasksByUserId_emptyList() {
 		OrganizerUser organizerUser = organizerUserFactory.createOneOrganizerUser(appUserFactory.createOneAppUser());
 		
 		when(taskRepository.findAllByOrganizerUser(organizerUser)).thenReturn(java.util.List.of());
@@ -315,14 +315,14 @@ public class TaskServiceTest {
 	}
 	
 	@Test
-	public void testGetAllTasksByUserId_nullUser() {
+	void testGetAllTasksByUserId_nullUser() {
 		java.util.List<Task> tasks = taskService.getAllTasksByUserId(null);
 		assertEquals(0, tasks.size());
 		verify(taskRepository).findAllByOrganizerUser(any());
 	}
 	
 	@Test
-	public void testGetAllTasksByUserIdAndDateRange() {
+	void testGetAllTasksByUserIdAndDateRange() {
 		Task task1 = taskFactory.createOneTask();
 		Task task2 = taskFactory.createOneTask();
 		
@@ -343,7 +343,7 @@ public class TaskServiceTest {
 	}
 	
 	@Test
-	public void testGetAllTasksByOcurrenceUniqueId() {
+	void testGetAllTasksByOcurrenceUniqueId() {
 		String uniqueId = "unique-id-123";
 		OrganizerUser organizerUser = organizerUserFactory.createOneOrganizerUser(appUserFactory.createOneAppUser());
 		

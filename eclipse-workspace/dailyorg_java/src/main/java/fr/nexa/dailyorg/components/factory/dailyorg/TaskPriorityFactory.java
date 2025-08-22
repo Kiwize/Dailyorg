@@ -8,4 +8,10 @@ public class TaskPriorityFactory {
 		return TaskPriority.builder().taskPriorityLevel((int) (Math.random() * 3)) // Random priority level between 0 and 3
 				.taskPriorityName("Low").build();
 	}
+	
+	public TaskPriority createOneTaskPriority(String name, int level) {
+		return TaskPriority.builder().taskPriorityLevel(level) // Random priority level between 0 and 3
+				.taskPriorityName(name).build();
+	}
+	
 }

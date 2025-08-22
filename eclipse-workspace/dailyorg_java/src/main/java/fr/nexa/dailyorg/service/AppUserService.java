@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import fr.nexa.dailyorg.model.AppUser;
 import fr.nexa.dailyorg.repository.IAppUserRepository;
+import fr.nexa.dailyorg.utils.EErrorMessages;
 import lombok.AllArgsConstructor;
 
 @Service
@@ -38,7 +39,6 @@ public class AppUserService implements IAppUserService {
 	
 	@Override
 	public Optional<AppUser> findByEmail(String email) throws Exception {
-		return appUserRepository.findByEmail(email);
+		return Optional.ofNullable(appUserRepository.findByEmail(email).orElseThrow(() -> new Exception(EErrorMessages.USER_NOT_FOUND.getMessage())));
 	}
-
 }

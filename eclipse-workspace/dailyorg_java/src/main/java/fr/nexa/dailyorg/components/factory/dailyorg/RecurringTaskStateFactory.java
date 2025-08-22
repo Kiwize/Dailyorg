@@ -10,4 +10,39 @@ public class RecurringTaskStateFactory {
 				.timeInterval(1)
 				.build();
 	}
+	
+	public RecurringTaskState createEveryXDayRecurringTaskState(int x) {
+		return RecurringTaskState.builder()
+				.frequency(RecurringTaskState.RecurringTaskFrequency.DAILY.getValue())
+				.timeInterval(x)
+				.build();
+	}
+	
+	public RecurringTaskState createWeeklyRecurringTaskState() {
+		return RecurringTaskState.builder()
+				.frequency(RecurringTaskState.RecurringTaskFrequency.WEEKLY.getValue())
+				.timeInterval(1)
+				.build();
+	}
+	
+	public RecurringTaskState createEveryXWeekRecurringTaskState(int x) {
+		return RecurringTaskState.builder()
+				.frequency(RecurringTaskState.RecurringTaskFrequency.WEEKLY.getValue())
+				.timeInterval(x)
+				.build();
+	}
+	
+	public RecurringTaskState createMonthlyRecurringTaskState() {
+		return RecurringTaskState.builder()
+				.frequency(RecurringTaskState.RecurringTaskFrequency.MONTHLY.getValue())
+				.timeInterval(1)
+				.build();
+	}
+	
+	public RecurringTaskState createEveryXMonthRecurringTaskState(int x) {
+		return RecurringTaskState.builder()
+				.frequency(RecurringTaskState.RecurringTaskFrequency.MONTHLY.getValue())
+				.timeInterval(x)
+				.build();
+	}
 }

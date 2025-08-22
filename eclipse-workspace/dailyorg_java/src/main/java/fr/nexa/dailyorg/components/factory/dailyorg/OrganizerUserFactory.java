@@ -13,4 +13,12 @@ public class OrganizerUserFactory {
 				.exp_points(0)
 				.build();
 	}
+	
+	public OrganizerUser createOneOrganizerUser() {
+		return OrganizerUser.builder()
+				.calendarFirstShownHour(0)
+				.calendarTotalShownHours(24)
+				.exp_points(0)
+				.build();
+	}
 }

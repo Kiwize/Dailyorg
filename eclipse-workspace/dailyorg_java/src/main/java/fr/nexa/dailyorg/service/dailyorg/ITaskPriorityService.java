@@ -13,7 +13,7 @@ public interface ITaskPriorityService {
 	 * @param taskPriorityName the name of the task priority
 	 * @return the created TaskPriority object
 	 */
-	TaskPriority createTaskPriority(String taskPriorityName);
+	TaskPriority createTaskPriority(TaskPriority taskPriority);
 	
 	/**
 	 * Get a task priority by its name.

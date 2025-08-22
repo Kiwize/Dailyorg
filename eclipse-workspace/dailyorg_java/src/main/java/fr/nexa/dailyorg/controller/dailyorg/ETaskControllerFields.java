@@ -11,7 +11,7 @@ public enum ETaskControllerFields {
     TASK_IS_COMPLETED("is_task_completed"),
 
     TASK_PRIORITY("task_priority"),
-    TASK_REPEAT_FREQUENCY("task_repeat_frequency"),
+    TASK_REPEAT_FREQUENCY_ID("task_repeat_frequency"),
     TASK_REPEAT_END_DATE("task_repeat_end_date"),
     TASK_IS_RECURRENT("is_recurrent");
 
