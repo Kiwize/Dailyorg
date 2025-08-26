@@ -11,7 +11,6 @@ public interface IRecurringTaskStateService {
 	public List<RecurringTaskState> findAllUniqueFrequencyAndTimeInterval();
 	List<RecurringTaskState> findAll();
 	public RecurringTaskState update(RecurringTaskState recurringTaskState);
-	public RecurringTaskState create(RecurringTaskState recurringTaskState);
 	public void delete(RecurringTaskState recurringTaskState);
 	public Optional<RecurringTaskState> findByFrequencyAndInterval(int frequency, int timeInterval);
 

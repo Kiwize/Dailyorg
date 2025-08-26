@@ -65,15 +65,6 @@ public class RecurringTaskStateService implements IRecurringTaskStateService {
 	}
 
 	@Override
-	public RecurringTaskState create(RecurringTaskState recurringTaskState) throws IllegalArgumentException {
-		if(recurringTaskState == null) {
-			Logger.getLogger(RecurringTaskStateService.class.getName()).severe(EErrorMessages.NULL_VALUE.getMessage());
-			throw new IllegalArgumentException(EErrorMessages.NULL_VALUE.getMessage());
-		}
-		return recurringTaskStateRepository.save(recurringTaskState);
-	}
-
-	@Override
 	public void delete(RecurringTaskState recurringTaskState) throws IllegalArgumentException {
 		if(recurringTaskState == null) {
 			Logger.getLogger(RecurringTaskStateService.class.getName()).severe(EErrorMessages.NULL_VALUE.getMessage());

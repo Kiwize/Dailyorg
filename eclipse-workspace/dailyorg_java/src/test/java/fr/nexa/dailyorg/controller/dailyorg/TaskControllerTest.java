@@ -24,8 +24,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -55,22 +55,22 @@ class TaskControllerTest {
 	@Autowired
 	private MockMvc mockMvc;
 	
-	@MockBean
+	@MockitoBean
 	private TaskService taskService;
 	
-	@MockBean
+	@MockitoBean
 	private RecurringTaskStateService recurringTaskStateService;
 	
-	@MockBean
+	@MockitoBean
 	private AppUserService appUserService;
 	
-	@MockBean
+	@MockitoBean
 	private OrganizerUserService organizerUserService;
 	
-	@MockBean
+	@MockitoBean
 	private TaskPriorityService taskPriorityService;
 	
-	@MockBean
+	@MockitoBean
 	private JwtUtil jwtUtil;
 	
 	private final ObjectMapper objectMapper = new ObjectMapper();

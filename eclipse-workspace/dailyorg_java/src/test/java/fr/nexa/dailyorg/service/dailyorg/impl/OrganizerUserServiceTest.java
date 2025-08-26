@@ -50,22 +50,6 @@ public class OrganizerUserServiceTest {
 	}
 
 	@Test
-	void testCreate() {
-		OrganizerUser organizerUser = organizerUserFactory.createOneOrganizerUser();
-
-		when(organizerUserRepository.save(organizerUser)).thenReturn(organizerUser);
-
-		OrganizerUser result = organizerUserService.create(organizerUser);
-
-		assertThat(result).isNotNull();
-	}
-	
-	@Test
-	void testCreate_null() {
-		assertThatIllegalArgumentException().isThrownBy(() -> organizerUserService.create(null)).withMessage(EErrorMessages.NULL_VALUE.getMessage());
-	}
-
-	@Test
 	void testUpdate() {
 		OrganizerUser organizerUser = organizerUserFactory.createOneOrganizerUser();
 

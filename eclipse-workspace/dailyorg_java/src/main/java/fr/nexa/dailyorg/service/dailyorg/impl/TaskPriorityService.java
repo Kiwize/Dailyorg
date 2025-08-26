@@ -3,7 +3,6 @@ package fr.nexa.dailyorg.service.dailyorg.impl;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +47,6 @@ public class TaskPriorityService implements ITaskPriorityService {
 
 	@Override
 	public List<TaskPriority> getAllTaskPriorities() {
-		return StreamSupport.stream(taskPriorityRepository.findAll().spliterator(), false).collect(Collectors.toList());
+		return StreamSupport.stream(taskPriorityRepository.findAll().spliterator(), false).toList();
 	}
 }

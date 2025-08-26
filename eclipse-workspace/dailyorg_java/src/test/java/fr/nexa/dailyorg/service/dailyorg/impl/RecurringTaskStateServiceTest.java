@@ -2,6 +2,7 @@ package fr.nexa.dailyorg.service.dailyorg.impl;
 
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -38,7 +39,7 @@ public class RecurringTaskStateServiceTest {
 
 		Optional<RecurringTaskState> found = recurringTaskStateService.findById(1L);
 
-		assert (found.isPresent());
+		assertTrue(found.isPresent());
 		assertEquals(recurringTaskState, found.get());
 	}
 
@@ -46,7 +47,7 @@ public class RecurringTaskStateServiceTest {
 	void testFindById_idIsNull() {
 		Optional<RecurringTaskState> found = recurringTaskStateService.findById(null);
 
-		assert (found.isEmpty());
+		assertTrue(found.isEmpty());
 	}
 
 	@Test
@@ -60,8 +61,8 @@ public class RecurringTaskStateServiceTest {
 		java.util.List<RecurringTaskState> found = recurringTaskStateService.findAllUniqueFrequencyAndTimeInterval();
 
 		assertEquals(2, found.size());
-		assert (found.contains(recurringTaskState1));
-		assert (found.contains(recurringTaskState2));
+		assertTrue(found.contains(recurringTaskState1));
+		assertTrue(found.contains(recurringTaskState2));
 	}
 
 	@Test
@@ -74,8 +75,8 @@ public class RecurringTaskStateServiceTest {
 		java.util.List<RecurringTaskState> found = recurringTaskStateService.findAll();
 
 		assertEquals(2, found.size());
-		assert (found.contains(recurringTaskState1));
-		assert (found.contains(recurringTaskState2));
+		assertTrue(found.contains(recurringTaskState1));
+		assertTrue(found.contains(recurringTaskState2));
 	}
 
 	@Test
@@ -86,7 +87,7 @@ public class RecurringTaskStateServiceTest {
 
 		Optional<RecurringTaskState> found = recurringTaskStateService.findByFrequencyAndInterval(recurringTaskState.getFrequency(), recurringTaskState.getTimeInterval());
 
-		assert (found.isPresent());
+		assertTrue(found.isPresent());
 		assertEquals(recurringTaskState, found.get());
 	}
 
@@ -105,23 +106,6 @@ public class RecurringTaskStateServiceTest {
 	@Test
 	void testUpdate_recurringTaskStateIsNull() {
 		assertThatIllegalArgumentException().isThrownBy(() -> recurringTaskStateService.update(null)).withMessage(EErrorMessages.NULL_VALUE.getMessage());
-	}
-
-	@Test
-	void testCreate() {
-		RecurringTaskState recurringTaskState = recurringTaskStateFactory.createEverydayRecurringTaskState();
-
-		when(recurringTaskStateRepository.save(recurringTaskState)).thenReturn(recurringTaskState);
-
-		RecurringTaskState created = recurringTaskStateService.create(recurringTaskState);
-
-		assertEquals(recurringTaskState, created);
-		verify(recurringTaskStateRepository).save(recurringTaskState);
-	}
-
-	@Test
-	void testCreate_recurringTaskStateIsNull() {
-		assertThatIllegalArgumentException().isThrownBy(() -> recurringTaskStateService.create(null)).withMessage(EErrorMessages.NULL_VALUE.getMessage());
 	}
 
 	@Test

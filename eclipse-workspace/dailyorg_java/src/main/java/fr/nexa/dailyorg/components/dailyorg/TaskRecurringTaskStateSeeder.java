@@ -1,5 +1,7 @@
 package fr.nexa.dailyorg.components.dailyorg;
 
+import java.util.logging.Logger;
+
 import org.springframework.stereotype.Component;
 
 import fr.nexa.dailyorg.model.dailyorg.RecurringTaskState;
@@ -17,18 +19,17 @@ public class TaskRecurringTaskStateSeeder {
 	public void populateRecurringTaskStates() {
 		// If empty, populate with default values
 		if (taskRecurringTaskStateService.findAll().isEmpty()) {
-			taskRecurringTaskStateService.create(RecurringTaskState.builder().frequency(RecurringTaskState.RecurringTaskFrequency.DAILY.getValue()).timeInterval(1).build());
-			taskRecurringTaskStateService.create(RecurringTaskState.builder().frequency(RecurringTaskState.RecurringTaskFrequency.WEEKLY.getValue()).timeInterval(1).build());
-			taskRecurringTaskStateService.create(RecurringTaskState.builder().frequency(RecurringTaskState.RecurringTaskFrequency.MONTHLY.getValue()).timeInterval(1).build());
+			taskRecurringTaskStateService.update(RecurringTaskState.builder().frequency(RecurringTaskState.RecurringTaskFrequency.DAILY.getValue()).timeInterval(1).build());
+			taskRecurringTaskStateService.update(RecurringTaskState.builder().frequency(RecurringTaskState.RecurringTaskFrequency.WEEKLY.getValue()).timeInterval(1).build());
+			taskRecurringTaskStateService.update(RecurringTaskState.builder().frequency(RecurringTaskState.RecurringTaskFrequency.MONTHLY.getValue()).timeInterval(1).build());
 			
-			taskRecurringTaskStateService.create(RecurringTaskState.builder().frequency(RecurringTaskState.RecurringTaskFrequency.DAILY.getValue()).timeInterval(2).build());
-			taskRecurringTaskStateService.create(RecurringTaskState.builder().frequency(RecurringTaskState.RecurringTaskFrequency.WEEKLY.getValue()).timeInterval(2).build());
+			taskRecurringTaskStateService.update(RecurringTaskState.builder().frequency(RecurringTaskState.RecurringTaskFrequency.DAILY.getValue()).timeInterval(2).build());
+			taskRecurringTaskStateService.update(RecurringTaskState.builder().frequency(RecurringTaskState.RecurringTaskFrequency.WEEKLY.getValue()).timeInterval(2).build());
 			
-			taskRecurringTaskStateService.create(RecurringTaskState.builder().frequency(RecurringTaskState.RecurringTaskFrequency.DAILY.getValue()).timeInterval(3).build());
-			taskRecurringTaskStateService.create(RecurringTaskState.builder().frequency(RecurringTaskState.RecurringTaskFrequency.WEEKLY.getValue()).timeInterval(3).build());
-
+			taskRecurringTaskStateService.update(RecurringTaskState.builder().frequency(RecurringTaskState.RecurringTaskFrequency.DAILY.getValue()).timeInterval(3).build());
+			taskRecurringTaskStateService.update(RecurringTaskState.builder().frequency(RecurringTaskState.RecurringTaskFrequency.WEEKLY.getValue()).timeInterval(3).build());
 		
-			System.out.println("RecurringTaskStates populated with default values.");
+			Logger.getLogger(this.getClass().getName()).info("RecurringTaskStates table populated with default values.");
 		}
 	}
 

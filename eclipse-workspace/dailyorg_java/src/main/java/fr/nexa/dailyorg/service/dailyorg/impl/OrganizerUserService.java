@@ -27,15 +27,6 @@ public class OrganizerUserService implements IOrganizerUserService{
 	}
 	
 	@Override
-	public OrganizerUser create(OrganizerUser organizerUser) {
-		if(organizerUser == null) {
-			Logger.getLogger(this.getClass().getName()).severe(EErrorMessages.NULL_VALUE.getMessage());
-			throw new IllegalArgumentException(EErrorMessages.NULL_VALUE.getMessage());
-		}
-		return organizerUserRepository.save(organizerUser);
-	}
-	
-	@Override
 	public void delete(OrganizerUser organizerUser) {
 		if(organizerUser == null) {
 			Logger.getLogger(this.getClass().getName()).severe(EErrorMessages.NULL_VALUE.getMessage());

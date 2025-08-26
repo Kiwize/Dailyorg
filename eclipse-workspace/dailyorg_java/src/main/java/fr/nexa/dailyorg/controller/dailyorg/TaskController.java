@@ -250,7 +250,7 @@ public class TaskController {
 		if (appUser.getOrganizerUser() == null) {
 			OrganizerUser organizerUser = OrganizerUser.builder().appUser(appUser).calendarFirstShownHour(0).calendarTotalShownHours(24).build();
 			appUser.setOrganizerUser(organizerUser);
-			organizerUserService.create(organizerUser);
+			organizerUserService.update(organizerUser);
 			appUserService.updateUser(appUser);
 			Logger.getLogger(TaskController.class.getName()).info("Organizer profile created for user: " + appUser.getEmail());
 			return true;
