@@ -30,5 +30,5 @@ public interface ITaskPriorityService {
 	 */
 	List<TaskPriority> getAllTaskPriorities();
 	
-	Optional<TaskPriority> findTaskPriorityById(long taskPriorityId);
+	Optional<TaskPriority> findTaskPriorityById(Long taskPriorityId);
 }

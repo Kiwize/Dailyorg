@@ -12,6 +12,8 @@ public enum EErrorMessages {
 	DATA_NOT_FOUND("[Data not found] "),
 	INVALID_INPUT("[Invalid input provided] "),
 	RESOURCE_NOT_FOUND("[Requested resource not found] "),
+	OPERATION_NOT_PERMITTED("[Operation not permitted] "),
+	NULL_VALUE("[Null value encountered] "),
 	
 	//Workout related error messages
 	INVALID_MUSCLE_NAME("[Invalid muscle name] "),

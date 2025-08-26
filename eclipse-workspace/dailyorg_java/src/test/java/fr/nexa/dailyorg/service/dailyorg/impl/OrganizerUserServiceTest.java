@@ -1,7 +1,10 @@
 package fr.nexa.dailyorg.service.dailyorg.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.mockito.Mockito.when;
+
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,9 +12,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import fr.nexa.dailyorg.model.AppUser;
+import fr.nexa.dailyorg.components.factory.dailyorg.OrganizerUserFactory;
 import fr.nexa.dailyorg.model.dailyorg.OrganizerUser;
 import fr.nexa.dailyorg.repository.dailyorg.IOrganizerUserRepository;
+import fr.nexa.dailyorg.utils.EErrorMessages;
 
 @ExtendWith(MockitoExtension.class)
 public class OrganizerUserServiceTest {
@@ -21,28 +25,33 @@ public class OrganizerUserServiceTest {
 
 	@InjectMocks
 	private OrganizerUserService organizerUserService;
-
+	
+	// Factories
+	private final OrganizerUserFactory organizerUserFactory = new OrganizerUserFactory();
+	
 	@Test
 	void testFindByAppUserId() {
+		OrganizerUser organizerUser = organizerUserFactory.createOneOrganizerUser();
 
-		// Mocking the AppUser object
-		AppUser appUser = AppUser.builder().userId(1L).username("testUser").password("testPassword")
-				.email("test@test.fr").build();
+		when(organizerUserRepository.findById(1L)).thenReturn(Optional.of(organizerUser));
 
-		OrganizerUser organizerUser = OrganizerUser.builder().organizerUserId(1L).appUser(appUser) // Mocked AppUser
-				.build();
-
-		when(organizerUserRepository.findByAppUser(appUser)).thenReturn(organizerUser);
-
-		OrganizerUser result = organizerUserService.findByAppUserId(appUser);
+		Optional<OrganizerUser> result = organizerUserService.findByAppUserId(1L);
 
 		assertThat(result).isNotNull();
+		assertThat(result.isPresent()).isTrue();
+	}
+	
+	@Test
+	void testFindByAppUserId_idIsNull() {
+		Optional<OrganizerUser> result = organizerUserService.findByAppUserId(null);
+
+		assertThat(result).isNotNull();
+		assertThat(result.isEmpty()).isTrue();
 	}
 
 	@Test
 	void testCreate() {
-		OrganizerUser organizerUser = OrganizerUser.builder().organizerUserId(1L)
-				.appUser(AppUser.builder().userId(1L).build()).build();
+		OrganizerUser organizerUser = organizerUserFactory.createOneOrganizerUser();
 
 		when(organizerUserRepository.save(organizerUser)).thenReturn(organizerUser);
 
@@ -50,11 +59,15 @@ public class OrganizerUserServiceTest {
 
 		assertThat(result).isNotNull();
 	}
+	
+	@Test
+	void testCreate_null() {
+		assertThatIllegalArgumentException().isThrownBy(() -> organizerUserService.create(null)).withMessage(EErrorMessages.NULL_VALUE.getMessage());
+	}
 
 	@Test
 	void testUpdate() {
-		OrganizerUser organizerUser = OrganizerUser.builder().organizerUserId(1L)
-				.appUser(AppUser.builder().userId(1L).build()).build();
+		OrganizerUser organizerUser = organizerUserFactory.createOneOrganizerUser();
 
 		when(organizerUserRepository.save(organizerUser)).thenReturn(organizerUser);
 
@@ -62,15 +75,24 @@ public class OrganizerUserServiceTest {
 
 		assertThat(result).isNotNull();
 	}
+	
+	@Test
+	void testUpdate_null() {
+		assertThatIllegalArgumentException().isThrownBy(() -> organizerUserService.update(null)).withMessage(EErrorMessages.NULL_VALUE.getMessage());
+	}
 
 	@Test
 	void testDelete() {
-		OrganizerUser organizerUser = OrganizerUser.builder().organizerUserId(1L)
-				.appUser(AppUser.builder().userId(1L).build()).build();
+		OrganizerUser organizerUser = organizerUserFactory.createOneOrganizerUser();
 
 		organizerUserService.delete(organizerUser);
 
 		assertThat(organizerUser).isNotNull();
+	}
+	
+	@Test
+	void testDelete_null() {
+		assertThatIllegalArgumentException().isThrownBy(() -> organizerUserService.delete(null)).withMessage(EErrorMessages.NULL_VALUE.getMessage());
 	}
 
 }

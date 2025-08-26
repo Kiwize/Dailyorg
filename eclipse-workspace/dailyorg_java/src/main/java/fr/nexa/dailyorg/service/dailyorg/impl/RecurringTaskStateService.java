@@ -3,6 +3,7 @@ package fr.nexa.dailyorg.service.dailyorg.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import fr.nexa.dailyorg.model.dailyorg.RecurringTaskState;
 import fr.nexa.dailyorg.repository.dailyorg.IRecurringTaskStateRepository;
 import fr.nexa.dailyorg.service.dailyorg.IRecurringTaskStateService;
+import fr.nexa.dailyorg.utils.EErrorMessages;
 import lombok.AllArgsConstructor;
 
 @Service
@@ -54,17 +56,29 @@ public class RecurringTaskStateService implements IRecurringTaskStateService {
 	}
 
 	@Override
-	public RecurringTaskState update(RecurringTaskState recurringTaskState) {
+	public RecurringTaskState update(RecurringTaskState recurringTaskState) throws IllegalArgumentException {
+		if(recurringTaskState == null) {
+			Logger.getLogger(RecurringTaskStateService.class.getName()).severe(EErrorMessages.NULL_VALUE.getMessage());
+			throw new IllegalArgumentException(EErrorMessages.NULL_VALUE.getMessage());
+		}
 		return recurringTaskStateRepository.save(recurringTaskState);
 	}
 
 	@Override
-	public RecurringTaskState create(RecurringTaskState recurringTaskState) {
+	public RecurringTaskState create(RecurringTaskState recurringTaskState) throws IllegalArgumentException {
+		if(recurringTaskState == null) {
+			Logger.getLogger(RecurringTaskStateService.class.getName()).severe(EErrorMessages.NULL_VALUE.getMessage());
+			throw new IllegalArgumentException(EErrorMessages.NULL_VALUE.getMessage());
+		}
 		return recurringTaskStateRepository.save(recurringTaskState);
 	}
 
 	@Override
-	public void delete(RecurringTaskState recurringTaskState) {
+	public void delete(RecurringTaskState recurringTaskState) throws IllegalArgumentException {
+		if(recurringTaskState == null) {
+			Logger.getLogger(RecurringTaskStateService.class.getName()).severe(EErrorMessages.NULL_VALUE.getMessage());
+			throw new IllegalArgumentException(EErrorMessages.NULL_VALUE.getMessage());
+		}
 		recurringTaskStateRepository.delete(recurringTaskState);
 	}
 	
