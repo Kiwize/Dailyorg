@@ -8,6 +8,8 @@ import React from 'react';
 import { useToolbar } from '../../contexts/ToolbarProvider';
 import DOSettings from './DOSettings';
 
+import SettingsIcon from '@mui/icons-material/Settings';
+
 const today = new Date();
 
 function DOHomePage() {
@@ -33,6 +35,7 @@ function DOHomePage() {
     const toolbarActions = [
       {
         label: 'Settings',
+        icon: SettingsIcon,
         onClick: () => {
           setLocalSettingsOpened((prev) => {
             return !prev;

@@ -2,8 +2,9 @@
 
 import { Box, Typography, Button, IconButton } from '@mui/material';
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import SettingsIcon from '@mui/icons-material/Settings';
+
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import BrokenImageIcon from '@mui/icons-material/BrokenImage';
 
 export const ToolbarContext = createContext(null);
 
@@ -39,9 +40,12 @@ export const ToolbarProvider = ({ children }) => {
             >
               {toolbarActions.map((action, index) => (
                 <IconButton key={index} onClick={action.onClick}>
-                  <SettingsIcon 
-                    sx={{ color: 'white', fontSize: 40 }}
-                  />
+                  {/* Change icon depending on action type, support multiple icons */}
+                  {action.icon ? (
+                    <action.icon sx={{ color: 'white', fontSize: 40 }} />
+                  ) : (
+                    <BrokenImageIcon sx={{ color: 'white', fontSize: 40 }} />
+                  )}
                 </IconButton>
               ))}
             </Box>
