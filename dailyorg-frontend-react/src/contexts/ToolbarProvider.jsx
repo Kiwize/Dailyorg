@@ -1,47 +1,80 @@
 //This context provides a way to manage the state and behavior of the toolbar across the application.
 
-import { Box, Typography, Button } from '@mui/material';
+import { Box, Typography, Button, IconButton } from '@mui/material';
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import SettingsIcon from '@mui/icons-material/Settings';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 export const ToolbarContext = createContext(null);
 
 export const ToolbarProvider = ({ children }) => {
-  const [toolbarTitle, setToolbarTitle] = useState('Default Title');
   const [toolbarActions, setToolbarActions] = useState([]);
   const [toolbarEnabled, setToolbarEnabled] = useState(false);
-
-  const updateToolbarTitle = (title) => {
-    setToolbarTitle(title);
-  };
+  const [isToolbarVisible, setIsToolbarVisible] = useState(true);
 
   const updateToolbarActions = (actions) => {
     setToolbarActions(actions);
   };
 
   return (
-    <ToolbarContext.Provider value={{ toolbarTitle, toolbarActions, updateToolbarTitle, updateToolbarActions, setToolbarEnabled }}>
-      <Box
-        className="toolbar"
-        sx={{
-          position: 'fixed',
-          top: 0,
-          zIndex: 1000,
-        }}
-      >
-        {toolbarEnabled && (
+    <ToolbarContext.Provider value={{ toolbarActions, updateToolbarActions, setToolbarEnabled }}>
+      {toolbarEnabled && (
+        <Box
+          className="toolbar"
+          sx={{
+            backgroundColor: '#686868bb',
+            position: 'fixed',
+            borderRadius: '0 20px 20px 0',
+            top: "25%",
+            zIndex: 1000,
+            width: '6%',
+            left: isToolbarVisible ? 0 : '-6%',
+            transition: 'left 0.3s ease',
+            height: '50vh',
+          }}
+        >
           <Box className="toolbar-content">
-            <Typography variant="h6">{toolbarTitle}</Typography>
-            <Box className="toolbar-actions">
+            <Box className="toolbar-actions"
+              sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '10px' }}
+            >
               {toolbarActions.map((action, index) => (
-                <Button key={index} onClick={action.onClick}>
-                  {action.label}
-                </Button>
+                <IconButton key={index} onClick={action.onClick}>
+                  <SettingsIcon 
+                    sx={{ color: 'white', fontSize: 40 }}
+                  />
+                </IconButton>
               ))}
             </Box>
           </Box>
-        )}
-      </Box>
 
+
+          {/* Click to toggle toolbar, little handle always visible, when toggled off the toolbar retracts out of the viewport */}
+          <Box
+            sx={{
+              position: 'absolute',
+              top: '40%',
+              right: '-32px',
+              width: '32px',
+              height: '20%',
+              backgroundColor: '#585858bb',
+              cursor: 'pointer',
+              borderRadius: '0 10px 10px 0',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+            onClick={() => setIsToolbarVisible(!isToolbarVisible)}
+          >
+            <ArrowForwardIosIcon
+              sx={{
+                transform: isToolbarVisible ? 'rotate(180deg)' : 'rotate(0deg)',
+                transition: 'transform 0.3s ease',
+              }}
+            />
+          </Box>
+            
+        </Box>
+      )}
       {children}
     </ToolbarContext.Provider>
   );

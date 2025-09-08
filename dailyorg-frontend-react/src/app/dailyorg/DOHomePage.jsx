@@ -30,7 +30,6 @@ function DOHomePage() {
   //Initializing the toolbar
   React.useEffect(() => {
     // Set the toolbar title and actions
-    const toolbarTitle = 'Daily Organizer';
     const toolbarActions = [
       {
         label: 'Settings',
@@ -39,14 +38,9 @@ function DOHomePage() {
             return !prev;
           });
         },
-      },
-      {
-        label: 'Help',
-        onClick: () => console.log('Help clicked'),
-      },
+      }
     ];
     toolBar.setToolbarEnabled(true);
-    toolBar.updateToolbarTitle(toolbarTitle);
     toolBar.updateToolbarActions(toolbarActions);
   }, []);
 

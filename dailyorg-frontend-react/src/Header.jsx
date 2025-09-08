@@ -22,7 +22,6 @@ function Header() {
     var filename = sha256(localStorage.getItem('username')) + '.webp';
   } catch (e) {
     filename = 'user_dark.webp'; // Fallback in case of error
-    console.error('Error generating filename:', e);
   }
 
   useEffect(() => {

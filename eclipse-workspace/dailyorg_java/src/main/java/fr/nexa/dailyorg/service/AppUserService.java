@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 
 import fr.nexa.dailyorg.model.AppUser;
 import fr.nexa.dailyorg.repository.IAppUserRepository;
-import fr.nexa.dailyorg.utils.EErrorMessages;
 import lombok.AllArgsConstructor;
 
 @Service
