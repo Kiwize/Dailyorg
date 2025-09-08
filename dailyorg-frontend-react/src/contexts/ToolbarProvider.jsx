@@ -5,6 +5,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import BrokenImageIcon from '@mui/icons-material/BrokenImage';
+import useWindowSize from '../hooks/useWindowSize';
 
 export const ToolbarContext = createContext(null);
 
@@ -12,6 +13,8 @@ export const ToolbarProvider = ({ children }) => {
   const [toolbarActions, setToolbarActions] = useState([]);
   const [toolbarEnabled, setToolbarEnabled] = useState(false);
   const [isToolbarVisible, setIsToolbarVisible] = useState(true);
+
+  const windowWidth = useWindowSize().width;
 
   const updateToolbarActions = (actions) => {
     setToolbarActions(actions);
@@ -28,13 +31,15 @@ export const ToolbarProvider = ({ children }) => {
             borderRadius: '0 20px 20px 0',
             top: "25%",
             zIndex: 1000,
-            width: '6%',
-            left: isToolbarVisible ? 0 : '-6%',
+            width: '60px',
+            left: isToolbarVisible ? 0 : '-60px',
             transition: 'left 0.3s ease',
             height: '50vh',
           }}
         >
-          <Box className="toolbar-content">
+          {
+            isToolbarVisible && (
+              <Box className="toolbar-content">
             <Box className="toolbar-actions"
               sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '10px' }}
             >
@@ -50,6 +55,8 @@ export const ToolbarProvider = ({ children }) => {
               ))}
             </Box>
           </Box>
+            )
+          }
 
 
           {/* Click to toggle toolbar, little handle always visible, when toggled off the toolbar retracts out of the viewport */}
