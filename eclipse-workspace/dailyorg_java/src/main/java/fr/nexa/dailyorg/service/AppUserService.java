@@ -36,9 +36,8 @@ public class AppUserService implements IAppUserService {
 		return appUserRepository.getReferenceById(userID); 
 	}
 
-	
 	@Override
 	public Optional<AppUser> findByEmail(String email) throws Exception {
-		return Optional.ofNullable(appUserRepository.findByEmail(email).orElseThrow(() -> new Exception(EErrorMessages.USER_NOT_FOUND.getMessage())));
+		return appUserRepository.findByEmail(email);
 	}
 }

@@ -3,6 +3,8 @@
 target
 .mvn
 
+.DS_Store
+
 dist
 node_modules
 docs
