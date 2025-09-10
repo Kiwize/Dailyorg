@@ -40,7 +40,6 @@ public class Category {
 	private List<Task> tasks;
 	
 	@ManyToOne(optional = true)
-	@JsonIgnore
 	private OrganizerUser organizerUser;
 
 }

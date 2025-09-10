@@ -1,12 +1,10 @@
 package fr.nexa.dailyorg.controller.dailyorg;
 
 import java.util.Optional;
-import java.util.logging.Logger;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,10 +19,8 @@ import fr.nexa.dailyorg.dto.dailyorg.CategoryDTO;
 import fr.nexa.dailyorg.mapper.dailyorg.CategoryMapper;
 import fr.nexa.dailyorg.model.AppUser;
 import fr.nexa.dailyorg.model.dailyorg.Category;
-import fr.nexa.dailyorg.model.dailyorg.OrganizerUser;
 import fr.nexa.dailyorg.service.AppUserService;
 import fr.nexa.dailyorg.service.dailyorg.impl.CategoryService;
-import fr.nexa.dailyorg.service.dailyorg.impl.OrganizerUserService;
 import fr.nexa.dailyorg.utils.EErrorMessages;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
@@ -36,47 +32,25 @@ public class CategoryController {
 
 	private final AppUserService appUserService;
 	private final CategoryService categoryService;
-	private final OrganizerUserService organizerUserService;
 	private final CategoryMapper categoryMapper;
 	
 	private final JwtUtil jwtUtil;
 	
-	@PutMapping("/create/{userId}")
-	public ResponseEntity<?> createCategory(@RequestBody CategoryDTO categoryDTO, @PathVariable Long userId) {
+	@PutMapping("/create")
+	public ResponseEntity<?> createCategory(@RequestBody CategoryDTO categoryDTO, @NonNull HttpServletRequest request) {
 		try {
-			Category category = categoryMapper.toEntity(categoryDTO);
-			if(category == null)
-				throw new Exception("Category mapping failed");
-			
-			//Check for the user
-			AppUser user = appUserService.getAppUserByID(userId);
-			if (user == null) {
-				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(EErrorMessages.USER_NOT_FOUND.getMessage());
-			} else {
-				OrganizerUser organizerUser = user.getOrganizerUser();
-				if (organizerUser == null) {
-					Logger.getLogger(CategoryController.class.getName()).warning("No organizer user linked to the app user with ID: " + userId);
-					return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(EErrorMessages.USER_NOT_FOUND.getMessage());
-				}
-				category.setOrganizerUser(organizerUser);
+			String userEmail = jwtUtil.extractUsernameFromCookies(request.getCookies());
+			Optional<AppUser> user = appUserService.findByEmail(userEmail);
+			if (user.isEmpty()) {
+				throw new Exception(EErrorMessages.USER_NOT_FOUND.getMessage());
 			}
 			
-			Category savedCategory = categoryService.save(category);
-			return ResponseEntity.status(HttpStatus.CREATED).body(savedCategory);
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error creating category");
-		}
-	}
-	
-	// Creates a category available for all users, restricted to admin use
-	@PutMapping("/create")
-	@PreAuthorize("hasRole('ADMIN')")
-	public ResponseEntity<?> createCategory(@RequestBody CategoryDTO categoryDTO) {
-		try {
 			Category category = categoryMapper.toEntity(categoryDTO);
 			if(category == null)
 				throw new Exception("Category mapping failed");
-			category.setOrganizerUser(null); // Global category
+			
+			category.setOrganizerUser(user.get().getOrganizerUser());
+			
 			Category savedCategory = categoryService.save(category);
 			return ResponseEntity.status(HttpStatus.CREATED).body(savedCategory);
 		} catch (Exception e) {
@@ -85,11 +59,24 @@ public class CategoryController {
 	}
 	
 	@DeleteMapping("/delete")
-	public ResponseEntity<?> deleteCategory(@RequestBody CategoryDTO categoryDTO) {
+	public ResponseEntity<?> deleteCategory(@RequestBody CategoryDTO categoryDTO, @NonNull HttpServletRequest request) {
 		try {
 			Category category = categoryMapper.toEntity(categoryDTO);
 			if(category == null)
 				throw new Exception("Category mapping failed");
+			
+			String userEmail = jwtUtil.extractUsernameFromCookies(request.getCookies());
+			Optional<AppUser> user = appUserService.findByEmail(userEmail);
+			if (user.isEmpty()) {
+				throw new Exception(EErrorMessages.USER_NOT_FOUND.getMessage());
+			}
+			
+			Category existingCategory = categoryService.findById(category.getIdCategory());
+			
+			if(existingCategory.getOrganizerUser() == null || existingCategory.getOrganizerUser().getOrganizerUserId() != (user.get().getOrganizerUser().getOrganizerUserId())) {
+				throw new Exception(EErrorMessages.OPERATION_NOT_PERMITTED.getMessage());
+			}
+			
 			categoryService.delete(category);
 			return ResponseEntity.ok("Category deleted successfully");
 		} catch (Exception e) {

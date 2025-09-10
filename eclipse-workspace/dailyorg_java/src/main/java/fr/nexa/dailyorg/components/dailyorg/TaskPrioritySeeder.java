@@ -1,6 +1,7 @@
 package fr.nexa.dailyorg.components.dailyorg;
 
 import java.util.Arrays;
+import java.util.logging.Logger;
 
 import org.springframework.stereotype.Component;
 
@@ -20,9 +21,8 @@ public class TaskPrioritySeeder {
         Arrays.asList(ETaskPriorities.values()).forEach(priority -> {
             if (taskPriorityRepository.findByTaskPriorityName(priority.getPriorityName()).isEmpty()) {
             	taskPriorityRepository.save(TaskPriority.builder().taskPriorityName(priority.getPriorityName()).taskPriorityLevel(priority.getPriorityLevel()).build());
+            	Logger.getLogger(TaskPrioritySeeder.class.getName()).info("Task priority created: " + priority.getPriorityName() + " with level " + priority.getPriorityLevel());
             }
         });
-
-        System.out.println("✅ Task priorities populated successfully!");
     }
 }

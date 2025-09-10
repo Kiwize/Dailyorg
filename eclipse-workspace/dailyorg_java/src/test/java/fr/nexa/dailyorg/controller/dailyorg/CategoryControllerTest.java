@@ -5,6 +5,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,9 +53,9 @@ public class CategoryControllerTest {
 	// Factories
 	private final OrganizerUserFactory organizerUserFactory = new OrganizerUserFactory();
 	private final AppUserFactory appUserFactory = new AppUserFactory();
-
+	
 	@Test
-	void testCreateCategoryLinkedWithUser() throws Exception {
+	void testCreateCategory() throws Exception {
 		AppUser appUser = appUserFactory.createOneAppUser();
 		appUser.setUserId(0L);
 		OrganizerUser organizerUser = organizerUserFactory.createOneOrganizerUser(appUser);
@@ -70,56 +71,9 @@ public class CategoryControllerTest {
 		when(categoryMapper.toEntity(any())).thenReturn(category);
 		when(appUserService.getAppUserByID(0L)).thenReturn(appUser);
 		when(categoryService.save(category)).thenReturn(category);
-
-		mockMvc.perform(put("/api/category/create/{userId}", 0L).contentType("application/json")
-				.content(objectMapper.writeValueAsString(categoryDTO)))
-				.andExpect(MockMvcResultMatchers.status().isCreated());
-
-	}
-	
-	@Test
-	void testCreateCategoryNotLinkedWithUser() throws Exception {
-		AppUser appUser = appUserFactory.createOneAppUser();
-		appUser.setUserId(0L);
-		CategoryDTO categoryDTO = new CategoryDTO();
-
-		appUser.setOrganizerUser(null);
-		categoryDTO.setTaskCategoryName("Work");
-		categoryDTO.setTaskCategoryColor("#FF5733");
-
-		Category category = Category.builder().taskCategoryName(categoryDTO.getTaskCategoryName())
-				.taskCategoryColor(categoryDTO.getTaskCategoryColor()).organizerUser(null).build();
-
-		when(categoryMapper.toEntity(any())).thenReturn(category);
-		when(appUserService.getAppUserByID(0L)).thenReturn(appUser);
-		when(categoryService.save(category)).thenReturn(category);
-
-		mockMvc.perform(put("/api/category/create/{userId}", 0L).contentType("application/json")
-				.content(objectMapper.writeValueAsString(categoryDTO)))
-				.andExpect(MockMvcResultMatchers.status().isBadRequest());
-
-	}
-	
-	@Test
-	void testCreateWithNullCategory() throws Exception {
-		when(categoryMapper.toEntity(any())).thenReturn(null);
-
-		mockMvc.perform(put("/api/category/create/{userId}", 1L).contentType("application/json")
-				.content(objectMapper.writeValueAsString(new CategoryDTO())))
-				.andExpect(MockMvcResultMatchers.status().isInternalServerError());
-	}
-	
-	@Test
-	void testCreateCategoryGlobalAdmin() throws Exception {
-		CategoryDTO categoryDTO = new CategoryDTO();
-		categoryDTO.setTaskCategoryName("Work");
-		categoryDTO.setTaskCategoryColor("#FF5733");
-
-		Category category = Category.builder().taskCategoryName(categoryDTO.getTaskCategoryName())
-				.taskCategoryColor(categoryDTO.getTaskCategoryColor()).organizerUser(null).build();
-
-		when(categoryMapper.toEntity(any())).thenReturn(category);
-		when(categoryService.save(category)).thenReturn(category);
+		
+		when(jwtUtil.extractUsernameFromCookies(any())).thenReturn(appUser.getEmail());
+		when(appUserService.findByEmail(any())).thenReturn(Optional.of(appUser));
 
 		mockMvc.perform(put("/api/category/create").contentType("application/json")
 				.content(objectMapper.writeValueAsString(categoryDTO)))
@@ -141,10 +95,11 @@ public class CategoryControllerTest {
 		CategoryDTO categoryDTO = new CategoryDTO();
 		categoryDTO.setTaskCategoryName("Work");
 		categoryDTO.setTaskCategoryColor("#FF5733");
+		
+		when(jwtUtil.extractUsernameFromCookies(any())).thenReturn(null);
+		when(appUserService.findByEmail(any())).thenReturn(Optional.empty());
 
-		when(appUserService.getAppUserByID(0L)).thenReturn(null);
-
-		mockMvc.perform(put("/api/category/create/{userId}", 0L).contentType("application/json")
+		mockMvc.perform(put("/api/category/create").contentType("application/json")
 				.content(objectMapper.writeValueAsString(categoryDTO)))
 				.andExpect(MockMvcResultMatchers.status().isInternalServerError());
 
@@ -240,10 +195,10 @@ public class CategoryControllerTest {
 	
 	@Test
 	void testGetAllCategoriesByUserId_userNotFound() throws Exception {
-		when(appUserService.getAppUserByID(0L)).thenReturn(null);
+		when(appUserService.findByEmail(any())).thenReturn(Optional.empty());
 
 		mockMvc.perform(MockMvcRequestBuilders
-				.get("/api/category/get_all_by_user/{userId}", 0L))
+				.get("/api/category/get_all_by_user"))
 				.andExpect(MockMvcResultMatchers.status().isInternalServerError());
 		
 	}
@@ -255,10 +210,10 @@ public class CategoryControllerTest {
 		OrganizerUser organizerUser = organizerUserFactory.createOneOrganizerUser(appUser);
 		appUser.setOrganizerUser(organizerUser);
 
-		when(appUserService.getAppUserByID(0L)).thenReturn(appUser);
+		when(appUserService.findByEmail(any())).thenReturn(Optional.of(appUser));
 
 		mockMvc.perform(MockMvcRequestBuilders
-				.get("/api/category/get_all_by_user/{userId}", 0L))
+				.get("/api/category/get_all_by_user"))
 				.andExpect(MockMvcResultMatchers.status().isOk());
 	}
 
@@ -283,11 +238,11 @@ public class CategoryControllerTest {
 				.organizerUser(organizerUser)
 				.build();
 		
+		when(appUserService.findByEmail(any())).thenReturn(Optional.of(appUser));
 		when(categoryService.findAllByOrganizerUser(organizerUser.getOrganizerUserId())).thenReturn(List.of(category1, category2));
-		when(appUserService.getAppUserByID(0L)).thenReturn(appUser);
 
 		mockMvc.perform(MockMvcRequestBuilders
-				.get("/api/category/get_all_by_user/{userId}", 0L))
+				.get("/api/category/get_all_by_user"))
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andExpect(MockMvcResultMatchers.jsonPath("$.length()").value(2));
 	}

@@ -1,23 +1,47 @@
-import { Box, Button } from "@mui/material";
+import { Box, Button, IconButton, Typography } from "@mui/material";
 import React from "react";
 import callApi from "../../hooks/api";
 
+import RefreshIcon from '@mui/icons-material/Refresh';
+import CloseIcon from '@mui/icons-material/Close';
+import { Icon } from "lucide-react";
+import useAlert from "../../hooks/useAlert";
+
 
 export default function DOCategoryForm({ onClose }) {
-    
+    const alert = useAlert();
 
     const [category, setCategory] = React.useState({ name: '', color: '#000000' });
-
     const [categories, setCategories] = React.useState([]);
 
     //When component in mounted, load user's categories from backend
     React.useEffect(() => {
         const fetchCategories = async () => {
             const result = await callApi('GET', 'category/get_all_by_user', null, false, false, true);
-            setCategories(result);
+            setCategories(result.content);
         };
         fetchCategories();
     }, []);
+
+    const onAddCategory = async () => {
+        if (category.name.trim() === '') {
+            alert.setAlert('Category name cannot be empty', 'error');
+            return;
+        }
+
+        const result = await callApi('PUT', 'category/create', {
+            taskCategoryName: category.name,
+            taskCategoryColor: category.color,
+        }, false, false, true);
+
+        if (result.content) {
+            setCategories((prev) => [...prev, result.content]);
+            setCategory({ name: '', color: '#000000' });
+            alert.setAlert('Category created successfully', 'success');
+        } else {
+            alert.setAlert('Error creating category', 'error');
+        }
+    }
 
     return (
         <Box
@@ -48,22 +72,63 @@ export default function DOCategoryForm({ onClose }) {
                     zIndex: 2000,
                 }}
             >
-                <Button variant="contained" onClick={() => onClose()} sx={{ mb: 2 }}>
-                    Close Settings
-                </Button>
+                <IconButton variant="contained" onClick={() => onClose()} sx={{ mb: 2, position: 'absolute', top: 8, right: 8 }}>
+                    <CloseIcon />
+                </IconButton>
                 <Box>
-                    <h2>Task categories</h2>
-                    <Box>
-                        <label>
-                            Category Name:
-                            <input type="text" value={category.name} onChange={(e) => setCategory({ ...category, name: e.target.value })} />
-                        </label>
+                    <Typography variant="h6" sx={{ mb: 2 }}>Manage Categories</Typography>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, maxHeight: '300px', overflowY: 'auto', mb: 2 }}>
+                        {
+                            categories.length > 0 ? (
+                                categories.map((cat) => (
+                                    <Box key={cat.id} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        <Box sx={{ width: 20, height: 20, backgroundColor: cat.taskCategoryColor, borderRadius: '4px' }}></Box>
+                                        <span>{cat.taskCategoryName}</span>
+                                        {
+                                            cat.organizerUser !== null && (
+                                                <IconButton aria-label="delete" size="small" onClick={async () => {
+                                                    const result = await callApi('DELETE', 'category/delete', { idCategory: cat.idCategory,
+                                                        taskCategoryName: cat.taskCategoryName, taskCategoryColor: cat.taskCategoryColor
+                                                     }, false, false, true);
+                                                    if (result.status === 200) {
+                                                        setCategories((prev) => prev.filter((c) => c.idCategory !== cat.idCategory));
+                                                    } else {
+                                                        alert.setAlert('Error deleting category', 'error');
+                                                    }
+                                                }}>
+                                                    <CloseIcon fontSize="small" />
+                                                </IconButton>
+                                            )
+                                        }
+                                    </Box>
+                                ))
+                            ) : (
+                                <span>No categories found. Create one!</span>
+                            )
+                        }
+                    </Box>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                        <input
+                            type="text"
+                            placeholder="Category Name"
+                            value={category.name}
+                            onChange={(e) => setCategory({ ...category, name: e.target.value })}
+                        />
+                        <input
+                            type="color"
+                            value={category.color}
+                            onChange={(e) => setCategory({ ...category, color: e.target.value })}
+                            style={{ width: '50px', height: '50px', padding: 0, border: 'none', background: 'none' }}
+                        />
                     </Box>
                     <Box>
-                        <label>
-                            Category Color:
-                            <input type="color" value={category.color} onChange={(e) => setCategory({ ...category, color: e.target.value })} />
-                        </label>
+                        <IconButton aria-label="refresh" onClick={async () => {
+                            const result = await callApi('GET', 'category/get_all_by_user', null, false, false, true);
+                            setCategories(result.content);
+                        }}>
+                            <RefreshIcon />
+                        </IconButton>
+                        <Button variant="contained" sx={{ mt: 2 }} onClick={onAddCategory}>Add Category</Button>
                     </Box>
                 </Box>
             </Box>
