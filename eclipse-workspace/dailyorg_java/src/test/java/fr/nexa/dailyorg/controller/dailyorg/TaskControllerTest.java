@@ -42,6 +42,7 @@ import fr.nexa.dailyorg.model.dailyorg.RecurringTaskState;
 import fr.nexa.dailyorg.model.dailyorg.Task;
 import fr.nexa.dailyorg.model.dailyorg.TaskPriority;
 import fr.nexa.dailyorg.service.AppUserService;
+import fr.nexa.dailyorg.service.dailyorg.impl.CategoryService;
 import fr.nexa.dailyorg.service.dailyorg.impl.OrganizerUserService;
 import fr.nexa.dailyorg.service.dailyorg.impl.RecurringTaskStateService;
 import fr.nexa.dailyorg.service.dailyorg.impl.TaskPriorityService;
@@ -69,6 +70,9 @@ class TaskControllerTest {
 	
 	@MockitoBean
 	private TaskPriorityService taskPriorityService;
+	
+	@MockitoBean
+	private CategoryService categoryService;
 	
 	@MockitoBean
 	private JwtUtil jwtUtil;

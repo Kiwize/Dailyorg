@@ -107,6 +107,10 @@ public class CategoryControllerTest {
 	
 	@Test
 	void testDeleteCategory() throws Exception {
+		AppUser appUser = appUserFactory.createOneAppUser();
+		OrganizerUser organizerUser = organizerUserFactory.createOneOrganizerUser(appUser);
+		appUser.setOrganizerUser(organizerUser);
+		
 		CategoryDTO categoryDTO = new CategoryDTO();
 		categoryDTO.setIdCategory(1L);
 		categoryDTO.setTaskCategoryName("Work");
@@ -115,13 +119,70 @@ public class CategoryControllerTest {
 		Category category = Category.builder().idCategory(categoryDTO.getIdCategory())
 				.taskCategoryName(categoryDTO.getTaskCategoryName())
 				.taskCategoryColor(categoryDTO.getTaskCategoryColor()).build();
+		
+		category.setOrganizerUser(appUser.getOrganizerUser());
 
+		when(jwtUtil.extractUsernameFromCookies(any())).thenReturn(appUser.getEmail());
+		when(appUserService.findByEmail(any())).thenReturn(Optional.of(appUser));
+		when(categoryService.findById(1L)).thenReturn(category);
 		when(categoryMapper.toEntity(any())).thenReturn(category);
 
 		mockMvc.perform(MockMvcRequestBuilders
 				.delete("/api/category/delete").contentType("application/json")
 				.content(objectMapper.writeValueAsString(categoryDTO)))
 				.andExpect(MockMvcResultMatchers.status().isOk());
+
+	}
+	
+	@Test
+	void testDeleteCategory_userNotFound() throws Exception {
+		CategoryDTO categoryDTO = new CategoryDTO();
+		categoryDTO.setIdCategory(1L);
+		categoryDTO.setTaskCategoryName("Work");
+		categoryDTO.setTaskCategoryColor("#FF5733");
+
+		Category category = Category.builder().idCategory(categoryDTO.getIdCategory())
+				.taskCategoryName(categoryDTO.getTaskCategoryName())
+				.taskCategoryColor(categoryDTO.getTaskCategoryColor()).build();
+		
+		when(jwtUtil.extractUsernameFromCookies(any())).thenReturn(null);
+		when(appUserService.findByEmail(any())).thenReturn(Optional.empty());
+		when(categoryService.findById(1L)).thenReturn(category);
+		when(categoryMapper.toEntity(any())).thenReturn(category);
+
+		mockMvc.perform(MockMvcRequestBuilders
+				.delete("/api/category/delete").contentType("application/json")
+				.content(objectMapper.writeValueAsString(categoryDTO)))
+				.andExpect(MockMvcResultMatchers.status().isInternalServerError());
+
+	}
+	
+	@Test
+	void testDeleteCategory_userIsNullAndNotOwnerOfCategoriesToDelete() throws Exception {
+		AppUser appUser = appUserFactory.createOneAppUser();
+		OrganizerUser organizerUser = organizerUserFactory.createOneOrganizerUser(appUser);
+		appUser.setOrganizerUser(organizerUser);
+		
+		CategoryDTO categoryDTO = new CategoryDTO();
+		categoryDTO.setIdCategory(1L);
+		categoryDTO.setTaskCategoryName("Work");
+		categoryDTO.setTaskCategoryColor("#FF5733");
+
+		Category category = Category.builder().idCategory(categoryDTO.getIdCategory())
+				.taskCategoryName(categoryDTO.getTaskCategoryName())
+				.taskCategoryColor(categoryDTO.getTaskCategoryColor()).build();
+		
+		category.setOrganizerUser(null);
+		
+		when(jwtUtil.extractUsernameFromCookies(any())).thenReturn(appUser.getEmail());
+		when(appUserService.findByEmail(any())).thenReturn(Optional.of(appUser));
+		when(categoryService.findById(1L)).thenReturn(category);
+		when(categoryMapper.toEntity(any())).thenReturn(category);
+
+		mockMvc.perform(MockMvcRequestBuilders
+				.delete("/api/category/delete").contentType("application/json")
+				.content(objectMapper.writeValueAsString(categoryDTO)))
+				.andExpect(MockMvcResultMatchers.status().isInternalServerError());
 
 	}
 	
@@ -146,6 +207,7 @@ public class CategoryControllerTest {
 				.taskCategoryName(categoryDTO.getTaskCategoryName())
 				.taskCategoryColor(categoryDTO.getTaskCategoryColor()).build();
 
+		when(categoryService.findById(1L)).thenReturn(category);
 		when(categoryMapper.toEntity(any())).thenReturn(category);
 		when(categoryService.save(category)).thenReturn(category);
 
