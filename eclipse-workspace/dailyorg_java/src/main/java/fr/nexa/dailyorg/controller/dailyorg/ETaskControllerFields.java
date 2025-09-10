@@ -13,7 +13,7 @@ public enum ETaskControllerFields {
     TASK_PRIORITY("task_priority"),
     TASK_REPEAT_FREQUENCY_ID("task_repeat_frequency"),
     TASK_REPEAT_END_DATE("task_repeat_end_date"),
-    TASK_IS_RECURRENT("is_recurrent");
+    TASK_IS_RECURRENT("is_recurrent"), TASK_CATEGORY_ID("task_category_id");
 
     private final String fieldName;
 

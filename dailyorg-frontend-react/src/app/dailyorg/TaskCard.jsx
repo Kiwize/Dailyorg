@@ -21,8 +21,23 @@ function TaskCard({
 
   const taskElem = useRef(null);
   const calculatePosition = useRef();
-
   // Calculate the position of the task based on start and end dates
+
+  const getContrastingTextColor = (hex) => {
+    // Retirer le "#"
+    hex = hex.replace("#", "");
+
+    // Convertir en R, G, B
+    let r = parseInt(hex.substr(0, 2), 16);
+    let g = parseInt(hex.substr(2, 2), 16);
+    let b = parseInt(hex.substr(4, 2), 16);
+
+    // Calculer la luminance perçue (formule simplifiée)
+    let luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+
+    // Si luminance > 0.5 -> texte noir, sinon texte blanc
+    return luminance > 0.5 ? "#000000" : "#ffffff";
+  }
 
   const onMouseDown = (e) => {
     setDragging(true);
@@ -36,6 +51,8 @@ function TaskCard({
     e.preventDefault();
 
     let taskElement = e.target.parentElement.parentElement;
+
+
 
     if (taskElement.id.startsWith('taskID-')) {
       taskElem.current = taskElement;
@@ -76,7 +93,7 @@ function TaskCard({
 
   // Helper to get top and height percentages for a task
   function getTaskPosition(start, end) {
-    if(displayConfig === undefined || displayConfig.displayedHours === undefined || displayConfig.firstDisplayedHour === undefined) {
+    if (displayConfig === undefined || displayConfig.displayedHours === undefined || displayConfig.firstDisplayedHour === undefined) {
       alert.setAlert('An error occurred while displaying task...', 'error');
       return { top: '0%', height: '0%' };
     }
@@ -149,7 +166,7 @@ function TaskCard({
             <div
               id={`taskID-${task.taskId}`}
               style={{
-                background: '#1976d2',
+                background: task.category ? task.category.taskCategoryColor : grey[500],
                 color: '#fff',
                 borderRadius: 4,
                 padding: '0px 0px',
@@ -189,7 +206,8 @@ function TaskCard({
                   }}
                   onMouseDown={onMouseDown}
                 ></div>
-                <p className="task-name" style={{ margin: 0 }}>
+                {/* Text automatically takes the opposite color of the task's category color */}
+                <p className="task-name" style={{ margin: 0, color: getContrastingTextColor(task.category ? task.category.taskCategoryColor : grey[500]), textAlign: 'center', pointerEvents: 'none', padding: '0 4px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {task.taskName}
                 </p>
               </div>

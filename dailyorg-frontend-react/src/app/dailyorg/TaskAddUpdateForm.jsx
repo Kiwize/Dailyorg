@@ -18,6 +18,16 @@ export default function TaskAddUpdateForm({
 
   const [showTaskOccurrenceConfig, setShowTaskOccurrenceConfig] = useState(false);
   const [taskRepeatFrequencies, setTaskRepeatFrequencies] = useState([]);
+  const [availableCategories, setAvailableCategories] = useState([]);
+
+  // Load available categories on component mount
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const result = await callApi('GET', 'category/get_all_by_user', null, false, false, true);
+      setAvailableCategories(result.content);
+    };
+    fetchCategories();
+  }, []);
 
   useEffect(() => {
     // Initialize task repeat frequencies if needed
@@ -98,6 +108,33 @@ export default function TaskAddUpdateForm({
               onChange={(event) => setTaskData({ ...taskData, taskName: event.target.value })}
               required
             />
+
+            <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
+              <InputLabel>Category :</InputLabel>
+              <Select
+                labelId="Category"
+                value={taskData.category || '-1'}
+                name="category_id"
+                onChange={(event) => setTaskData({ ...taskData, category: event.target.value })}
+              >
+                <MenuItem value="-1">None</MenuItem>
+                {availableCategories &&
+                  availableCategories.map((category) => (
+                    <MenuItem key={category.idCategory} value={category.idCategory}>
+                      <Box
+                        sx={{
+                          width: 20,
+                          height: 20,
+                          backgroundColor: category.taskCategoryColor,
+                          borderRadius: '4px',
+                          display: 'inline-block',
+                        }}
+                      />
+                      {category.taskCategoryName}
+                    </MenuItem>
+                  ))}
+              </Select>
+            </Box>
 
             <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
               <InputLabel>Start time :</InputLabel>

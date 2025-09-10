@@ -90,7 +90,12 @@ public class CategoryController {
 			Category category = categoryMapper.toEntity(categoryDTO);
 			if(category == null)
 				throw new Exception("Category mapping failed");
-			Category updatedCategory = categoryService.save(category);
+			
+			Category existingCategory = categoryService.findById(category.getIdCategory());
+			existingCategory.setTaskCategoryName(category.getTaskCategoryName());
+			existingCategory.setTaskCategoryColor(category.getTaskCategoryColor());
+			
+			Category updatedCategory = categoryService.save(existingCategory);
 			return ResponseEntity.ok(updatedCategory);
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating category");

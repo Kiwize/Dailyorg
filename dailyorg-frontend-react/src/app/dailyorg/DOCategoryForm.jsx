@@ -4,22 +4,24 @@ import callApi from "../../hooks/api";
 
 import RefreshIcon from '@mui/icons-material/Refresh';
 import CloseIcon from '@mui/icons-material/Close';
-import { Icon } from "lucide-react";
+import EditOffIcon from '@mui/icons-material/EditOff';
 import useAlert from "../../hooks/useAlert";
 
 
 export default function DOCategoryForm({ onClose }) {
     const alert = useAlert();
 
+    const [selectedCategoryId, setSelectedCategoryId] = React.useState(null);
     const [category, setCategory] = React.useState({ name: '', color: '#000000' });
     const [categories, setCategories] = React.useState([]);
 
     //When component in mounted, load user's categories from backend
+    const fetchCategories = async () => {
+        const result = await callApi('GET', 'category/get_all_by_user', null, false, false, true);
+        setCategories(result.content);
+    };
+
     React.useEffect(() => {
-        const fetchCategories = async () => {
-            const result = await callApi('GET', 'category/get_all_by_user', null, false, false, true);
-            setCategories(result.content);
-        };
         fetchCategories();
     }, []);
 
@@ -29,18 +31,38 @@ export default function DOCategoryForm({ onClose }) {
             return;
         }
 
-        const result = await callApi('PUT', 'category/create', {
-            taskCategoryName: category.name,
-            taskCategoryColor: category.color,
-        }, false, false, true);
+        if (selectedCategoryId) {
+            // Update existing category
+            const result = await callApi('POST', `category/update`, {
+                idCategory: selectedCategoryId,
+                taskCategoryName: category.name,
+                taskCategoryColor: category.color,
+            }, false, false, true);
+            if (result.content) {
+                setCategories((prev) => prev.map((cat) => (cat.id === selectedCategoryId ? result.content : cat)));
+                setCategory({ name: '', color: '#000000' });
+                setSelectedCategoryId(null);
 
-        if (result.content) {
-            setCategories((prev) => [...prev, result.content]);
-            setCategory({ name: '', color: '#000000' });
-            alert.setAlert('Category created successfully', 'success');
+                alert.setAlert('Category updated successfully', 'success');
+            } else {
+                alert.setAlert('Error updating category', 'error');
+            }
         } else {
-            alert.setAlert('Error creating category', 'error');
+            // Create new category
+            const result = await callApi('PUT', 'category/create', {
+                taskCategoryName: category.name,
+                taskCategoryColor: category.color,
+            }, false, false, true);
+            if (result.content) {
+                setCategories((prev) => [...prev, result.content]);
+                setCategory({ name: '', color: '#000000' });
+                alert.setAlert('Category created successfully', 'success');
+            } else {
+                alert.setAlert('Error creating category', 'error');
+            }
         }
+
+        fetchCategories();
     }
 
     return (
@@ -83,13 +105,23 @@ export default function DOCategoryForm({ onClose }) {
                                 categories.map((cat) => (
                                     <Box key={cat.id} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                         <Box sx={{ width: 20, height: 20, backgroundColor: cat.taskCategoryColor, borderRadius: '4px' }}></Box>
-                                        <span>{cat.taskCategoryName}</span>
+                                        <span onClick={() => {
+                                            if (cat.organizerUser === null) {
+                                                alert.setAlert('You cannot edit this category', 'error');
+                                                return;
+                                            }
+                                            setCategory({ name: cat.taskCategoryName, color: cat.taskCategoryColor });
+                                            setSelectedCategoryId(cat.idCategory);
+                                        }}
+                                        style={{ cursor: cat.organizerUser !== null ? 'pointer' : 'not-allowed', flexGrow: 1, fontWeight: selectedCategoryId === cat.idCategory ? 'bold' : 'normal' }}
+                                        >{cat.taskCategoryName}</span>
                                         {
                                             cat.organizerUser !== null && (
                                                 <IconButton aria-label="delete" size="small" onClick={async () => {
-                                                    const result = await callApi('DELETE', 'category/delete', { idCategory: cat.idCategory,
+                                                    const result = await callApi('DELETE', 'category/delete', {
+                                                        idCategory: cat.idCategory,
                                                         taskCategoryName: cat.taskCategoryName, taskCategoryColor: cat.taskCategoryColor
-                                                     }, false, false, true);
+                                                    }, false, false, true);
                                                     if (result.status === 200) {
                                                         setCategories((prev) => prev.filter((c) => c.idCategory !== cat.idCategory));
                                                     } else {
@@ -122,13 +154,17 @@ export default function DOCategoryForm({ onClose }) {
                         />
                     </Box>
                     <Box>
-                        <IconButton aria-label="refresh" onClick={async () => {
-                            const result = await callApi('GET', 'category/get_all_by_user', null, false, false, true);
-                            setCategories(result.content);
-                        }}>
-                            <RefreshIcon />
-                        </IconButton>
-                        <Button variant="contained" sx={{ mt: 2 }} onClick={onAddCategory}>Add Category</Button>
+                        {
+                            selectedCategoryId && (
+                                <IconButton aria-label="cancel edit" onClick={() => {
+                                    setSelectedCategoryId(null);
+                                    setCategory({ name: '', color: '#000000' });
+                                }}>
+                                    <EditOffIcon />
+                                </IconButton>
+                            )
+                        }
+                        <Button variant="contained" sx={{ mt: 2 }} onClick={onAddCategory}>{selectedCategoryId ? 'Update' : 'Add'} Category</Button>
                     </Box>
                 </Box>
             </Box>

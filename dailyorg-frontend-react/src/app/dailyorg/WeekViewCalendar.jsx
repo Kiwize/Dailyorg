@@ -100,6 +100,7 @@ export default function WeekViewCalendar({ calendarRefreshCallback, settings }) 
     if (!newState) {
       setTaskData({
         id: '',
+        taskCategory: null,
         taskName: '',
         startTime: '',
         endTime: '',
@@ -124,6 +125,7 @@ export default function WeekViewCalendar({ calendarRefreshCallback, settings }) 
 
     setTaskData({
       id: task.id,
+      category: task.category.idCategory,
       taskName: task.taskName,
       startTime: task.taskStartDate,
       endTime: task.taskEndDate,
@@ -185,6 +187,7 @@ export default function WeekViewCalendar({ calendarRefreshCallback, settings }) 
         `task/${isEditingTask ? 'update_task' : 'create_task'}`,
         {
           task_id: isEditingTask ? taskData.id : null, // Only include task_id if editing
+          task_category_id: taskData.category ? taskData.category : null,
           is_task_completed: taskData.isCompleted,
           task_name: taskData.taskName,
           task_start_date: taskData.startTime,
@@ -324,6 +327,7 @@ export default function WeekViewCalendar({ calendarRefreshCallback, settings }) 
       'task/update_task',
       {
         task_id: task.id,
+        task_category_id: task.taskCategory ? task.taskCategory.idCategory : null,
         is_task_completed: task.isCompleted,
         task_name: task.taskName,
         user_email: localStorage.getItem('username'),

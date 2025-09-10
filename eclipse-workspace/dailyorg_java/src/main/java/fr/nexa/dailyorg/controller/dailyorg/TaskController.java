@@ -23,11 +23,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import fr.nexa.dailyorg.config.JwtUtil;
 import fr.nexa.dailyorg.model.AppUser;
+import fr.nexa.dailyorg.model.dailyorg.Category;
 import fr.nexa.dailyorg.model.dailyorg.OrganizerUser;
 import fr.nexa.dailyorg.model.dailyorg.RecurringTaskState;
 import fr.nexa.dailyorg.model.dailyorg.Task;
 import fr.nexa.dailyorg.model.dailyorg.TaskPriority;
 import fr.nexa.dailyorg.service.AppUserService;
+import fr.nexa.dailyorg.service.dailyorg.impl.CategoryService;
 import fr.nexa.dailyorg.service.dailyorg.impl.OrganizerUserService;
 import fr.nexa.dailyorg.service.dailyorg.impl.RecurringTaskStateService;
 import fr.nexa.dailyorg.service.dailyorg.impl.TaskPriorityService;
@@ -48,6 +50,7 @@ public class TaskController {
 	private final AppUserService appUserService;
 	private final OrganizerUserService organizerUserService;
 	private final TaskPriorityService taskPriorityService;
+	private final CategoryService categoryService;
 
 	private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
@@ -129,6 +132,16 @@ public class TaskController {
 				boolean isRecurrent = Boolean.parseBoolean(data.get(ETaskControllerFields.TASK_IS_RECURRENT.getFieldName()));
 
 				if (task != null && task.getOrganizerUser().getAppUser().getUserId() == appUser.getUserId()) {
+					//Check for task category
+					task.setCategory(null);
+					
+					if (data.containsKey(ETaskControllerFields.TASK_CATEGORY_ID.getFieldName())) {
+						long categoryId = Long.parseLong(data.get(ETaskControllerFields.TASK_CATEGORY_ID.getFieldName()));
+						Category category = categoryService.findById(categoryId);
+						task.setCategory(category == null ? null : category);
+					}
+					
+					
 					task.setTaskName(data.get(ETaskControllerFields.TASK_NAME.getFieldName()));
 					task.setTaskRequiredEnergy(Integer.parseInt(data.get(ETaskControllerFields.TASK_REQUIRED_ENERGY.getFieldName())));
 					task.setTaskStartDate(LocalDateTime.parse(data.get(ETaskControllerFields.TASK_START_DATE.getFieldName())));
