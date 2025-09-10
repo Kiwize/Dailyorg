@@ -30,7 +30,7 @@ public class CategoryService implements ICategoryService {
 	
 	@Override
 	public List<Category> findAllByOrganizerUser(OrganizerUser organizerUser) throws Exception {
-		return categoryRepository.findAllByOrganizerUserIdOrOrganizerUserIdIsNull(organizerUser);
+		return categoryRepository.findAllByOrganizerUserOrganizerUserIdOrOrganizerUserOrganizerUserIdIsNull(organizerUser);
 	}
 
 	@Override

@@ -13,6 +13,6 @@ import fr.nexa.dailyorg.model.dailyorg.OrganizerUser;
 public interface ICategoryRepository extends JpaRepository<Category, Long> {
 	
 	Optional<Category> findByTaskCategoryName(String taskCategoryName);
-	List<Category> findAllByOrganizerUserIdOrOrganizerUserIdIsNull(OrganizerUser organizerUserId);
+	List<Category> findAllByOrganizerUserOrganizerUserIdOrOrganizerUserOrganizerUserIdIsNull(OrganizerUser organizerUserId);
 
 }

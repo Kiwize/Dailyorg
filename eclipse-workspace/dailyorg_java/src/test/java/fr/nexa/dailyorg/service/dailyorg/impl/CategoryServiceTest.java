@@ -1,6 +1,5 @@
 package fr.nexa.dailyorg.service.dailyorg.impl;
 
-import static org.assertj.core.api.Assertions.assertThatException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -106,7 +105,7 @@ public class CategoryServiceTest {
 				.organizerUser(organizerUser)
 				.build();
 		
-		when(categoryRepository.findAllByOrganizerUserIdOrOrganizerUserIdIsNull(organizerUser)).thenReturn(List.of(category1, category2));
+		when(categoryRepository.findAllByOrganizerUserOrganizerUserIdOrOrganizerUserOrganizerUserIdIsNull(organizerUser)).thenReturn(List.of(category1, category2));
 		
 		List<Category> foundCategories = categoryService.findAllByOrganizerUser(organizerUser);
 		
@@ -119,7 +118,7 @@ public class CategoryServiceTest {
 	void testFindAllByOrganizerUser_empty() throws Exception {
 		OrganizerUser organizerUser = organizerUserFactory.createOneOrganizerUser(appUserFactory.createOneAppUser());
 		
-		when(categoryRepository.findAllByOrganizerUserIdOrOrganizerUserIdIsNull(organizerUser)).thenReturn(List.of());
+		when(categoryRepository.findAllByOrganizerUserOrganizerUserIdOrOrganizerUserOrganizerUserIdIsNull(organizerUser)).thenReturn(List.of());
 		
 		List<Category> foundCategories = categoryService.findAllByOrganizerUser(organizerUser);
 		
