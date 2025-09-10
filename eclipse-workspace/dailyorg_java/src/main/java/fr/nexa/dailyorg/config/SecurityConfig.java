@@ -41,6 +41,8 @@ public class SecurityConfig {
 				.authorizeHttpRequests(
 						auth -> auth.requestMatchers(new String[] { "/api/login", "/api/user/me", "/api/health", "/api/register", "/api/auth/status", "/api/logout", "/uploads/profile_pictures/**" })
 								.permitAll().requestMatchers("/api/**").authenticated())
+				.authorizeHttpRequests(auth -> auth.requestMatchers("/api/category/create").hasRole("ADMIN"))
+				.authorizeHttpRequests(auth -> auth.requestMatchers("/api/category/create/**").hasRole("USER"))
 				.addFilterBefore(jwtCookieAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
 				.build();
 	}

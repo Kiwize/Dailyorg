@@ -31,8 +31,6 @@ public class JwtCookieAuthenticationFilter extends OncePerRequestFilter {
 	protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
 			@NonNull FilterChain filterChain) throws ServletException, IOException, java.io.IOException {
 
-		System.err.println("JwtCookieAuthenticationFilter: Processing request for " + request.getRequestURI());
-
 		// Check if the request is for the login / register endpoint
 		if (request.getRequestURI().equals("/api/login") || request.getRequestURI().equals("/api/register")) {
 			filterChain.doFilter(request, response);
@@ -42,7 +40,6 @@ public class JwtCookieAuthenticationFilter extends OncePerRequestFilter {
 		// Read JWT from the cookie
 		Cookie[] cookies = request.getCookies();
 		if (cookies != null) {
-
 			String jwt = jwtUtil.extractJWTFromCookies(cookies);
 			String username = jwtUtil.extractUsername(jwt);
 

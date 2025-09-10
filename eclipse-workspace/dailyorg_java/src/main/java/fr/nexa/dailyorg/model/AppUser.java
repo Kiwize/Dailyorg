@@ -45,13 +45,13 @@ public class AppUser {
 	@Column(nullable = false, length = 255, unique = true)
 	private String email;
 	
-	@Column(length = 255)
+	@Column(length = 255, nullable = true)
 	private String profilepicturelink;
 	
 	@OneToMany(fetch = FetchType.EAGER)
 	@JoinColumn(name = "userId")
 	private List<WorkoutSession> workoutSessions;
 	
-	@OneToOne(mappedBy = "appUser", cascade = CascadeType.ALL)
+	@OneToOne(mappedBy = "appUser", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private OrganizerUser organizerUser;
 }

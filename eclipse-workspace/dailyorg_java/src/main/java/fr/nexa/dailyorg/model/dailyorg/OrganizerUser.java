@@ -41,7 +41,7 @@ public class OrganizerUser {
 	private int exp_points;
 	
 	@JsonIgnore
-	@OneToOne
+	@OneToOne(fetch = jakarta.persistence.FetchType.EAGER)
 	@JoinColumn(name = "userId")
 	private AppUser appUser;
 	
@@ -52,4 +52,8 @@ public class OrganizerUser {
 	@JsonIgnore
 	@OneToMany(mappedBy = "organizerUser")
 	private List<Task> tasks;
+	
+	@JsonIgnore
+	@OneToMany(mappedBy = "organizerUser")
+	private List<Category> categories;
 }

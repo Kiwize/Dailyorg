@@ -81,4 +81,8 @@ public class Task {
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "recurring_task_state")
 	private RecurringTaskState recurringTaskState;
+	
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "category")
+	private Category category;
 }
