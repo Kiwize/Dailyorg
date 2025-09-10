@@ -9,6 +9,8 @@ import { useToolbar } from '../../contexts/ToolbarProvider';
 import DOSettings from './DOSettings';
 
 import SettingsIcon from '@mui/icons-material/Settings';
+import FolderIcon from '@mui/icons-material/Folder';
+import DOCategoryForm from './DOCategoryForm';
 
 const today = new Date();
 
@@ -19,6 +21,7 @@ function DOHomePage() {
 
   // Ref to check if local settings are opened
   const [areLocalSettingsOpened, setLocalSettingsOpened] = React.useState(false);
+  const [areCategorySettingsOpened, setCategorySettingsOpened] = React.useState(false);
 
   const toolBar = useToolbar();
 
@@ -38,6 +41,15 @@ function DOHomePage() {
         icon: SettingsIcon,
         onClick: () => {
           setLocalSettingsOpened((prev) => {
+            return !prev;
+          });
+        },
+      },
+      {
+        label: 'Categories',
+        icon: FolderIcon,
+        onClick: () => {
+          setCategorySettingsOpened((prev) => {
             return !prev;
           });
         },
@@ -63,36 +75,14 @@ function DOHomePage() {
     setTodayCompletedTasks(todayCompletedTasks);
   };
 
-  const onSettingsClose = () => {
-    setLocalSettingsOpened(false);
-  };
-
-  const onUpdateSetting = (setting) => {
-    if (setting.firstDisplayedHour) {
-      //Prevents from displaying more than 24 hours
-      if (settings.displayedHours > 24 - setting.firstDisplayedHour) {
-        settings.displayedHours = 24 - setting.firstDisplayedHour;
-      }
-    }
-
-    if (setting.displayedHours) {
-      if (settings.firstDisplayedHour + setting.displayedHours > 24) {
-        settings.firstDisplayedHour = 24 - setting.displayedHours;
-      }
-    }
-
-    setSettings((prevSettings) => ({
-      ...prevSettings,
-      ...setting,
-    }));
-  };
-
   return (
     <Box>
       <Header />
       {areLocalSettingsOpened && (
-        //Centered window on the screen
-        <DOSettings onClose={onSettingsClose} onUpdateSetting={onUpdateSetting} settings={settings} />
+        <DOSettings onClose={() => setLocalSettingsOpened(false)} settings={settings} setSettings={setSettings} />
+      )}
+      {areCategorySettingsOpened && (
+        <DOCategoryForm onClose={() => setCategorySettingsOpened(false)} />
       )}
       <Typography variant="h4" sx={{ my: 2, textAlign: 'center' }}>
         Daily Organizer

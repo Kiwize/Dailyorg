@@ -1,6 +1,27 @@
 import { Box, Button } from '@mui/material';
 
-export default function DOSettings({ onClose, onUpdateSetting, settings }) {
+export default function DOSettings({ onClose, settings, setSettings }) {
+
+  const onUpdateSetting = (setting) => {
+    if (setting.firstDisplayedHour) {
+      //Prevents from displaying more than 24 hours
+      if (settings.displayedHours > 24 - setting.firstDisplayedHour) {
+        settings.displayedHours = 24 - setting.firstDisplayedHour;
+      }
+    }
+
+    if (setting.displayedHours) {
+      if (settings.firstDisplayedHour + setting.displayedHours > 24) {
+        settings.firstDisplayedHour = 24 - setting.displayedHours;
+      }
+    }
+
+    setSettings((prevSettings) => ({
+      ...prevSettings,
+      ...setting,
+    }));
+  };
+
   return (
     <Box
       sx={{

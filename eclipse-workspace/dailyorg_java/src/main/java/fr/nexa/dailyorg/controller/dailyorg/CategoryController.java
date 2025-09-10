@@ -1,9 +1,11 @@
 package fr.nexa.dailyorg.controller.dailyorg;
 
+import java.util.Optional;
 import java.util.logging.Logger;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import fr.nexa.dailyorg.config.JwtUtil;
 import fr.nexa.dailyorg.dto.dailyorg.CategoryDTO;
 import fr.nexa.dailyorg.mapper.dailyorg.CategoryMapper;
 import fr.nexa.dailyorg.model.AppUser;
@@ -21,7 +24,9 @@ import fr.nexa.dailyorg.model.dailyorg.Category;
 import fr.nexa.dailyorg.model.dailyorg.OrganizerUser;
 import fr.nexa.dailyorg.service.AppUserService;
 import fr.nexa.dailyorg.service.dailyorg.impl.CategoryService;
+import fr.nexa.dailyorg.service.dailyorg.impl.OrganizerUserService;
 import fr.nexa.dailyorg.utils.EErrorMessages;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 
 @RestController
@@ -31,7 +36,10 @@ public class CategoryController {
 
 	private final AppUserService appUserService;
 	private final CategoryService categoryService;
+	private final OrganizerUserService organizerUserService;
 	private final CategoryMapper categoryMapper;
+	
+	private final JwtUtil jwtUtil;
 	
 	@PutMapping("/create/{userId}")
 	public ResponseEntity<?> createCategory(@RequestBody CategoryDTO categoryDTO, @PathVariable Long userId) {
@@ -102,18 +110,19 @@ public class CategoryController {
 		}
 	}
 	
-	@GetMapping("/get_all_by_user/{userId}")
-	public ResponseEntity<?> getAllCategoriesByUserId(@PathVariable Long userId) {
+	@GetMapping("/get_all_by_user")
+	public ResponseEntity<?> getAllCategoriesByUserId(@NonNull HttpServletRequest request) {
 		try {
-			AppUser user = appUserService.getAppUserByID(userId);
-			if (user == null) {
+			//Extract user ID from JWT token
+			String userEmail = jwtUtil.extractUsernameFromCookies(request.getCookies());
+			
+			Optional<AppUser> user = appUserService.findByEmail(userEmail);
+			if (user.isEmpty()) {
 				throw new Exception(EErrorMessages.USER_NOT_FOUND.getMessage());
 			}
-			OrganizerUser organizerUser = user.getOrganizerUser();
-			
-			return ResponseEntity.ok(categoryService.findAllByOrganizerUser(organizerUser));
+			return ResponseEntity.ok(categoryService.findAllByOrganizerUser(user.get().getOrganizerUser().getOrganizerUserId()));
 		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error retrieving categories");
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage() + "Error retrieving categories");
 		}
 	}
 	

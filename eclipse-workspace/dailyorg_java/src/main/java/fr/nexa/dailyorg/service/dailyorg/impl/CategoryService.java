@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import fr.nexa.dailyorg.model.dailyorg.Category;
-import fr.nexa.dailyorg.model.dailyorg.OrganizerUser;
 import fr.nexa.dailyorg.repository.dailyorg.ICategoryRepository;
 import fr.nexa.dailyorg.service.dailyorg.ICategoryService;
 import jakarta.transaction.Transactional;
@@ -29,8 +28,8 @@ public class CategoryService implements ICategoryService {
 	}
 	
 	@Override
-	public List<Category> findAllByOrganizerUser(OrganizerUser organizerUser) throws Exception {
-		return categoryRepository.findAllByOrganizerUserOrganizerUserIdOrOrganizerUserOrganizerUserIdIsNull(organizerUser);
+	public List<Category> findAllByOrganizerUser(Long organizerUserId) throws Exception {
+		return categoryRepository.findAllByOrganizerUserOrganizerUserIdOrOrganizerUserOrganizerUserIdIsNull(organizerUserId);
 	}
 
 	@Override

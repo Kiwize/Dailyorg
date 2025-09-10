@@ -41,7 +41,7 @@ public class OrganizerUser {
 	private int exp_points;
 	
 	@JsonIgnore
-	@OneToOne(fetch = jakarta.persistence.FetchType.EAGER)
+	@OneToOne(fetch = jakarta.persistence.FetchType.LAZY)
 	@JoinColumn(name = "userId")
 	private AppUser appUser;
 	

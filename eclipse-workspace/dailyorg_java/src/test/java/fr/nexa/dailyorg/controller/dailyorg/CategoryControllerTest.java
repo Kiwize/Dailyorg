@@ -283,7 +283,7 @@ public class CategoryControllerTest {
 				.organizerUser(organizerUser)
 				.build();
 		
-		when(categoryService.findAllByOrganizerUser(organizerUser)).thenReturn(List.of(category1, category2));
+		when(categoryService.findAllByOrganizerUser(organizerUser.getOrganizerUserId())).thenReturn(List.of(category1, category2));
 		when(appUserService.getAppUserByID(0L)).thenReturn(appUser);
 
 		mockMvc.perform(MockMvcRequestBuilders

@@ -7,12 +7,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import fr.nexa.dailyorg.model.dailyorg.Category;
-import fr.nexa.dailyorg.model.dailyorg.OrganizerUser;
 
 @Repository
 public interface ICategoryRepository extends JpaRepository<Category, Long> {
 	
 	Optional<Category> findByTaskCategoryName(String taskCategoryName);
-	List<Category> findAllByOrganizerUserOrganizerUserIdOrOrganizerUserOrganizerUserIdIsNull(OrganizerUser organizerUserId);
+	List<Category> findAllByOrganizerUserOrganizerUserIdOrOrganizerUserOrganizerUserIdIsNull(Long organizerUserId);
 
 }

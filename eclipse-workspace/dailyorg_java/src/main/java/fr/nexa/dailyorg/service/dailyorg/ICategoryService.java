@@ -3,7 +3,6 @@ package fr.nexa.dailyorg.service.dailyorg;
 import java.util.List;
 
 import fr.nexa.dailyorg.model.dailyorg.Category;
-import fr.nexa.dailyorg.model.dailyorg.OrganizerUser;
 
 public interface ICategoryService {
 
@@ -11,7 +10,7 @@ public interface ICategoryService {
 
 	void delete(Category category) throws Exception;
 
-	List<Category> findAllByOrganizerUser(OrganizerUser organizerUser) throws Exception;
+	List<Category> findAllByOrganizerUser(Long organizerUserId) throws Exception;
 
 	Category findById(long id) throws Exception;
 

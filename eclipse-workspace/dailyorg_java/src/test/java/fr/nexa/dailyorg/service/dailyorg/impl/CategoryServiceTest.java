@@ -105,9 +105,9 @@ public class CategoryServiceTest {
 				.organizerUser(organizerUser)
 				.build();
 		
-		when(categoryRepository.findAllByOrganizerUserOrganizerUserIdOrOrganizerUserOrganizerUserIdIsNull(organizerUser)).thenReturn(List.of(category1, category2));
+		when(categoryRepository.findAllByOrganizerUserOrganizerUserIdOrOrganizerUserOrganizerUserIdIsNull(organizerUser.getOrganizerUserId())).thenReturn(List.of(category1, category2));
 		
-		List<Category> foundCategories = categoryService.findAllByOrganizerUser(organizerUser);
+		List<Category> foundCategories = categoryService.findAllByOrganizerUser(organizerUser.getOrganizerUserId());
 		
 		assertEquals(2, foundCategories.size());
 		assertEquals(category1, foundCategories.get(0));
@@ -118,9 +118,9 @@ public class CategoryServiceTest {
 	void testFindAllByOrganizerUser_empty() throws Exception {
 		OrganizerUser organizerUser = organizerUserFactory.createOneOrganizerUser(appUserFactory.createOneAppUser());
 		
-		when(categoryRepository.findAllByOrganizerUserOrganizerUserIdOrOrganizerUserOrganizerUserIdIsNull(organizerUser)).thenReturn(List.of());
+		when(categoryRepository.findAllByOrganizerUserOrganizerUserIdOrOrganizerUserOrganizerUserIdIsNull(organizerUser.getOrganizerUserId())).thenReturn(List.of());
 		
-		List<Category> foundCategories = categoryService.findAllByOrganizerUser(organizerUser);
+		List<Category> foundCategories = categoryService.findAllByOrganizerUser(organizerUser.getOrganizerUserId());
 		
 		assertEquals(0, foundCategories.size());
 	}
