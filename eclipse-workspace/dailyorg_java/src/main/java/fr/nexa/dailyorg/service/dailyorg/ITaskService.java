@@ -19,5 +19,6 @@ public interface ITaskService {
 	List<Task> getAllTasksByUserId(OrganizerUser userId);
 	List<Task> getAllTasksByUserIdAndDateRange(OrganizerUser userId, LocalDateTime startDate, LocalDateTime endDate);
 	List<Task> getAllTasksByOcurrenceUniqueId(String occurrenceUniqueId);
+	List<Task> getAllTasksByCategoryId(long idCategory);
 
 }

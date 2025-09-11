@@ -1,5 +1,6 @@
 package fr.nexa.dailyorg.controller.dailyorg;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
@@ -19,8 +20,10 @@ import fr.nexa.dailyorg.dto.dailyorg.CategoryDTO;
 import fr.nexa.dailyorg.mapper.dailyorg.CategoryMapper;
 import fr.nexa.dailyorg.model.AppUser;
 import fr.nexa.dailyorg.model.dailyorg.Category;
+import fr.nexa.dailyorg.model.dailyorg.Task;
 import fr.nexa.dailyorg.service.AppUserService;
 import fr.nexa.dailyorg.service.dailyorg.impl.CategoryService;
+import fr.nexa.dailyorg.service.dailyorg.impl.TaskService;
 import fr.nexa.dailyorg.utils.EErrorMessages;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
@@ -32,6 +35,7 @@ public class CategoryController {
 
 	private final AppUserService appUserService;
 	private final CategoryService categoryService;
+	private final TaskService taskService;
 	private final CategoryMapper categoryMapper;
 	
 	private final JwtUtil jwtUtil;
@@ -75,6 +79,14 @@ public class CategoryController {
 			
 			if(existingCategory.getOrganizerUser() == null || existingCategory.getOrganizerUser().getOrganizerUserId() != (user.get().getOrganizerUser().getOrganizerUserId())) {
 				throw new Exception(EErrorMessages.OPERATION_NOT_PERMITTED.getMessage());
+			}
+			
+			//Check for tasks using this category
+			List<Task> tasksWithCategory = taskService.getAllTasksByCategoryId(existingCategory.getIdCategory());
+			
+			for(Task t : tasksWithCategory) {
+				t.setCategory(null);
+				taskService.updateTask(t);
 			}
 			
 			categoryService.delete(category);

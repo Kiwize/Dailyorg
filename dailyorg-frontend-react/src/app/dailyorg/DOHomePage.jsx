@@ -22,6 +22,7 @@ function DOHomePage() {
   // Ref to check if local settings are opened
   const [areLocalSettingsOpened, setLocalSettingsOpened] = React.useState(false);
   const [areCategorySettingsOpened, setCategorySettingsOpened] = React.useState(false);
+  const [triggerRefresh, setTriggerRefresh] = React.useState(false);
 
   const toolBar = useToolbar();
 
@@ -82,7 +83,7 @@ function DOHomePage() {
         <DOSettings onClose={() => setLocalSettingsOpened(false)} settings={settings} setSettings={setSettings} />
       )}
       {areCategorySettingsOpened && (
-        <DOCategoryForm onClose={() => setCategorySettingsOpened(false)} />
+        <DOCategoryForm onClose={() => setCategorySettingsOpened(false)} calendarRefreshCallback={triggerRefresh} />
       )}
       <Typography variant="h4" sx={{ my: 2, textAlign: 'center' }}>
         Daily Organizer
@@ -96,7 +97,7 @@ function DOHomePage() {
           mb: 2,
         }}
       >
-        <WeekViewCalendar calendarRefreshCallback={handleCalendarWeekTaskRefresh} settings={settings} />
+        <WeekViewCalendar calendarRefreshCallback={handleCalendarWeekTaskRefresh} settings={settings} calendarRefreshTrigger={triggerRefresh} />
       </Box>
 
       <Grid2 container columns={12} spacing={2} sx={{ mt: 2 }} justifyContent="center" alignItems="center" direction="row">

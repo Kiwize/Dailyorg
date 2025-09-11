@@ -158,4 +158,9 @@ public class TaskService implements ITaskService {
 		}
 		return false;
 	}
+	
+	@Override
+	public List<Task> getAllTasksByCategoryId(long idCategory) {
+		return taskRepository.findAllByCategory_IdCategory(idCategory);
+	}
 }

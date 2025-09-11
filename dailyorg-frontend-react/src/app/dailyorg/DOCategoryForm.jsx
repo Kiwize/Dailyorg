@@ -8,12 +8,16 @@ import EditOffIcon from '@mui/icons-material/EditOff';
 import useAlert from "../../hooks/useAlert";
 
 
-export default function DOCategoryForm({ onClose }) {
+export default function DOCategoryForm({ onClose, calendarRefreshCallback }) {
     const alert = useAlert();
 
     const [selectedCategoryId, setSelectedCategoryId] = React.useState(null);
     const [category, setCategory] = React.useState({ name: '', color: '#000000' });
     const [categories, setCategories] = React.useState([]);
+
+    const triggerRefresh = () => {
+        calendarRefreshCallback = !calendarRefreshCallback;
+    }
 
     //When component in mounted, load user's categories from backend
     const fetchCategories = async () => {
@@ -124,6 +128,8 @@ export default function DOCategoryForm({ onClose }) {
                                                     }, false, false, true);
                                                     if (result.status === 200) {
                                                         setCategories((prev) => prev.filter((c) => c.idCategory !== cat.idCategory));
+                                                        triggerRefresh();
+                                                        alert.setAlert('Category deleted successfully', 'success');
                                                     } else {
                                                         alert.setAlert('Error deleting category', 'error');
                                                     }

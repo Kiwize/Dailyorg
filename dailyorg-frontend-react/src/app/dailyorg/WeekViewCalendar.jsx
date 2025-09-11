@@ -11,11 +11,14 @@ import TaskAddUpdateForm from './TaskAddUpdateForm';
 import useLoading from '../../hooks/useLoading';
 import LoadingScreen from '../../components/LoadingScreen';
 
-export default function WeekViewCalendar({ calendarRefreshCallback, settings }) {
+export default function WeekViewCalendar({ calendarRefreshCallback, settings, triggerRefresh }) {
   const [isAddFormShown, setIsAddFormShown] = useState(false);
-  const [triggerRefresh, setTriggerRefresh] = useState(false);
   const alert = useAlert();
   const loading = useLoading();
+
+  const setTriggerRefresh = (value) => {
+    triggerRefresh = value;
+  }
 
   const [selectedTask, setSelectedTask] = useState(null);
 
