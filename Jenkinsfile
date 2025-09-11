@@ -77,7 +77,8 @@ pipeline {
                     name: 'ubuntudev-server',
                     host: '192.168.1.100',
                     user: 'dev',
-                    credentialsId: 'ssh-credentials-ubuntudev-server'
+                    credentialsId: 'ssh-credentials-ubuntudev-server',
+                    allowAnyHosts: true
                 ], command: 'bash /var/www/html/dailyorg.thomaspradeau.com/Dailyorg/deploy_containers.sh'
             }
         }
