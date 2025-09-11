@@ -34,7 +34,7 @@ export default function WeekViewCalendar({ calendarRefreshCallback, settings }) 
     priority: 'Low',
     energy: 1,
     wasTaskMarkedDone: false,
-    isRecurrent: false,
+    is_recurrent: false,
     repeatFrequency: null,
     repeatEndDate: '',
   });
@@ -111,7 +111,7 @@ export default function WeekViewCalendar({ calendarRefreshCallback, settings }) 
         priority: 'Low',
         energy: 1,
         wasTaskMarkedDone: false,
-        isRecurrent: false,
+        is_recurrent: false,
         repeatFrequency: null,
         repeatEndDate: '',
       });
@@ -325,6 +325,8 @@ export default function WeekViewCalendar({ calendarRefreshCallback, settings }) 
   }
 
   function updateTaskAfterDrag(task, newStartDate, newEndDate) {
+      console.log('Updating task after drag:', task, newStartDate, newEndDate);
+
     // Update the task position in the backend
     callApi(
       'PUT',
@@ -339,6 +341,9 @@ export default function WeekViewCalendar({ calendarRefreshCallback, settings }) 
         task_end_date: newEndDate.toLocaleString('sv-SE').replace(' ', 'T'),
         task_description: task.taskDescription,
         task_required_energy: parseInt(task.taskRequiredEnergy, 10),
+        is_recurrent: task.recurringTaskState !== null,
+        task_repeat_frequency: task.recurringTaskState ? task.recurringTaskState.recurringTaskStateId : null,
+        task_repeat_end_date: task.recurrenceEndDate ? task.recurrenceEndDate.split('T')[0] : null,
         task_priority: task.taskPriority.taskPriorityName,
       },
       {},

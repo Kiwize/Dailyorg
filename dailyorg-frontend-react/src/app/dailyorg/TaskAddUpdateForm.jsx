@@ -300,7 +300,7 @@ export default function TaskAddUpdateForm({
           </Box>
           {showTaskOccurrenceConfig && (
             <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-              <Button variant="contained" color="success" type="submit" sx={{ mt: 2 }}>
+              <Button variant="contained" color="success" type='submit' onClick={(e) => handleAddTaskFormSubmit(e)} sx={{ mt: 2 }}>
                 {isEditingTask ? 'Update Task' : 'Add Task'}
               </Button>
               {isEditingTask && (
