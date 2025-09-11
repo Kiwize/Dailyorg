@@ -241,6 +241,10 @@ public class TaskController {
 
 			if (user.isPresent()) {
 				AppUser appUser = user.get();
+				
+				// Ensure the user has an organizer profile
+				checkProfile(appUser);
+				
 				List<Task> tasks = taskService.getAllTasksByUserIdAndDateRange(appUser.getOrganizerUser(), LocalDateTime.parse(data.get("start_date")), LocalDateTime.parse(data.get("end_date")));
 
 				return ResponseEntity.ok(tasks);

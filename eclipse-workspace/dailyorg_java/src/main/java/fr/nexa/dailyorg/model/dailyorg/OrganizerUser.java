@@ -31,13 +31,13 @@ public class OrganizerUser {
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long organizerUserId;
 
-	@Column(nullable = false)
+	@Column(nullable = false, unique = false)
 	private int calendarFirstShownHour;
 	
-	@Column(nullable = false)
+	@Column(nullable = false, unique = false)
 	private int calendarTotalShownHours;
 	
-	@Column(nullable = false)
+	@Column(nullable = false, unique = false)
 	private int exp_points;
 	
 	@JsonIgnore

@@ -26,6 +26,20 @@ services:
     networks:
       - dailyorg-app-network
 
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: dailyorg_phpmyadmin
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    ports:
+      - "3307:80"
+    depends_on:
+      - mysql
+    networks:
+      - dailyorg-app-network
+
 networks:
   dailyorg-app-network:
     driver: bridge

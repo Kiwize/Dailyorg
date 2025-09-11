@@ -6,6 +6,14 @@ export default function LoadingScreen({ message = 'Loading...' }) {
   return (
     <Box
       sx={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        backgroundColor: 'rgba(0, 0, 0, 0.7)',
+        color: '#ffffff',
+        zIndex: 1300,
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',

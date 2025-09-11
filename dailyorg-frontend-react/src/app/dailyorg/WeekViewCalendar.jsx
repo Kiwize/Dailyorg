@@ -8,11 +8,14 @@ import useAlert from '../../hooks/useAlert';
 import VisualTimeIndicator from './VisualTimeIndicator';
 import OutsideHoursTask from './OutsideHoursTask';
 import TaskAddUpdateForm from './TaskAddUpdateForm';
+import useLoading from '../../hooks/useLoading';
+import LoadingScreen from '../../components/LoadingScreen';
 
 export default function WeekViewCalendar({ calendarRefreshCallback, settings }) {
   const [isAddFormShown, setIsAddFormShown] = useState(false);
   const [triggerRefresh, setTriggerRefresh] = useState(false);
   const alert = useAlert();
+  const loading = useLoading();
 
   const [selectedTask, setSelectedTask] = useState(null);
 
@@ -22,6 +25,7 @@ export default function WeekViewCalendar({ calendarRefreshCallback, settings }) 
   // State for form fields
   const [taskData, setTaskData] = React.useState({
     id: '',
+    category: null,
     taskName: '',
     startTime: '',
     endTime: '',
@@ -125,7 +129,7 @@ export default function WeekViewCalendar({ calendarRefreshCallback, settings }) 
 
     setTaskData({
       id: task.id,
-      category: task.category.idCategory,
+      category: task.category ? task.category.idCategory : null,
       taskName: task.taskName,
       startTime: task.taskStartDate,
       endTime: task.taskEndDate,
@@ -138,8 +142,6 @@ export default function WeekViewCalendar({ calendarRefreshCallback, settings }) 
       repeatFrequency: task.recurringTaskState ? task.recurringTaskState.recurringTaskStateId : null,
       repeatEndDate: task.recurringTaskState ? task.recurrenceEndDate.split('T')[0] : null,
     });
-
-    console.log('Selected task for editing:', task);
 
     setTriggerRefresh(!triggerRefresh);
   };
@@ -215,6 +217,8 @@ export default function WeekViewCalendar({ calendarRefreshCallback, settings }) 
   };
 
   const retrieveTasksForWeek = async (forceRefresh = false) => {
+    loading.setIsLoading(true);
+    
     // Fetch tasks for the current week from the backend
     var taskData = [];
     var currentWeekKey = getCacheKeyFromDate(startOfCurrentWeek);
@@ -292,6 +296,8 @@ export default function WeekViewCalendar({ calendarRefreshCallback, settings }) 
       });
 
       visualIndicators.push(time);
+
+      loading.setIsLoading(false);
     }
 
     if (settings.displayedHours <= 8) {

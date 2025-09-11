@@ -5,15 +5,18 @@ import App from './App.jsx';
 import { AlertProvider } from './contexts/AlertProvider.jsx';
 import { ToolbarProvider } from './contexts/ToolbarProvider.jsx';
 import BackendChecker from './contexts/BackendChecker.jsx';
+import LoadingContext, { LoadingProvider } from './contexts/LoadingContext.jsx';
 
 createRoot(document.getElementById('root')).render(
   <BackendChecker>
     <AlertProvider>
-      <StrictMode>
-        <ToolbarProvider>
-          <App />
-        </ToolbarProvider>
-      </StrictMode>
+      <LoadingProvider>
+        <StrictMode>
+          <ToolbarProvider>
+            <App />
+          </ToolbarProvider>
+        </StrictMode>
+      </LoadingProvider>
     </AlertProvider>
   </BackendChecker>
 );
