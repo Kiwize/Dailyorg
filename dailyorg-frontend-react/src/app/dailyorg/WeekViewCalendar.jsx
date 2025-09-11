@@ -32,7 +32,7 @@ export default function WeekViewCalendar({ calendarRefreshCallback, settings }) 
     description: '',
     isCompleted: false,
     priority: 'Low',
-    energy: '',
+    energy: 1,
     wasTaskMarkedDone: false,
     isRecurrent: false,
     repeatFrequency: null,
@@ -42,7 +42,6 @@ export default function WeekViewCalendar({ calendarRefreshCallback, settings }) 
   const [isEditingTask, setIsEditingTask] = useState(false);
 
   // Stores all the tasks for the selected week
-
   const [selectedWeekTasks, setSelectedWeekTasks] = useState([]);
   const [visualTimeIndicators, setVisualTimeIndicators] = useState([]);
 
@@ -61,12 +60,11 @@ export default function WeekViewCalendar({ calendarRefreshCallback, settings }) 
   });
 
   useEffect(() => {
-    retrieveTasksForWeek();
+    retrieveTasksForWeek(false, false);
   }, [settings, triggerRefresh]);
 
   useEffect(() => {
     // Fetch tasks for the current week when the component mounts
-
     if (!localStorage.getItem('tasks.calendar.cache_' + localStorage.getItem('username'))) {
       //Delete previous cache if it exists
       for (let i = localStorage.length - 1; i >= 0; i--) {
@@ -104,14 +102,14 @@ export default function WeekViewCalendar({ calendarRefreshCallback, settings }) 
     if (!newState) {
       setTaskData({
         id: '',
-        taskCategory: null,
+        category: null,
         taskName: '',
         startTime: '',
         endTime: '',
         description: '',
         isCompleted: false,
         priority: 'Low',
-        energy: '',
+        energy: 1,
         wasTaskMarkedDone: false,
         isRecurrent: false,
         repeatFrequency: null,
@@ -176,7 +174,7 @@ export default function WeekViewCalendar({ calendarRefreshCallback, settings }) 
 
   const handleAddTaskFormSubmit = async (event) => {
     event.preventDefault();
-    console.log('Submitting task data:', taskData);
+    console.log(`Submitting task data for '${isEditingTask ? 'edit' : 'new'}':`, taskData);
 
     if (taskData.isRecurrent && taskData.repeatEndDate == null) {
       alert.setAlert('Please provide both repeat frequency and end date for recurring tasks.', 'error');
@@ -216,9 +214,9 @@ export default function WeekViewCalendar({ calendarRefreshCallback, settings }) 
     }
   };
 
-  const retrieveTasksForWeek = async (forceRefresh = false) => {
-    loading.setIsLoading(true);
-    
+  const retrieveTasksForWeek = async (forceRefresh = false, showLoadingScreen = true) => {
+    loading.setIsLoading(showLoadingScreen);
+
     // Fetch tasks for the current week from the backend
     var taskData = [];
     var currentWeekKey = getCacheKeyFromDate(startOfCurrentWeek);
@@ -322,7 +320,7 @@ export default function WeekViewCalendar({ calendarRefreshCallback, settings }) 
     selectedTask.taskStartDate = x.toLocaleString('sv-SE').replace(' ', 'T');
     selectedTask.taskEndDate = y.toLocaleString('sv-SE').replace(' ', 'T');
 
-    retrieveTasksForWeek(false);
+    retrieveTasksForWeek(false, false);
     setTriggerRefresh(!triggerRefresh);
   }
 
@@ -333,7 +331,7 @@ export default function WeekViewCalendar({ calendarRefreshCallback, settings }) 
       'task/update_task',
       {
         task_id: task.id,
-        task_category_id: task.taskCategory ? task.taskCategory.idCategory : null,
+        task_category_id: task.category ? task.category.idCategory : null,
         is_task_completed: task.isCompleted,
         task_name: task.taskName,
         user_email: localStorage.getItem('username'),
@@ -349,7 +347,7 @@ export default function WeekViewCalendar({ calendarRefreshCallback, settings }) 
     )
       .then(() => {
         // Refresh the tasks after updating
-        retrieveTasksForWeek(true);
+        retrieveTasksForWeek(true, false);
         setTriggerRefresh(!triggerRefresh);
       })
       .catch((error) => {
