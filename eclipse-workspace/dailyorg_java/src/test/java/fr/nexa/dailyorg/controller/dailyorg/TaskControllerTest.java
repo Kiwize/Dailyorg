@@ -37,6 +37,7 @@ import fr.nexa.dailyorg.components.factory.dailyorg.TaskFactory;
 import fr.nexa.dailyorg.components.factory.dailyorg.TaskPriorityFactory;
 import fr.nexa.dailyorg.config.JwtUtil;
 import fr.nexa.dailyorg.model.AppUser;
+import fr.nexa.dailyorg.model.dailyorg.Category;
 import fr.nexa.dailyorg.model.dailyorg.OrganizerUser;
 import fr.nexa.dailyorg.model.dailyorg.RecurringTaskState;
 import fr.nexa.dailyorg.model.dailyorg.Task;
@@ -113,6 +114,75 @@ class TaskControllerTest {
 		.andExpect(status().isOk())
 		.andExpect(content().string("Task and profile created..."));
 	}
+	
+
+	@Test
+	void testCreateTask_withValidDataAndOrganizerProfileAndCategory_returnsOk() throws Exception {
+		Map<String, String> requestBody = new HashMap<>();
+		
+		requestBody.put(ETaskControllerFields.TASK_NAME.getFieldName(), "Test task");
+		requestBody.put(ETaskControllerFields.TASK_DESCRIPTION.getFieldName(), "This is a test task");
+		requestBody.put(ETaskControllerFields.TASK_START_DATE.getFieldName(), LocalDateTime.now().toString());
+		requestBody.put(ETaskControllerFields.TASK_END_DATE.getFieldName(), LocalDateTime.now().plusHours(1).toString());
+		requestBody.put(ETaskControllerFields.TASK_REQUIRED_ENERGY.getFieldName(), "1");
+		requestBody.put(ETaskControllerFields.TASK_PRIORITY.getFieldName(), "High");
+		requestBody.put(ETaskControllerFields.TASK_CATEGORY_ID.getFieldName(), "1");
+		
+		TaskPriority taskPriority = taskPriorityFactory.createOneTaskPriority("High", 3);
+		when(taskPriorityService.getTaskPriorityByTaskPriorityName("High")).thenReturn(Optional.of(taskPriority));
+		
+		AppUser appUser = appUserFactory.createOneAppUser();
+		appUser.setOrganizerUser(organizerUserFactory.createOneOrganizerUser());
+		
+		Category category = Category.builder()
+				.idCategory(1L)
+				.taskCategoryName("Test category")
+				.taskCategoryColor("#FFFFFF")
+				.organizerUser(appUser.getOrganizerUser())
+				.build();
+		
+		when(categoryService.findById(eq(1L))).thenReturn(category);
+		
+		when(jwtUtil.extractUsernameFromCookies(any())).thenReturn("test@test.fr");
+		when(appUserService.findByEmail("test@test.fr")).thenReturn(Optional.of(appUser));
+		
+		mockMvc.perform(put("/api/task/create_task")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(requestBody))
+				)
+		.andExpect(status().isOk())
+		.andExpect(content().string("Task created..."));
+	}
+	
+	@Test
+	void testCreateTask_withValidDataAndOrganizerProfileAndNullCategory_returnsOk() throws Exception {
+		Map<String, String> requestBody = new HashMap<>();
+		
+		requestBody.put(ETaskControllerFields.TASK_NAME.getFieldName(), "Test task");
+		requestBody.put(ETaskControllerFields.TASK_DESCRIPTION.getFieldName(), "This is a test task");
+		requestBody.put(ETaskControllerFields.TASK_START_DATE.getFieldName(), LocalDateTime.now().toString());
+		requestBody.put(ETaskControllerFields.TASK_END_DATE.getFieldName(), LocalDateTime.now().plusHours(1).toString());
+		requestBody.put(ETaskControllerFields.TASK_REQUIRED_ENERGY.getFieldName(), "1");
+		requestBody.put(ETaskControllerFields.TASK_PRIORITY.getFieldName(), "High");
+		requestBody.put(ETaskControllerFields.TASK_CATEGORY_ID.getFieldName(), "1");
+		
+		TaskPriority taskPriority = taskPriorityFactory.createOneTaskPriority("High", 3);
+		when(taskPriorityService.getTaskPriorityByTaskPriorityName("High")).thenReturn(Optional.of(taskPriority));
+		
+		AppUser appUser = appUserFactory.createOneAppUser();
+		appUser.setOrganizerUser(organizerUserFactory.createOneOrganizerUser());
+		
+		when(jwtUtil.extractUsernameFromCookies(any())).thenReturn("test@test.fr");
+		when(appUserService.findByEmail("test@test.fr")).thenReturn(Optional.of(appUser));
+		
+		mockMvc.perform(put("/api/task/create_task")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(requestBody))
+				)
+		.andExpect(status().isOk())
+		.andExpect(content().string("Task created..."));
+	}
+		
 	
 	@Test
 	void testCreateTask_withValidDataAndOrganizerProfile_returnsOk() throws Exception {
@@ -353,6 +423,75 @@ class TaskControllerTest {
 		requestBody.put(ETaskControllerFields.TASK_END_DATE.getFieldName(), existingTask.getTaskEndDate().toString());
 		requestBody.put(ETaskControllerFields.TASK_REQUIRED_ENERGY.getFieldName(), Integer.toString(existingTask.getTaskRequiredEnergy()));
 		requestBody.put(ETaskControllerFields.TASK_PRIORITY.getFieldName(), existingTask.getTaskPriority().getTaskPriorityName());
+		
+		when(taskPriorityService.getTaskPriorityByTaskPriorityName(existingTask.getTaskPriority().getTaskPriorityName()))
+			.thenReturn(Optional.of(existingTask.getTaskPriority()));
+		
+		when(appUserService.findByEmail(any())).thenReturn(Optional.of(existingTask.getOrganizerUser().getAppUser()));
+		
+		when(taskService.updateTask(any(Task.class))).thenReturn(existingTask);
+		
+		mockMvc.perform(put("/api/task/update_task")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(requestBody))
+				)
+		.andExpect(status().isOk())
+		.andExpect(content().string("Task updated successfully..."));
+	}
+	
+	@Test
+	void testUpdateTask_withValidDataAndCategory_returnsOk() throws Exception {
+		Task existingTask = taskFactory.createOneTaskWithOrganizerUserAndTaskPriority(organizerUserFactory, appUserFactory, taskPriorityFactory);
+		when(taskService.getTaskById(1L)).thenReturn(existingTask);
+		
+		Map<String, String> requestBody = new HashMap<>();
+		
+		requestBody.put(ETaskControllerFields.TASK_ID.getFieldName(), "1");
+		requestBody.put(ETaskControllerFields.TASK_NAME.getFieldName(), existingTask.getTaskName());
+		requestBody.put(ETaskControllerFields.TASK_START_DATE.getFieldName(), existingTask.getTaskStartDate().toString());
+		requestBody.put(ETaskControllerFields.TASK_END_DATE.getFieldName(), existingTask.getTaskEndDate().toString());
+		requestBody.put(ETaskControllerFields.TASK_REQUIRED_ENERGY.getFieldName(), Integer.toString(existingTask.getTaskRequiredEnergy()));
+		requestBody.put(ETaskControllerFields.TASK_PRIORITY.getFieldName(), existingTask.getTaskPriority().getTaskPriorityName());
+		requestBody.put(ETaskControllerFields.TASK_CATEGORY_ID.getFieldName(), "1");
+		
+		Category category = Category.builder()
+				.idCategory(1L)
+				.taskCategoryName("Test category")
+				.taskCategoryColor("#FFFFFF")
+				.organizerUser(existingTask.getOrganizerUser())
+				.build();
+		
+		when(categoryService.findById(eq(1L))).thenReturn(category);
+		
+		when(taskPriorityService.getTaskPriorityByTaskPriorityName(existingTask.getTaskPriority().getTaskPriorityName()))
+			.thenReturn(Optional.of(existingTask.getTaskPriority()));
+		
+		when(appUserService.findByEmail(any())).thenReturn(Optional.of(existingTask.getOrganizerUser().getAppUser()));
+		
+		when(taskService.updateTask(any(Task.class))).thenReturn(existingTask);
+		
+		mockMvc.perform(put("/api/task/update_task")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(requestBody))
+				)
+		.andExpect(status().isOk())
+		.andExpect(content().string("Task updated successfully..."));
+	}
+	
+	@Test
+	void testUpdateTask_withValidDataAndNullCategory_returnsOk() throws Exception {
+		Task existingTask = taskFactory.createOneTaskWithOrganizerUserAndTaskPriority(organizerUserFactory, appUserFactory, taskPriorityFactory);
+		when(taskService.getTaskById(1L)).thenReturn(existingTask);
+		
+		Map<String, String> requestBody = new HashMap<>();
+		
+		requestBody.put(ETaskControllerFields.TASK_ID.getFieldName(), "1");
+		requestBody.put(ETaskControllerFields.TASK_NAME.getFieldName(), existingTask.getTaskName());
+		requestBody.put(ETaskControllerFields.TASK_START_DATE.getFieldName(), existingTask.getTaskStartDate().toString());
+		requestBody.put(ETaskControllerFields.TASK_END_DATE.getFieldName(), existingTask.getTaskEndDate().toString());
+		requestBody.put(ETaskControllerFields.TASK_REQUIRED_ENERGY.getFieldName(), Integer.toString(existingTask.getTaskRequiredEnergy()));
+		requestBody.put(ETaskControllerFields.TASK_PRIORITY.getFieldName(), existingTask.getTaskPriority().getTaskPriorityName());
+		requestBody.put(ETaskControllerFields.TASK_CATEGORY_ID.getFieldName(), "1");
 		
 		when(taskPriorityService.getTaskPriorityByTaskPriorityName(existingTask.getTaskPriority().getTaskPriorityName()))
 			.thenReturn(Optional.of(existingTask.getTaskPriority()));

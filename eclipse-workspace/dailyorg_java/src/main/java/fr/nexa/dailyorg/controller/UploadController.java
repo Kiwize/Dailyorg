@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.NoSuchAlgorithmException;
 import java.util.Optional;
 import java.util.logging.Logger;
 
@@ -38,7 +39,7 @@ public class UploadController {
 
 	@PostMapping("/profile_picture")
 	public ResponseEntity<String> uploadProfilePicture(@RequestParam("profilePicture") MultipartFile profilePicture,
-			@NonNull HttpServletRequest request) throws IOException {
+			@NonNull HttpServletRequest request) throws IOException, NoSuchAlgorithmException {
 		if (profilePicture.isEmpty()) {
 			return ResponseEntity.badRequest().body("No file uploaded");
 		}

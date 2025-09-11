@@ -28,6 +28,7 @@ import fr.nexa.dailyorg.model.dailyorg.Category;
 import fr.nexa.dailyorg.model.dailyorg.OrganizerUser;
 import fr.nexa.dailyorg.service.AppUserService;
 import fr.nexa.dailyorg.service.dailyorg.impl.CategoryService;
+import fr.nexa.dailyorg.service.dailyorg.impl.TaskService;
 
 @WebMvcTest(CategoryController.class)
 @AutoConfigureMockMvc(addFilters = false)
@@ -41,6 +42,9 @@ public class CategoryControllerTest {
 
 	@MockitoBean
 	private AppUserService appUserService;
+	
+	@MockitoBean
+	private TaskService taskService;
 	
 	@MockitoBean
 	private CategoryMapper categoryMapper;
