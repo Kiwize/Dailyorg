@@ -73,13 +73,17 @@ pipeline {
 
         stage('SSH Deploy') {
             steps {
-                sshCommand remote: [
-                    name: 'ubuntudev-server',
-                    host: '192.168.1.100',
-                    user: 'dev',
-                    credentialsId: 'ssh-credentials-ubuntudev-server',
-                    allowAnyHosts: true
-                ], command: 'bash /var/www/html/dailyorg.thomaspradeau.com/Dailyorg/deploy_containers.sh'
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'ssh-credentials-ubuntudev-server', usernameVariable: 'SSH_USER', passwordVariable: 'SSH_PASS')]) {
+                        def remote = [:]
+                        remote.name = 'ubuntudev-server'
+                        remote.host = '192.168.1.100'
+                        remote.user = env.SSH_USER
+                        remote.password = env.SSH_PASS
+                        remote.allowAnyHosts = true
+                        sshCommand remote: remote, command: 'bash /var/www/html/dailyorg.thomaspradeau.com/Dailyorg/deploy_containers.sh'
+                    }
+                }
             }
         }
     }
