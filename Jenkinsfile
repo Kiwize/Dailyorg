@@ -70,6 +70,17 @@ pipeline {
                 }
             }
         }
+
+        stage('SSH Deploy') {
+            steps {
+                sshCommand remote: [
+                    name: 'ubuntudev-server',
+                    host: '192.168.1.100',
+                    user: 'dev',
+                    credentialsId: 'ssh-credentials-ubuntudev-server'
+                ], command: 'bash /var/www/html/dailyorg.thomaspradeau.com/Dailyorg/deploy_containers.sh'
+            }
+        }
     }
 
     post {
