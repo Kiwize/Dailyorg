@@ -81,7 +81,7 @@ pipeline {
                         remote.user = env.SSH_USER
                         remote.password = env.SSH_PASS
                         remote.allowAnyHosts = true
-                        sshCommand remote: remote, command: 'bash /var/www/html/dailyorg.thomaspradeau.com/Dailyorg/deploy_containers.sh'
+                        sshCommand remote: remote, command: '''cd /var/www/html/dailyorg.thomaspradeau.com/Dailyorg/ && bash deploy_containers.sh'''
                     }
                 }
             }
