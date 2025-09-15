@@ -40,8 +40,6 @@ public class AuthController {
 
 	@GetMapping("/auth/status")
 	public ResponseEntity<String> getAuthStatus(HttpServletRequest request) {
-		System.err.println("Checking authentication status...");
-		
 		Cookie[] cookies = request.getCookies();
 		if (cookies == null) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No authentication cookie found.");
@@ -70,8 +68,6 @@ public class AuthController {
 	 */
 	@PostMapping("/login")
 	public ResponseEntity<?> login(@RequestBody Map<String, String> credentials, HttpServletResponse response) {
-		System.err.println(response.getStatus());
-
 		Map<String, String> result = new HashMap<>();
 		String email = credentials.get("email");
 		String password = credentials.get("password");
@@ -103,7 +99,6 @@ public class AuthController {
 	public ResponseEntity<?> register(@RequestBody Map<String, String> user, HttpServletResponse response) {
 		try {
 			Map<String, String> result = new HashMap<>();
-		
 
 			String firstname = user.get("firstName");
 			String lastname = user.get("lastName");
@@ -193,13 +188,12 @@ public class AuthController {
 	 */
 	private void addJwtToCookie(HttpServletResponse response, String jwtToken) {
 		Cookie cookie = new Cookie("jwt", jwtToken);
-		cookie.setHttpOnly(true);
-		cookie.setSecure(false);
-		cookie.setPath("/");
+		cookie.setHttpOnly(true); //Hides cookie from client side scripts
+		cookie.setSecure(false); // Should be true in production with HTTPS (test only)
+		cookie.setPath("/"); 
 		cookie.setMaxAge(10 * 60 * 60); // 10 hours
 		response.addCookie(cookie);
 
-		response.addHeader("Set-Cookie",
-				"jwt=" + jwtToken + "; HttpOnly; Secure; SameSite=None; Path=/; Max-Age=36000");
+		response.addHeader("Set-Cookie", "jwt=" + jwtToken + "; HttpOnly; Secure; SameSite=None; Path=/; Max-Age=36000");
 	}
 }

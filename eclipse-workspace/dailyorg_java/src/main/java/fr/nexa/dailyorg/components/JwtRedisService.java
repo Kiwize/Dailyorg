@@ -14,12 +14,21 @@ public class JwtRedisService {
 
 	private final StringRedisTemplate redisTemplate;
 
-	// Stocke le token avec une durée d’expiration
+	/**
+	 * Stores a token in Redis with a specified duration.
+	 * @param token
+	 * @param duration
+	 * @param unit
+	 */
 	public void storeToken(String token, long duration, TimeUnit unit) {
 		redisTemplate.opsForValue().set(token, "valid", duration, unit);
 	}
 
-	// Vérifie si le token existe en base
+	/**
+	 * Checks if a token is valid (exists in Redis).
+	 * @param token
+	 * @return
+	 */
 	public boolean isTokenValid(String token) {
 		if(token == null || token.isEmpty()) {
 			return false;
@@ -27,7 +36,10 @@ public class JwtRedisService {
 		return redisTemplate.hasKey(token);
 	}
 
-	// Supprime le token (pour une déconnexion ou révocation)
+	/**
+	 * Deletes a token from Redis.
+	 * @param token
+	 */
 	public void deleteToken(String token) {
 		redisTemplate.delete(token);
 	}
