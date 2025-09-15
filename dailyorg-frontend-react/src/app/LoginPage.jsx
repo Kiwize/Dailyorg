@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Box, Button, Input, Paper, Typography } from "@mui/material";
 import { useNavigate } from "react-router";
 import useAlert from "../hooks/useAlert";
-import { sha256 } from "js-sha256";
+
 const API_URL = import.meta.env.VITE_API_URL;
 
 function LoginPage() {
@@ -10,12 +10,9 @@ function LoginPage() {
     const alert = useAlert();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [error, setError] = useState("");
 
     const handleLogin = async (e) => {
         e.preventDefault();
-
-        setError("");
 
         try {
             const response = await fetch(`${API_URL}/api/login`, {
@@ -25,9 +22,12 @@ function LoginPage() {
                 body: JSON.stringify({ email, password })
             });
 
-            if (!response.ok) {
+            if (!response.ok && response.status === 403) {
                 alert.setAlert("Invalid email or password", "error");
-                throw new Error("Invalid email or password");
+                return;
+            } else if (!response.ok) {
+                alert.setAlert("An error occurred, please try again later.", "error");
+                return;
             }
 
             await response.json();
@@ -35,6 +35,7 @@ function LoginPage() {
 
             navigate("/");
         } catch (err) {
+            alert.setAlert("Login failed. Please try again.", "error");
         }
     };
 
@@ -49,7 +50,6 @@ function LoginPage() {
                     </Box>
                     <Button type="submit" variant="contained" size="large">Login</Button>
                 </form>
-                {error && <p style={{ color: "red" }}>{error}</p>}
             </Paper>
             <Button
                 variant="text"
@@ -58,11 +58,6 @@ function LoginPage() {
             >
                 Don't have an account? Register
             </Button>
-            {
-                error && <Typography variant="body2" color="error" sx={{ mt: 2 }}>
-                    {`${API_URL}/api/login`}
-                </Typography>
-            }
         </Box>
     );
 }
