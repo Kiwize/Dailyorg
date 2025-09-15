@@ -188,18 +188,18 @@ export default function WeekViewCalendar({ calendarRefreshCallback, settings, tr
         'PUT',
         `task/${isEditingTask ? 'update_task' : 'create_task'}`,
         {
-          task_id: isEditingTask ? taskData.id : null, // Only include task_id if editing
-          task_category_id: taskData.category ? taskData.category : null,
-          is_task_completed: taskData.isCompleted,
-          task_name: taskData.taskName,
-          task_start_date: taskData.startTime,
-          task_end_date: taskData.endTime,
-          task_description: taskData.description,
-          task_required_energy: parseInt(taskData.energy, 10),
-          task_priority: taskData.priority,
-          is_recurrent: taskData.isRecurrent,
-          task_repeat_frequency: taskData.isRecurrent ? taskData.repeatFrequency : null,
-          task_repeat_end_date: taskData.isRecurrent ? taskData.repeatEndDate : null,
+          taskId: isEditingTask ? taskData.id : null, // Only include task_id if editing
+          taskCategoryId: taskData.category ? taskData.category : null,
+          isTaskCompleted: taskData.isCompleted,
+          taskName: taskData.taskName,
+          taskStartDate: taskData.startTime,
+          taskEndDate: taskData.endTime,
+          taskDescription: taskData.description,
+          taskRequiredEnergy: parseInt(taskData.energy, 10),
+          taskPriority: taskData.priority,
+          isRecurrent: taskData.isRecurrent,
+          taskRepeatFrequencyId: taskData.isRecurrent ? taskData.repeatFrequency : null,
+          taskRepeatEndDate: taskData.isRecurrent ? taskData.repeatEndDate : null,
         },
         {},
         true,
@@ -326,40 +326,40 @@ export default function WeekViewCalendar({ calendarRefreshCallback, settings, tr
     setTriggerRefresh(!triggerRefresh);
   }
 
-  function updateTaskAfterDrag(task, newStartDate, newEndDate) {
-      console.log('Updating task after drag:', task, newStartDate, newEndDate);
-
+  async function updateTaskAfterDrag(task, newStartDate, newEndDate) {
+ 
     // Update the task position in the backend
-    callApi(
+    const result = await callApi(
       'PUT',
       'task/update_task',
       {
-        task_id: task.id,
-        task_category_id: task.category ? task.category.idCategory : null,
-        is_task_completed: task.isCompleted,
-        task_name: task.taskName,
-        user_email: localStorage.getItem('username'),
-        task_start_date: newStartDate.toLocaleString('sv-SE').replace(' ', 'T'),
-        task_end_date: newEndDate.toLocaleString('sv-SE').replace(' ', 'T'),
-        task_description: task.taskDescription,
-        task_required_energy: parseInt(task.taskRequiredEnergy, 10),
-        is_recurrent: task.recurringTaskState !== null,
-        task_repeat_frequency: task.recurringTaskState ? task.recurringTaskState.recurringTaskStateId : null,
-        task_repeat_end_date: task.recurrenceEndDate ? task.recurrenceEndDate.split('T')[0] : null,
-        task_priority: task.taskPriority.taskPriorityName,
+        taskId: task.id,
+        taskCategoryId: task.category ? task.category.idCategory : null,
+        isTaskCompleted: task.taskCompleted,
+        taskName: task.taskName,
+        userEmail: localStorage.getItem('username'),
+        taskStartDate: newStartDate.toLocaleString('sv-SE').replace(' ', 'T'),
+        taskEndDate: newEndDate.toLocaleString('sv-SE').replace(' ', 'T'),
+        taskDescription: task.taskDescription,
+        taskRequiredEnergy: parseInt(task.taskRequiredEnergy, 10),
+        isRecurrent: task.recurringTaskState !== null,
+        taskRepeatFrequencyId: task.recurringTaskState ? task.recurringTaskState.recurringTaskStateId : null,
+        taskRepeatEndDate: task.recurrenceEndDate ? task.recurrenceEndDate.split('T')[0] : null,
+        taskPriority: task.taskPriority.taskPriorityName,
       },
       {},
       true,
       false
-    )
-      .then(() => {
-        // Refresh the tasks after updating
-        retrieveTasksForWeek(true, false);
-        setTriggerRefresh(!triggerRefresh);
-      })
-      .catch((error) => {
-        alert.setAlert('Failed to update task. Please try again.', 'error');
-      });
+    );
+
+    if (result.status !== 200) {
+      alert.setAlert('Failed to update task position', 'error');
+    } else {
+      alert.setAlert('Task position updated', 'success');
+    }
+
+    retrieveTasksForWeek(true, false);
+    setTriggerRefresh(!triggerRefresh);
 
     setSelectedTask(null); // Clear selected task after dragging
   }
