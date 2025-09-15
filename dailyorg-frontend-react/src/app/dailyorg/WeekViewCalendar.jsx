@@ -177,7 +177,6 @@ export default function WeekViewCalendar({ calendarRefreshCallback, settings, tr
 
   const handleAddTaskFormSubmit = async (event) => {
     event.preventDefault();
-    console.log(`Submitting task data for '${isEditingTask ? 'edit' : 'new'}':`, taskData);
 
     if (taskData.isRecurrent && taskData.repeatEndDate == null) {
       alert.setAlert('Please provide both repeat frequency and end date for recurring tasks.', 'error');
@@ -213,7 +212,7 @@ export default function WeekViewCalendar({ calendarRefreshCallback, settings, tr
       handleAddTask(false); // Hide the form after successful submission
       alert.setAlert(`Task ${isEditingTask ? 'updated' : 'added'} successfully`, 'success');
     } catch (err) {
-      alert.setAlert(`Failed to ${isEditingTask ? 'update' : 'add'} task: ${err.message}`, 'error');
+      alert.setAlert(`Failed to ${isEditingTask ? 'update' : 'add'} task`, 'error');
     }
   };
 
