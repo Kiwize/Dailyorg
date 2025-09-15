@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -41,6 +42,7 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 
 @RestController
+@Validated
 @RequestMapping("/api/task")
 @AllArgsConstructor
 public class TaskController {
@@ -89,7 +91,9 @@ public class TaskController {
 			
 			//Check for recurring task state
 			if(isRecurrent)
-				updateRecurringTaskState(task, taskDTO.getTaskRepeatFrequencyId(), taskDTO.getTaskRepeatEndDate());
+				if(!updateRecurringTaskState(task, taskDTO.getTaskRepeatFrequencyId(), taskDTO.getTaskRepeatEndDate())) {
+					return ResponseEntity.badRequest().body(EErrorMessages.DATA_NOT_FOUND.getMessage() + " (recurring task state)");
+				}
 			
 			
 			Optional<AppUser> user = appUserService.findByEmail(userEmail);

@@ -30,5 +30,6 @@
             "runWith": "host-with-password",
             "name": "DailyOrganizer"
         }
-    }
+    },
+    "java.configuration.updateBuildConfiguration": "interactive"
 }

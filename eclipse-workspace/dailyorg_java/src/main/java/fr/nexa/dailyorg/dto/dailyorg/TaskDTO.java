@@ -14,7 +14,7 @@ public class TaskDTO {
 	private Long taskId;
 	private Long taskCategoryId;
 	
-	private Boolean isTaskCompleted;
+	private Boolean isTaskCompleted = false;
 	
 	@NotNull
 	private String taskName;
@@ -25,7 +25,7 @@ public class TaskDTO {
 	@NotNull
 	private LocalDateTime taskEndDate;
 	
-	private String taskDescription;
+	private String taskDescription = "";
 	
 	@NotNull
 	private int taskRequiredEnergy;
@@ -33,7 +33,7 @@ public class TaskDTO {
 	@NotNull
 	private String taskPriority;
 	
-	private Boolean isRecurrent;
+	private Boolean isRecurrent = false;
 	
 	private Long taskRepeatFrequencyId;
 	

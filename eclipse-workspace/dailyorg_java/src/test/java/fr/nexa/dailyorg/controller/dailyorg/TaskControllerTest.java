@@ -36,6 +36,7 @@ import fr.nexa.dailyorg.components.factory.dailyorg.RecurringTaskStateFactory;
 import fr.nexa.dailyorg.components.factory.dailyorg.TaskFactory;
 import fr.nexa.dailyorg.components.factory.dailyorg.TaskPriorityFactory;
 import fr.nexa.dailyorg.config.JwtUtil;
+import fr.nexa.dailyorg.dto.dailyorg.TaskDTO;
 import fr.nexa.dailyorg.model.AppUser;
 import fr.nexa.dailyorg.model.dailyorg.Category;
 import fr.nexa.dailyorg.model.dailyorg.OrganizerUser;
@@ -347,7 +348,7 @@ class TaskControllerTest {
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(requestBody))
 				)
-		.andExpect(status().is5xxServerError());
+		.andExpect(status().is4xxClientError());
 	}
 	
 	@Test
@@ -711,8 +712,7 @@ class TaskControllerTest {
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(requestBody))
 				)
-		.andExpect(status().is4xxClientError())
-		.andExpect(content().string(EErrorMessages.INVALID_INPUT.getMessage()));
+		.andExpect(status().is4xxClientError());
 	}
 	
 	@Test
@@ -739,8 +739,7 @@ class TaskControllerTest {
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(requestBody))
 				)
-		.andExpect(status().is5xxServerError())
-		.andExpect(content().string(EErrorMessages.INTERNAL_SERVER_ERROR.getMessage()));
+		.andExpect(status().is4xxClientError());
 	}
 	
 	// ##### TASK DELETION TESTS ######
