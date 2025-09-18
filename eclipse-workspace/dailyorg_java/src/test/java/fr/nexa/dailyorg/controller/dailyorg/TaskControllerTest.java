@@ -36,7 +36,6 @@ import fr.nexa.dailyorg.components.factory.dailyorg.RecurringTaskStateFactory;
 import fr.nexa.dailyorg.components.factory.dailyorg.TaskFactory;
 import fr.nexa.dailyorg.components.factory.dailyorg.TaskPriorityFactory;
 import fr.nexa.dailyorg.config.JwtUtil;
-import fr.nexa.dailyorg.dto.dailyorg.TaskDTO;
 import fr.nexa.dailyorg.model.AppUser;
 import fr.nexa.dailyorg.model.dailyorg.Category;
 import fr.nexa.dailyorg.model.dailyorg.OrganizerUser;

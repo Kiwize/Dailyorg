@@ -30,7 +30,5 @@ public class MuscleSeeder {
                 muscleRepository.save(Muscle.builder().name(muscleName).build());
             }
         });
-
-        System.out.println("✅ Muscles populated successfully!");
     }
 }

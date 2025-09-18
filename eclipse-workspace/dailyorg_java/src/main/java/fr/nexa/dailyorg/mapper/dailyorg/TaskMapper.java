@@ -22,11 +22,12 @@ public class TaskMapper {
 		dto.setTaskName(task.getTaskName());
 		dto.setTaskDescription(task.getTaskDescription());
 		dto.setTaskCreationDate(task.getTaskCreationDate().toString());
-		dto.setTaskCompletionDate(
-				task.getTaskCompletionDate() != null ? task.getTaskCompletionDate().toString() : null);
+		dto.setTaskCompletionDate(task.getTaskCompletionDate() != null ? task.getTaskCompletionDate().toString() : null);
 		dto.setTaskRequiredEnergy(task.getTaskRequiredEnergy());
 		dto.setTaskStartDate(task.getTaskStartDate());
 		dto.setTaskEndDate(task.getTaskEndDate());
+		dto.setIsTaskCompleted(task.isTaskCompleted());
+		dto.setTaskRepeatEndDate(task.getRecurrenceEndDate().toLocalDate());
 		return dto;
 	}
 
@@ -40,11 +41,12 @@ public class TaskMapper {
 		task.setTaskName(dto.getTaskName());
 		task.setTaskDescription(dto.getTaskDescription());
 		task.setTaskCreationDate(LocalDateTime.parse(dto.getTaskCreationDate()));
-		task.setTaskCompletionDate(
-				dto.getTaskCompletionDate() != null ? LocalDateTime.parse(dto.getTaskCompletionDate()) : null);
+		task.setTaskCompletionDate(dto.getTaskCompletionDate() != null ? LocalDateTime.parse(dto.getTaskCompletionDate()) : null);
 		task.setTaskRequiredEnergy(dto.getTaskRequiredEnergy());
 		task.setTaskStartDate(dto.getTaskStartDate());
 		task.setTaskEndDate(dto.getTaskEndDate());
+		task.setTaskCompleted(dto.getIsTaskCompleted() != null ? dto.getIsTaskCompleted() : false);
+		task.setRecurrenceEndDate(dto.getTaskRepeatEndDate().atStartOfDay());
 		return task;
 	}
 

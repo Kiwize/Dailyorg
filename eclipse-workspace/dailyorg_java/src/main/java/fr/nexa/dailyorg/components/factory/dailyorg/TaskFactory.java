@@ -1,6 +1,7 @@
 package fr.nexa.dailyorg.components.factory.dailyorg;
 
 import java.time.LocalDateTime;
+import java.util.Random;
 import java.util.UUID;
 
 import com.github.javafaker.Faker;
@@ -11,12 +12,13 @@ import fr.nexa.dailyorg.model.dailyorg.Task;
 public class TaskFactory {
 	
 	private final Faker faker = Faker.instance();
+	private final Random random = new Random();
 	
 	public Task createOneTask() {
 		return Task.builder()
 				.taskName(faker.lorem().word())
 				.taskDescription(faker.lorem().sentence())
-				.taskRequiredEnergy((int) (Math.random() * 10))
+				.taskRequiredEnergy(random.nextInt(11))
 				.taskStartDate(LocalDateTime.now().toLocalDate().atStartOfDay().plusHours(8))
 				.taskEndDate(LocalDateTime.now().toLocalDate().atStartOfDay().plusHours(9))
 				.isTaskCompleted(false)
@@ -30,7 +32,7 @@ public class TaskFactory {
 		return Task.builder()
 				.taskName(faker.lorem().word())
 				.taskDescription(faker.lorem().sentence())
-				.taskRequiredEnergy((int) (Math.random() * 10))
+				.taskRequiredEnergy(random.nextInt(11))
 				.taskStartDate(LocalDateTime.now().toLocalDate().atStartOfDay().plusHours(8))
 				.taskEndDate(LocalDateTime.now().toLocalDate().atStartOfDay().plusHours(9))
 				.isTaskCompleted(false)
@@ -46,7 +48,7 @@ public class TaskFactory {
 		return Task.builder()
 				.taskName(faker.lorem().word())
 				.taskDescription(faker.lorem().sentence())
-				.taskRequiredEnergy((int) (Math.random() * 10))
+				.taskRequiredEnergy(random.nextInt(11))
 				.taskStartDate(LocalDateTime.now().toLocalDate().atStartOfDay().plusHours(8))
 				.taskEndDate(LocalDateTime.now().toLocalDate().atStartOfDay().plusHours(9))
 				.isTaskCompleted(false)

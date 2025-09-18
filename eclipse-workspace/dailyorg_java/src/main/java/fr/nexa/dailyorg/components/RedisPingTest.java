@@ -19,9 +19,7 @@ public class RedisPingTest {
     public void ping() {
         try {
             redisTemplate.opsForValue().set("pingkey", "pong");
-            System.out.println("Redis test OK");
         } catch (Exception e) {
-            System.err.println("Redis test KO");
             Logger.getLogger(RedisPingTest.class.getName()).severe("Redis connection failed: " + e.getMessage());
         }
     }

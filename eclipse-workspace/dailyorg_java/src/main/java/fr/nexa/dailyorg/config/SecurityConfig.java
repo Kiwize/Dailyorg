@@ -39,7 +39,7 @@ public class SecurityConfig {
 		return http.cors(cors -> cors.configurationSource(corsConfigurationSource())).csrf(csrf -> csrf.disable())
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authorizeHttpRequests(
-						auth -> auth.requestMatchers(new String[] { "/api/login", "/api/user/me", "/api/health", "/api/register", "/api/auth/status", "/api/logout", "/uploads/profile_pictures/**" })
+						auth -> auth.requestMatchers("/api/login", "/api/user/me", "/api/health", "/api/register", "/api/auth/status", "/api/logout", "/uploads/profile_pictures/**")
 								.permitAll().requestMatchers("/api/**").authenticated())
 				.authorizeHttpRequests(auth -> auth.requestMatchers("/api/category/create").hasRole("ADMIN"))
 				.authorizeHttpRequests(auth -> auth.requestMatchers("/api/category/create/**").hasRole("USER"))

@@ -18,6 +18,7 @@ import fr.nexa.dailyorg.dto.AppUserDTO;
 import fr.nexa.dailyorg.mapper.AppUserMapper;
 import fr.nexa.dailyorg.model.AppUser;
 import fr.nexa.dailyorg.service.AppUserService;
+import fr.nexa.dailyorg.utils.EErrorMessages;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -60,7 +61,7 @@ public class AppUserController {
 			return ResponseEntity.ok(appUserService.addUser(user));
 		} catch (Exception e) {
 			Logger.getLogger(AppUserController.class.getName()).severe("Error creating user: " + e.getMessage());
-			return ResponseEntity.internalServerError().body("Internal error...");
+			return ResponseEntity.internalServerError().body(EErrorMessages.INTERNAL_SERVER_ERROR.getMessage());
 		}
 	}
 
@@ -124,7 +125,7 @@ public class AppUserController {
 
 		} catch (Exception e) {
 			Logger.getLogger(AppUserController.class.getName()).severe("Error updating user: " + e.getMessage());
-			return ResponseEntity.internalServerError().body("Internal error...");
+			return ResponseEntity.internalServerError().body(EErrorMessages.INTERNAL_SERVER_ERROR.getMessage());
 		}
 	}
 
@@ -140,7 +141,7 @@ public class AppUserController {
 			}
 		} catch (Exception e) {
 			Logger.getLogger(AppUserController.class.getName()).severe("Error fetching current user: " + e.getMessage());
-			return ResponseEntity.internalServerError().body("Internal error...");
+			return ResponseEntity.internalServerError().body(EErrorMessages.INTERNAL_SERVER_ERROR.getMessage());
 		}
 	}
 

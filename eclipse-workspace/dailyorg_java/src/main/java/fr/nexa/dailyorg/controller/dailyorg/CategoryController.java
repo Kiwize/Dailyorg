@@ -1,6 +1,7 @@
 package fr.nexa.dailyorg.controller.dailyorg;
 
 import java.util.List;
+import java.util.MissingResourceException;
 import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
@@ -46,12 +47,12 @@ public class CategoryController {
 			String userEmail = jwtUtil.extractUsernameFromCookies(request.getCookies());
 			Optional<AppUser> user = appUserService.findByEmail(userEmail);
 			if (user.isEmpty()) {
-				throw new Exception(EErrorMessages.USER_NOT_FOUND.getMessage());
+				throw new IllegalStateException(EErrorMessages.USER_NOT_FOUND.getMessage());
 			}
 			
 			Category category = categoryMapper.toEntity(categoryDTO);
 			if(category == null)
-				throw new Exception("Category mapping failed");
+				throw new IllegalStateException("Category mapping failed");
 			
 			category.setOrganizerUser(user.get().getOrganizerUser());
 			
@@ -67,18 +68,18 @@ public class CategoryController {
 		try {
 			Category category = categoryMapper.toEntity(categoryDTO);
 			if(category == null)
-				throw new Exception("Category mapping failed");
+				throw new IllegalStateException("Category mapping failed");
 			
 			String userEmail = jwtUtil.extractUsernameFromCookies(request.getCookies());
 			Optional<AppUser> user = appUserService.findByEmail(userEmail);
 			if (user.isEmpty()) {
-				throw new Exception(EErrorMessages.USER_NOT_FOUND.getMessage());
+				throw new IllegalStateException(EErrorMessages.USER_NOT_FOUND.getMessage());
 			}
 			
 			Category existingCategory = categoryService.findById(category.getIdCategory());
 			
 			if(existingCategory.getOrganizerUser() == null || existingCategory.getOrganizerUser().getOrganizerUserId() != (user.get().getOrganizerUser().getOrganizerUserId())) {
-				throw new Exception(EErrorMessages.OPERATION_NOT_PERMITTED.getMessage());
+				throw new IllegalStateException(EErrorMessages.OPERATION_NOT_PERMITTED.getMessage());
 			}
 			
 			//Check for tasks using this category
@@ -101,7 +102,7 @@ public class CategoryController {
 		try {
 			Category category = categoryMapper.toEntity(categoryDTO);
 			if(category == null)
-				throw new Exception("Category mapping failed");
+				throw new IllegalStateException("Category mapping failed");
 			
 			Category existingCategory = categoryService.findById(category.getIdCategory());
 			existingCategory.setTaskCategoryName(category.getTaskCategoryName());
@@ -122,7 +123,7 @@ public class CategoryController {
 			
 			Optional<AppUser> user = appUserService.findByEmail(userEmail);
 			if (user.isEmpty()) {
-				throw new Exception(EErrorMessages.USER_NOT_FOUND.getMessage());
+				throw new IllegalStateException(EErrorMessages.USER_NOT_FOUND.getMessage());
 			}
 			return ResponseEntity.ok(categoryService.findAllByOrganizerUser(user.get().getOrganizerUser().getOrganizerUserId()));
 		} catch (Exception e) {
@@ -135,7 +136,7 @@ public class CategoryController {
 		try {
 			Category category = categoryService.findById(id);
 			if (category == null) {
-				throw new Exception(EErrorMessages.RESOURCE_NOT_FOUND.getMessage());
+				throw new IllegalStateException(EErrorMessages.RESOURCE_NOT_FOUND.getMessage());
 			}
 			
 			return ResponseEntity.ok(category);

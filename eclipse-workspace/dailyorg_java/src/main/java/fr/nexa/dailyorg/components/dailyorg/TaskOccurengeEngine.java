@@ -28,7 +28,7 @@ public class TaskOccurengeEngine {
 	public void handleTaskChangedEvent(TaskChangedEvent event) {
 		// Handle the task change event
 		// This method will be called when a task is created, updated or deleted
-		List<Task> tasksToDelete = new ArrayList<>();
+		List<Task> tasksToDelete;
 
 		Task task = taskService.getTaskById(event.getTaskId());
 		if (task == null && event.getChangeType() != TaskChangedEvent.TaskChangeType.DELETED) {
@@ -99,9 +99,6 @@ public class TaskOccurengeEngine {
 		// Logic to create task occurrences based on the recurring task state
 		// This method should handle the logic to create occurrences based on the
 		// frequency and time interval
-		List<Long> affectedTasks = new ArrayList<>();
-		affectedTasks.add(task.getId());
-
 		LocalDateTime computedStartDate = task.getTaskStartDate();
 		LocalDateTime computedEndDate = task.getTaskEndDate();
 
